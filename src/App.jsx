@@ -358,8 +358,31 @@ CRITICAL — NEVER write:
 
 /* ─── System prompts ─── */
 const buildConverterSystem = (ids) => {
-  const rules  = ids.map(id => DIALECT_RULES[id]).join("\n");
+  const rules  = ids.map(id => DIALECT_RULES[id]).join("\n\n---\n\n");
   const tmpl   = ids.map(id => `  "${id}": "..."`).join(",\n");
+  const checklists = ids.map(id => {
+    if (id === "haryanvi") return `
+HARYANVI CRITICAL ENFORCEMENT (verify every sentence before output):
+✅ है → सै | हैं → सैं | हूँ → सूं (MANDATORY — if you see "बा" or "है" in Haryanvi output, you FAILED)
+✅ -ना infinitives → -णा (जाना→जाणा, करना→करणा, देखना→देखणा, आना→आणा)
+✅ नहीं → ना / कोनी | बहुत → घणा | क्या → के | मैं → म्हैं | मेरा → म्हारा
+❌ ZERO Bhojpuri words allowed: बा, बाड़न, नाहीं, हमके, ऊ, ओकरा, काहे, केतना — these are BHOJPURI, NOT Haryanvi
+❌ NEVER use "है" at sentence end — always "सै"`;
+    if (id === "rajasthani") return `
+RAJASTHANI CRITICAL ENFORCEMENT (verify every sentence before output):
+✅ है/हैं → छे (MANDATORY — if you see "बा" or "है" in Rajasthani output, you FAILED)
+✅ नहीं → कोनी (MANDATORY — NEVER write "नहीं" or "नाहीं" in Rajasthani)
+✅ -ना infinitives → -णो (जाना→जावणो, करना→करणो, देखना→देखणो)
+✅ बहुत → घणो/घणी | क्या → के/शा | मैं → म्हैं | मेरा → म्हारो | कहाँ → कठे
+❌ ZERO Bhojpuri words allowed: बा, बाड़न, नाहीं, हमके, ऊ, ओकरा, काहे — these are BHOJPURI, NOT Rajasthani
+❌ NEVER use "है" or "नहीं" — always "छे" and "कोनी"`;
+    if (id === "bhojpuri") return `
+BHOJPURI CRITICAL ENFORCEMENT:
+✅ है → बा | हैं → बाड़न | हूँ → बानी
+✅ नहीं → नाहीं | मैं → हम | मुझे → हमके | वो → ऊ
+❌ NEVER use "है", "नहीं", "मैं" in Bhojpuri output`;
+    return "";
+  }).filter(Boolean).join("\n");
   return `You are an expert linguist specializing in Indian regional languages and dialects.
 
 STEP 1 — AUTO-DETECT INPUT LANGUAGE:
@@ -367,16 +390,20 @@ The input script may be in ANY language: Hindi, English, Hinglish, Bhojpuri, Har
 Silently identify the source language. Do NOT mention it in your output.
 
 STEP 2 — UNDERSTAND THE MEANING:
-Read the full script semantically. Understand the story, emotion, characters, and intent.
+Extract the MEANING, story, emotion, and intent from the input. Do NOT copy words from the source language.
+⚠️ CRITICAL: If input is in Bhojpuri — do NOT carry over any Bhojpuri words (बा, नाहीं, हमके, ऊ, काहे) into Haryanvi or Rajasthani outputs.
+⚠️ CRITICAL: Each dialect output must be written INDEPENDENTLY from scratch using only that dialect's vocabulary.
 
-STEP 3 — CONVERT TO EACH TARGET DIALECT:
-For each dialect listed below, rewrite the script completely in that authentic dialect.
-- If input is already in a target dialect: refine it to sound more natural, don't return as-is.
+STEP 3 — CONVERT TO EACH TARGET DIALECT INDEPENDENTLY:
+For each dialect below, write a COMPLETELY FRESH version using ONLY that dialect's grammar and vocabulary.
+- Each output must sound like a NATIVE SPEAKER of that dialect wrote it from scratch.
 - Preserve the original meaning, emotion, and structure across all versions.
 - Show names, "Stage", and proper nouns must be preserved exactly as given.
 
 DIALECT RULES — apply strictly for each dialect:
 ${rules}
+
+${checklists}
 
 OUTPUT FORMAT — respond with ONLY this valid JSON, nothing else:
 {
