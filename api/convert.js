@@ -3,7 +3,7 @@ const OPENROUTER_KEY = process.env.OPENROUTER_KEY || "sk-or-v1-a98ada01f250a11fe
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
 
-  const { system, messages } = req.body;
+  const { system, messages, model } = req.body;
   if (!messages) return res.status(400).json({ error: "messages required" });
 
   const orRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -15,7 +15,7 @@ export default async function handler(req, res) {
       "X-Title": "Stage Converter",
     },
     body: JSON.stringify({
-      model: "anthropic/claude-sonnet-4-5",
+      model: model || "anthropic/claude-sonnet-4-5",
       max_tokens: 4096,
       stream: true,
       messages: system

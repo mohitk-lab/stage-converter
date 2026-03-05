@@ -1,11 +1,11 @@
 import { useState, useRef, useCallback } from "react";
 
 /* ─── Streaming fetch helper ─── */
-async function streamConvert(body) {
+async function streamConvert({ model, system, messages }) {
   const res = await fetch("/api/convert", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ model, system, messages }),
   });
   if (!res.ok) {
     const e = await res.json().catch(() => ({}));
@@ -95,6 +95,11 @@ OUTPUT FORMAT — respond with ONLY this JSON, nothing else:
 ${tmpl}
 }`;
 };
+
+const buildSingleConverterSystem = (id) =>
+  `You are an expert linguist. Convert the script to authentic ${id} dialect.
+${DIALECT_RULES[id]}
+Respond with ONLY the converted text. No JSON, no labels, no explanation.`;
 
 const TONES = [
   { id:"dramatic",  icon:"🎬", label:"Dramatic",
@@ -463,6 +468,85 @@ ${tmpl}
 }`;
 };
 
+/* ─── Single-dialect promo/story system builders ─── */
+const SINGLE_TMPL = `{"hooks":["h1","h2","h3","h4","h5","h6","h7","h8"],"voScript":"150-250 word VO — no timestamps, pure flowing text","captions":["c1 with hashtags","c2","c3","c4","c5","c6"],"ctas":["cta1","cta2","cta3"]}`;
+
+const buildSinglePromoSystem = (id, tone, contentType, length, intensity, platform, showContext, genre, targetEmotion, duration, cast, plotPoints) => {
+  const t    = TONES.find(x=>x.id===tone);
+  const ct   = CONTENT_TYPES.find(x=>x.id===contentType);
+  const ln   = LENGTHS.find(x=>x.id===length);
+  const intn = INTENSITIES.find(x=>x.id===intensity);
+  const plt  = PLATFORMS.find(x=>x.id===platform);
+  const contextBlock = showContext?.trim() ? `SHOW CONTEXT:\n${showContext.trim()}` : `No show context — write for a generic Stage OTT promo.`;
+  const genreBlock = genre ? `GENRE: ${genre.toUpperCase()}` : "";
+  const emotionBlock = targetEmotion ? `TARGET EMOTION: ${targetEmotion.toUpperCase()}` : "";
+  const durationBlock = duration ? `PROMO DURATION: ${duration}s (~2.5 words/second)` : "";
+  const castBlock = cast?.trim() ? `STAR CAST: ${cast.trim()}` : "";
+  const plotBlock = plotPoints?.trim() ? `KEY PLOT POINTS:\n${plotPoints.trim()}` : "";
+  const dialectCTAs = {
+    bhojpuri:["Stage pe देखीं — सात दिन अनलिमिटेड बा","एक रुपिया में ट्रायल करीं"],
+    haryanvi:["Stage पे देखो — सात दिन अनलिमिटेड सै","एक रुपिया में ट्रायल करो"],
+    rajasthani:["Stage पर देखो — सात दिन अनलिमिटेड छे","एक रुपिया में ट्रायल करो"],
+    gujarati:["Stage પર જુઓ — સાત દિવસ અनलिमिटेड","એક રૂપિयामां ट्रायल"],
+    marathi:["Stage वर पाहा — सात दिवस अनलिमिटेड","एक रुपयात ट्रायल करा"],
+    punjabi:["Stage ਤੇ ਦੇਖੋ — ਸੱਤ ਦਿਨ ਅਨਲਿਮਿਟਿਡ","ਇੱਕ ਰੁਪਏ ਵਿੱਚ ਟ੍ਰਾਇਲ"],
+  };
+  const ctaBlock = dialectCTAs[id] ? `${id.toUpperCase()} CTAs: ${dialectCTAs[id].join(" | ")}` : "";
+  return `You are a senior promo writer for Stage OTT. Write promo content in ${id.toUpperCase()} dialect only.
+${contextBlock}
+${genreBlock}${emotionBlock}${durationBlock}${castBlock}${plotBlock}
+${t?.prompt}
+${ct?.prompt}
+${ln?.prompt}
+${intn?.prompt}
+${plt?.prompt}
+Write 8 hooks (one per category: pattern-interrupt, curiosity-gap, social-proof, emotional-trigger, fear-loss-aversion, trend-jacking, ugc-reaction, cliffhanger), a VO script, 6 captions, and 3 CTAs.
+"Stage" is never translated. Show/character names preserved exactly.
+${ctaBlock}
+DIALECT RULES:
+${DIALECT_RULES[id]}
+OUTPUT FORMAT — ONLY this valid JSON, nothing else:
+${SINGLE_TMPL}`;
+};
+
+const buildSingleStorySystem = (id, tone, contentType, length, intensity, platform, showContext, storyBible) => {
+  const t    = TONES.find(x=>x.id===tone);
+  const ct   = CONTENT_TYPES.find(x=>x.id===contentType);
+  const ln   = LENGTHS.find(x=>x.id===length);
+  const intn = INTENSITIES.find(x=>x.id===intensity);
+  const plt  = PLATFORMS.find(x=>x.id===platform);
+  const contextBlock = showContext?.trim() ? `SHOW REFERENCE:\n${showContext.trim()}` : "";
+  const bibleLines = [];
+  if(storyBible){
+    if(storyBible.protagonist)     bibleLines.push(`PROTAGONIST: ${storyBible.protagonist}`);
+    if(storyBible.protaGoal)       bibleLines.push(`PROTAGONIST'S GOAL: ${storyBible.protaGoal}`);
+    if(storyBible.protaFlaw)       bibleLines.push(`FLAW/WOUND: ${storyBible.protaFlaw}`);
+    if(storyBible.antagonist)      bibleLines.push(`ANTAGONIST: ${storyBible.antagonist}`);
+    if(storyBible.act1)            bibleLines.push(`ACT 1: ${storyBible.act1}`);
+    if(storyBible.act2)            bibleLines.push(`ACT 2: ${storyBible.act2}`);
+    if(storyBible.act3)            bibleLines.push(`ACT 3: ${storyBible.act3}`);
+    if(storyBible.twist)           bibleLines.push(`TWIST: ${storyBible.twist}`);
+    if(storyBible.climax)          bibleLines.push(`CLIMAX: ${storyBible.climax}`);
+    if(storyBible.cast)            bibleLines.push(`CAST: ${storyBible.cast}`);
+    if(storyBible.keyDialogues)    bibleLines.push(`KEY DIALOGUES:\n${storyBible.keyDialogues}`);
+  }
+  const bibleBlock = bibleLines.length ? `STORY BIBLE:\n${bibleLines.join("\n")}` : "";
+  return `You are a senior promo writer for Stage OTT. Read the story and CREATE original ${id.toUpperCase()} dialect promo content — do NOT translate, write as a local writer from that region.
+${contextBlock}
+${bibleBlock}
+${t?.prompt}
+${ct?.prompt}
+${ln?.prompt}
+${intn?.prompt}
+${plt?.prompt}
+Write 8 hooks, a VO script (150-250 words), 6 captions, and 3 CTAs. All in ${id} dialect.
+"Stage" is never translated. Character names preserved exactly.
+DIALECT RULES:
+${DIALECT_RULES[id]}
+OUTPUT FORMAT — ONLY this valid JSON, nothing else:
+${SINGLE_TMPL}`;
+};
+
 /* ─── History ─── */
 const LS_KEY     = "openrouter_api_key";
 const LS_HISTORY = "ruhi_history";
@@ -811,13 +895,13 @@ function ConverterTab() {
     setLoading(true);setError("");setResults(null);
     const ids=DIALECTS.filter(d=>sel.has(d.id)).map(d=>d.id);
     try {
-      const raw=await streamConvert({system:buildConverterSystem(ids),messages:[{role:"user",content:`Convert this script:\n\n${script}`}]});
-      const m=raw.replace(/```json|```/gi,"").trim().match(/\{[\s\S]*\}/);
-      if(!m)throw new Error("Response parse nahi hua. Dobara try karo.");
-      const parsed=JSON.parse(m[0]);
-      const miss=ids.filter(id=>!parsed[id]);
-      if(miss.length)throw new Error(`Missing: ${miss.join(", ")}. Dobara try karo.`);
-      setResults(parsed);
+      await Promise.all(ids.map(id =>
+        streamConvert({
+          model:"anthropic/claude-haiku-4-5",
+          system:buildSingleConverterSystem(id),
+          messages:[{role:"user",content:`Convert this script:\n\n${script}`}]
+        }).then(raw => setResults(prev=>({...(prev||{}), [id]:raw.trim()})))
+      ));
     }catch(e){setError(e.message);}
     setLoading(false);
   };
@@ -859,12 +943,18 @@ function ConverterTab() {
 
       {error&&<div style={{background:"rgba(239,68,68,0.07)",border:"1px solid rgba(239,68,68,0.18)",borderRadius:"13px",padding:"13px 16px",color:"#fca5a5",marginBottom:"12px",fontSize:"13px",display:"flex",gap:"9px"}}><span>⚠</span><span>{error}</span></div>}
 
-      {loading&&<div style={CARD}><div style={{padding:"56px 24px",textAlign:"center"}}><div style={{display:"flex",justifyContent:"center",gap:"10px",marginBottom:"24px"}}>{[0,1,2].map(i=><div key={i} style={{width:"11px",height:"11px",borderRadius:"50%",background:"linear-gradient(135deg,#f59e0b,#ef4444)",boxShadow:"0 0 14px rgba(245,158,11,0.55)",animation:`pulse 1.3s ${i*0.22}s ease-in-out infinite`}}/>)}</div><div style={{fontSize:"14px",color:"#94a3b8",fontWeight:700}}>Claude analyzing your script…</div><div style={{fontSize:"11px",color:"#334155",marginTop:"6px"}}>{ids.map(id=>DIALECTS.find(d=>d.id===id)?.sub).join(" · ")}</div></div></div>}
+      {loading&&<div style={CARD}><div style={{padding:"32px 24px",textAlign:"center"}}>
+        <div style={{display:"flex",justifyContent:"center",gap:"10px",marginBottom:"16px"}}>{[0,1,2].map(i=><div key={i} style={{width:"11px",height:"11px",borderRadius:"50%",background:"linear-gradient(135deg,#f59e0b,#ef4444)",boxShadow:"0 0 14px rgba(245,158,11,0.55)",animation:`pulse 1.3s ${i*0.22}s ease-in-out infinite`}}/>)}</div>
+        <div style={{fontSize:"14px",color:"#94a3b8",fontWeight:700,marginBottom:"10px"}}>Converting in parallel…</div>
+        <div style={{display:"flex",flexWrap:"wrap",gap:"6px",justifyContent:"center"}}>
+          {ids.map(id=>{const d=DIALECTS.find(x=>x.id===id);const done=results&&results[id];return <span key={id} style={{fontSize:"11px",padding:"3px 10px",borderRadius:"8px",border:`1px solid ${done?d.color+"60":"rgba(255,255,255,0.08)"}`,color:done?d.color:"#334155",background:done?d.color+"12":"transparent",fontWeight:done?700:400}}>{done?"✓ ":""}{d?.sub}</span>;})}
+        </div>
+      </div></div>}
 
       {results&&(
         <>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px",background:"rgba(34,197,94,0.05)",border:"1px solid rgba(34,197,94,0.13)",borderRadius:"13px",padding:"13px 18px",flexWrap:"wrap",gap:"8px"}}>
-            <div style={{display:"flex",alignItems:"center",gap:"10px"}}><span style={{fontSize:"18px"}}>✅</span><div><div style={{fontSize:"13px",fontWeight:700,color:"#f1f5f9"}}>{ids.length} conversion{ids.length>1?"s":""} complete</div><div style={{fontSize:"10.5px",color:"#475569"}}>Ready to copy & use</div></div></div>
+            <div style={{display:"flex",alignItems:"center",gap:"10px"}}><span style={{fontSize:"18px"}}>{loading?"⏳":"✅"}</span><div><div style={{fontSize:"13px",fontWeight:700,color:"#f1f5f9"}}>{Object.keys(results).length}/{ids.length} conversion{ids.length>1?"s":""} {loading?"in progress…":"complete"}</div><div style={{fontSize:"10.5px",color:"#475569"}}>Ready to copy & use</div></div></div>
             <div style={{display:"flex",gap:"7px"}}>
               <button onClick={copyAll} className="gb" style={{padding:"5px 12px",borderRadius:"8px",border:"1px solid rgba(255,255,255,0.08)",cursor:"pointer",fontWeight:600,fontSize:"11px",background:"transparent",color:copied==="all"?"#22c55e":"#64748b"}}>{copied==="all"?"✓ Copied!":"Copy All"}</button>
               <button onClick={()=>{setResults(null);setScript("");}} className="gb" style={{padding:"5px 12px",borderRadius:"8px",border:"1px solid rgba(255,255,255,0.08)",cursor:"pointer",fontWeight:600,fontSize:"11px",background:"transparent",color:"#64748b"}}>New Script</button>
@@ -912,22 +1002,26 @@ function PromoTab() {
     if(!input||sel.size===0)return;
     setLoading(true);setError("");setResults(null);
     const ids=DIALECTS.filter(d=>sel.has(d.id)).map(d=>d.id);
-    const sys = mode==="story"
-      ? buildStorySystem(ids,tone,contentType,length,intensity,platform,showContext,storyBible)
-      : buildPromoSystem(ids,tone,contentType,length,intensity,platform,showContext,genre,targetEmotion,duration,cast,plotPoints);
-    const userMsg = mode==="story"
-      ? `Yeh story hai. Isko samajhkar in dialects mein original promo content likho:\n\n${input}`
-      : `Is script ko in dialects mein convert karo:\n\n${input}`;
+    const accumulated={};
     try{
-      const raw=await streamConvert({system:sys,messages:[{role:"user",content:userMsg}]});
-      const m=raw.replace(/```json|```/gi,"").trim().match(/\{[\s\S]*\}/);
-      if(!m)throw new Error("Response parse nahi hua. Dobara try karo.");
-      const parsed=JSON.parse(m[0]);
-      const miss=ids.filter(id=>!parsed[id]);
-      if(miss.length)throw new Error(`Missing: ${miss.join(", ")}. Dobara try karo.`);
-      setResults(parsed);
+      await Promise.all(ids.map(id=>{
+        const sys = mode==="story"
+          ? buildSingleStorySystem(id,tone,contentType,length,intensity,platform,showContext,storyBible)
+          : buildSinglePromoSystem(id,tone,contentType,length,intensity,platform,showContext,genre,targetEmotion,duration,cast,plotPoints);
+        const userMsg = mode==="story"
+          ? `Yeh story hai. Isko samajhkar ${id} dialect mein original promo content likho:\n\n${input}`
+          : `Is script ko ${id} dialect mein convert karo:\n\n${input}`;
+        return streamConvert({model:"anthropic/claude-sonnet-4-5",system:sys,messages:[{role:"user",content:userMsg}]})
+          .then(raw=>{
+            const m=raw.replace(/```json|```/gi,"").trim().match(/\{[\s\S]*\}/);
+            if(!m)throw new Error(`${id}: parse nahi hua`);
+            const parsed=JSON.parse(m[0]);
+            accumulated[id]=parsed;
+            setResults(prev=>({...(prev||{}), [id]:parsed}));
+          });
+      }));
       setInnerTab("output");
-      const entry={id:Date.now(),ts:new Date().toISOString(),mode,script:input,selIds:ids,tone,contentType,length,intensity,platform,showContext,genre,targetEmotion,duration,cast,plotPoints,results:parsed};
+      const entry={id:Date.now(),ts:new Date().toISOString(),mode,script:input,selIds:ids,tone,contentType,length,intensity,platform,showContext,genre,targetEmotion,duration,cast,plotPoints,results:accumulated};
       setHistory(prev=>pushHistory(entry,prev));
     }catch(e){setError(e.message);}
     setLoading(false);
