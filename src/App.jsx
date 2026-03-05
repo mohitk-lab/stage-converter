@@ -52,17 +52,80 @@ const DIALECT_RULES = {
 - negation: नहीं→नाहीं, मत→जनि
 - words: क्या→का, क्यों→काहे, कैसे→कइसे, बहुत→बहुते, अच्छा→नीमन, बड़ा→बड़हन, अभी→अबहीं
 - flavor: sentence end में "हऊ","ना" add करो`,
-  haryanvi:`HARYANVI (Devanagari):
-- pronouns: मैं→म्हैं, मुझे→म्हाने, मेरा→म्हारा, तुम→तन्ने, आप→आपनै, वो→वो, यह→या
-- verbs: है→सै, हैं→सैं, जाना→जाणा, करना→करणा, देखना→देखणा, आना→आणा
-- words: बहुत→घणा, क्या→के, कैसे→किसां, कब→कद, अच्छा→बढ़िया, अभी→अबी
-- flavor: भाई, यार, छोरा, छोरी naturally use करो`,
-  rajasthani:`RAJASTHANI (Devanagari):
-- pronouns: मैं→म्हैं, मुझे→म्हाने, मेरा→म्हारो, तुम→थे, वो→ओ/उण, यह→आ
-- verbs: है→छे, हैं→छे, जाना→जावणो, करना→करणो, देखना→देखणो
-- negation: नहीं→कोनी
-- words: बहुत→घणो, क्या→के, कैसे→किंया, कब→कद, अच्छा→बढ़िया
-- flavor: राम राम सा, भाई naturally use करो`,
+  haryanvi:`HARYANVI (Devanagari) — authentic Haryana dialect:
+
+PRONOUNS:
+मैं→म्हैं, मुझे/मुझको→म्हाने, मेरा→म्हारा, मेरी→म्हारी, हम→म्हां, हमारा→म्हारा
+तुम→थारे, तुम्हें→थाने, तेरा→थारा, तू→तू, आप→आपनै
+वो/वह→वो, उसे→उसनै, उसका→उसका, यह→या, इसे→इसनै, ये→ये, वे→वे, उन्हें→उन्नै
+
+VERBS — present tense:
+है→सै, हैं→सैं, हूँ→हूँ, हो→हो
+होना→होणा, जाना→जाणा, करना→करणा, देखना→देखणा, आना→आणा
+खाना→खाणा, पीना→पीणा, लेना→लेणा, देना→देणा, बोलना→बोलणा
+रहना→रहणा, मिलना→मिलणा, सोना→सोणा, उठना→उठणा, बैठना→बैठणा
+मारना→मारणा, चलना→चलणा, बनना→बणणा, सुनना→सुणणा, समझना→समझणा
+लड़ना→लड़णा, हँसना→हँसणा, रोना→रोणा, भागना→भाजणा
+
+NEGATION: नहीं→ना/कोनी, मत→मत, नहीं होता→होता ना
+
+QUESTION WORDS:
+क्या→के, क्यों→क्यूं, कैसे→किसां, कब→कद, कहाँ→कड़ै/कठै, कौन→कौण, कितना→कित्ता
+
+COMMON WORDS:
+बहुत→घणा, अच्छा→बढ़िया, बुरा→खराब, अभी→अबी, यहाँ→यां, वहाँ→वां
+बड़ा→बड़ा, छोटा→छोटा, थोड़ा→थोड़ा सा, सब→सारे, कोई→कोई
+घर→घर, काम→काम, बात→बात, दिन→दिन, लोग→लोग
+आदमी→मर्द/बंदा, औरत→लुगाई, बच्चा→छोरा (लड़का)/छोरी (लड़की)
+दोस्त→यार, भाई→भाई/भाया, पैसा→पैसा, खाना→खाणा
+
+SENTENCE PATTERNS — sentence endings में use करो:
+सै (वो करता सै), सैं (वे जाते सैं), ना (कर ना भाई), री (सुण री)
+"देख भाई", "सुण यार", "हो जा", "कर दे", "बता दे"
+
+FLAVOR — naturally scatter करो:
+भाई, यार, छोरा, छोरी, बावली, बाहर सै, घणा बढ़िया, ठाड़ा रह
+Avoid: formal Hindi endings, -ता हूँ (instead use -ता हूँ only if natural, else restructure)`,
+
+  rajasthani:`RAJASTHANI/MARWARI (Devanagari) — authentic Rajasthan dialect:
+
+PRONOUNS:
+मैं→म्हैं, मुझे/मुझको→म्हाने, मेरा→म्हारो, मेरी→म्हारी, हम→म्हे, हमारा→म्हारो
+तुम→थे, तुम्हें→थाने, तेरा→थारो, तू→तूं, आप→आप/थे
+वो/वह→वो/उण, उसे→उणने, उसका→उणरो, यह→आ/इ, इसे→इणने, ये→ये, वे→वे/उणां
+
+VERBS — present tense (है→छे for Marwari):
+है→छे, हैं→छे, हूँ→हूँ, हो→छो
+होना→होवणो, जाना→जावणो, करना→करणो, देखना→देखणो/निरखणो
+आना→आवणो, खाना→खावणो, पीना→पीवणो, लेना→लेवणो, देना→देवणो
+बोलना→बोलणो, रहना→रहणो, मिलना→मिलणो, सोना→सोवणो
+उठना→उठणो, बैठना→बैठणो, मारना→मारणो, चलना→चालणो
+बनना→बणणो, सुनना→सुणणो, समझना→समझणो, लड़ना→लड़णो
+हँसना→हँसणो, रोना→रोवणो, भागना→भाजणो
+
+NEGATION: नहीं→कोनी, नहीं है→कोनी छे, मत→मत, नहीं था→कोनी थो
+
+QUESTION WORDS:
+क्या→के/शा, क्यों→क्यूं, कैसे→किंयां/कियां, कब→कद, कहाँ→कठे/कठै
+कौन→कुण, कितना→कित्तो, किसका→किणरो
+
+COMMON WORDS:
+बहुत→घणो (masc)/घणी (fem), अच्छा→बढ़िया/सारो, बुरा→खराब/बुरो
+अभी→अबार/हाले, यहाँ→इठे/इयां, वहाँ→उठे/उयां
+बड़ा→मोटो/बड़ो, छोटा→नानो/छोटो, थोड़ा→थोड़ो, सब→सगळा
+घर→घर/घरां, काम→काम, बात→बात, दिन→दिन, लोग→लोग/मिनख
+आदमी→मिनख/बंदो, औरत→लुगाई/बाई, बच्चा→छोरो (लड़का)/छोरी (लड़की)
+दोस्त→भायलो/दोस्त, भाई→भाई/भायजी, पैसा→पइसो
+खाना→खाणो, पानी→पाणी, रात→रात, दिल→दिल
+
+SENTENCE PATTERNS:
+"छे" for है/हैं, "कोनी" for नहीं/नहीं है
+Past: थो (masc था), थी (fem थी), हा (थे/were)
+"राम राम सा" (greeting), "जय श्री राम" naturally use करो
+
+FLAVOR — naturally scatter करो:
+राम राम सा, भाई, बाई, हाँ भाई, कोनी यार, घणो बढ़िया
+Avoid: है, हैं, नहीं (replace with छे, कोनी) — ye Rajasthani ki core identity है`,
   gujarati:`GUJARATI (Gujarati script only):
 - pronouns: मैं→હું, मुझे→મने, मेरा→મारो, तुम→તું, आप→તमे, वो→તे, यह→આ
 - verbs: है→છे, हैं→છे, था→હतो/હती, जाना→જवू, करना→કरवू, देखना→જोवू
@@ -87,19 +150,73 @@ const DIALECT_RULES = {
 const buildConverterSystem = (ids) => {
   const rules  = ids.map(id => DIALECT_RULES[id]).join("\n");
   const tmpl   = ids.map(id => `  "${id}": "..."`).join(",\n");
-  return `You are an expert linguist specializing in Indian regional dialects. Convert scripts into authentic regional dialects.
-DIALECT RULES — follow strictly:
+  return `You are an expert linguist specializing in Indian regional languages and dialects.
+
+STEP 1 — AUTO-DETECT INPUT LANGUAGE:
+The input script may be in ANY language: Hindi, English, Hinglish, Bhojpuri, Haryanvi, Rajasthani, Gujarati, Marathi, Punjabi, Bengali, or any mix/dialect.
+Silently identify the source language. Do NOT mention it in your output.
+
+STEP 2 — UNDERSTAND THE MEANING:
+Read the full script semantically. Understand the story, emotion, characters, and intent.
+
+STEP 3 — CONVERT TO EACH TARGET DIALECT:
+For each dialect listed below, rewrite the script completely in that authentic dialect.
+- If input is already in a target dialect: refine it to sound more natural, don't return as-is.
+- Preserve the original meaning, emotion, and structure across all versions.
+- Show names, "Stage", and proper nouns must be preserved exactly as given.
+
+DIALECT RULES — apply strictly for each dialect:
 ${rules}
-OUTPUT FORMAT — respond with ONLY this JSON, nothing else:
+
+OUTPUT FORMAT — respond with ONLY this valid JSON, nothing else:
 {
 ${tmpl}
 }`;
 };
 
 const buildSingleConverterSystem = (id) =>
-  `You are an expert linguist. Convert the script to authentic ${id} dialect.
+  `You are an expert linguist specializing in Indian regional languages and dialects.
+
+STEP 1 — AUTO-DETECT INPUT LANGUAGE:
+The input script may be in ANY language or dialect: Hindi, English, Hinglish, Bhojpuri, Haryanvi, Rajasthani, Gujarati, Marathi, Punjabi, Bengali, or any mix.
+First, silently identify the source language/dialect. Do NOT mention it in your output.
+
+STEP 2 — UNDERSTAND THE MEANING:
+Read the full script semantically. Understand the story, emotion, characters, and intent — not just the words.
+
+STEP 3 — CONVERT TO ${id.toUpperCase()} DIALECT:
+Rewrite the script completely in authentic ${id} dialect, preserving the original meaning, emotion, and structure.
+- If the input is already in ${id}: refine it to sound more authentic and natural, don't just return it as-is.
+- If the input is in another Indian dialect: understand it fully, then rewrite in ${id}.
+- If the input is in Hindi/Hinglish: convert using the dialect rules below.
+- If the input is in English: translate the meaning first, then write in ${id} dialect.
+- Show names, brand names ("Stage"), and proper nouns must be preserved exactly.
+
 ${DIALECT_RULES[id]}
-Respond with ONLY the converted text. No JSON, no labels, no explanation.`;
+
+${id === "haryanvi" ? `CRITICAL HARYANVI CHECKLIST — verify every sentence:
+✅ Every "है" → "सै" (MANDATORY — the #1 Haryanvi marker)
+✅ Every "हैं" → "सैं"
+✅ Every infinitive "-ना" ending → "-णा" (जाना→जाणा, करना→करणा, देखना→देखणा)
+✅ Every "नहीं" → "ना" or "कोनी"
+✅ "बहुत" → "घणा", "क्या" → "के", "कैसे" → "किसां"
+✅ "मैं" → "म्हैं", "हम" → "म्हां", "मेरा" → "म्हारा"
+❌ NEVER use "है" at end of sentence — always "सै"
+❌ NEVER use plain "-ना" infinitives — always "-णा"` : ""}
+
+${id === "rajasthani" ? `CRITICAL RAJASTHANI CHECKLIST — verify every sentence:
+✅ Every "है/हैं" → "छे" (MANDATORY — the #1 Rajasthani/Marwari marker)
+✅ Every "नहीं" → "कोनी" (MANDATORY — never write "नहीं")
+✅ Every infinitive "-ना" ending → "-णो" (जाना→जावणो, करना→करणो, देखना→देखणो)
+✅ "बहुत" → "घणो/घणी", "क्या" → "के/शा", "कैसे" → "किंयां"
+✅ "मैं" → "म्हैं", "हम" → "म्हे", "मेरा" → "म्हारो"
+✅ "कहाँ" → "कठे", "कौन" → "कुण", "वो" → "उण"
+✅ Use "राम राम सा" naturally in appropriate places
+❌ NEVER use "है" or "हैं" — always "छे"
+❌ NEVER use "नहीं" — always "कोनी"
+❌ NEVER use plain "-ना" infinitives — always "-णो"` : ""}
+
+Respond with ONLY the converted ${id} dialect text. No JSON, no labels, no explanation, no source language mention.`;
 
 const TONES = [
   { id:"dramatic",  icon:"🎬", label:"Dramatic",
@@ -899,7 +1016,7 @@ function ConverterTab() {
         streamConvert({
           model:"anthropic/claude-haiku-4-5",
           system:buildSingleConverterSystem(id),
-          messages:[{role:"user",content:`Convert this script:\n\n${script}`}]
+          messages:[{role:"user",content:`Auto-detect the language of this script, understand its full meaning, then rewrite it completely in authentic ${id} dialect:\n\n${script}`}]
         }).then(raw => setResults(prev=>({...(prev||{}), [id]:raw.trim()})))
       ));
     }catch(e){setError(e.message);}
@@ -928,7 +1045,7 @@ function ConverterTab() {
         </div>
         <div style={{padding:"18px 20px"}}>
           <textarea value={script} onChange={e=>setScript(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&e.ctrlKey)convert();}}
-            placeholder={"Apna script yahan paste karo...\n\nExample: \"Yeh kahani hai ek aisi ladki ki, jisne apni zindagi mein sab kuch kho diya — par haar nahi maani. Dekhiye Stage par.\""}
+            placeholder={"Kisi bhi bhasha mein script paste karo — Hindi, English, Bhojpuri, Gujarati, Marathi, Punjabi, Haryanvi, ya koi bhi...\n\nAI automatically detect karega aur selected dialects mein convert karega.\n\nExample: \"Yeh kahani hai ek aisi ladki ki, jisne apni zindagi mein sab kuch kho diya — par haar nahi maani.\""}
             style={{width:"100%",background:"transparent",border:"none",outline:"none",color:"#e2e8f0",fontSize:"14px",resize:"none",lineHeight:1.9,fontFamily:"'Inter','Segoe UI',sans-serif",minHeight:"140px",boxSizing:"border-box"}}
           />
           {script.length>0&&<div style={{marginTop:"8px",height:"2px",borderRadius:"2px",background:"rgba(255,255,255,0.05)",overflow:"hidden"}}><div style={{height:"100%",width:`${cp}%`,borderRadius:"2px",background:cp>90?"linear-gradient(90deg,#f97316,#ef4444)":"linear-gradient(90deg,#f59e0b,#fbbf24)",transition:"width 0.3s"}}/></div>}
