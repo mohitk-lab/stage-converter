@@ -1,5 +1,40 @@
 import { useState, useRef, useCallback } from "react";
 
+/* ─── Streaming fetch helper ─── */
+async function streamConvert(body) {
+  const res = await fetch("/api/convert", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const e = await res.json().catch(() => ({}));
+    throw new Error(e?.error?.message || `HTTP ${res.status}`);
+  }
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = "";
+  let content = "";
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+    const lines = buf.split("\n");
+    buf = lines.pop();
+    for (const line of lines) {
+      if (!line.startsWith("data: ")) continue;
+      const data = line.slice(6).trim();
+      if (data === "[DONE]") continue;
+      try {
+        const chunk = JSON.parse(data);
+        const delta = chunk.choices?.[0]?.delta?.content;
+        if (delta) content += delta;
+      } catch {}
+    }
+  }
+  return content;
+}
+
 /* ─── Dialects ─── */
 const DIALECTS = [
   { id:"bhojpuri",   label:"भोजपुरी",   sub:"Bhojpuri",   region:"UP / Bihar",  color:"#f97316" },
@@ -776,10 +811,7 @@ function ConverterTab() {
     setLoading(true);setError("");setResults(null);
     const ids=DIALECTS.filter(d=>sel.has(d.id)).map(d=>d.id);
     try {
-      const res=await fetch("/api/convert",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({system:buildConverterSystem(ids),messages:[{role:"user",content:`Convert this script:\n\n${script}`}]})});
-      if(!res.ok){const e=await res.json().catch(()=>{});throw new Error(e?.error?.message||`HTTP ${res.status}`);}
-      const data=await res.json();
-      const raw=data?.choices?.[0]?.message?.content||"";
+      const raw=await streamConvert({system:buildConverterSystem(ids),messages:[{role:"user",content:`Convert this script:\n\n${script}`}]});
       const m=raw.replace(/```json|```/gi,"").trim().match(/\{[\s\S]*\}/);
       if(!m)throw new Error("Response parse nahi hua. Dobara try karo.");
       const parsed=JSON.parse(m[0]);
@@ -887,10 +919,7 @@ function PromoTab() {
       ? `Yeh story hai. Isko samajhkar in dialects mein original promo content likho:\n\n${input}`
       : `Is script ko in dialects mein convert karo:\n\n${input}`;
     try{
-      const res=await fetch("/api/convert",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({system:sys,messages:[{role:"user",content:userMsg}]})});
-      if(!res.ok){const e=await res.json().catch(()=>{});throw new Error(e?.error?.message||`HTTP ${res.status}`);}
-      const data=await res.json();
-      const raw=data?.choices?.[0]?.message?.content||"";
+      const raw=await streamConvert({system:sys,messages:[{role:"user",content:userMsg}]});
       const m=raw.replace(/```json|```/gi,"").trim().match(/\{[\s\S]*\}/);
       if(!m)throw new Error("Response parse nahi hua. Dobara try karo.");
       const parsed=JSON.parse(m[0]);

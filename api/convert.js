@@ -15,15 +15,34 @@ export default async function handler(req, res) {
       "X-Title": "Stage Converter",
     },
     body: JSON.stringify({
-      model: "anthropic/claude-opus-4",
+      model: "anthropic/claude-sonnet-4-5",
       max_tokens: 4096,
+      stream: true,
       messages: system
         ? [{ role: "system", content: system }, ...messages]
         : messages,
     }),
   });
 
-  const data = await orRes.json();
-  if (!orRes.ok) return res.status(orRes.status).json(data);
-  res.status(200).json(data);
+  if (!orRes.ok) {
+    const data = await orRes.json();
+    return res.status(orRes.status).json(data);
+  }
+
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
+  const reader = orRes.body.getReader();
+  const decoder = new TextDecoder();
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      res.write(decoder.decode(value, { stream: true }));
+    }
+  } finally {
+    res.end();
+  }
 }
