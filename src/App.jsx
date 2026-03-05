@@ -1242,22 +1242,39 @@ function ConverterTab() {
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState("");
   const [copied,  setCopied]  = useState("");
+  const [step,    setStep]    = useState(""); // "hindi" | "dialects" | ""
   const toggle = id => setSel(prev=>{const n=new Set(prev);if(n.has(id)&&n.size===1)return prev;n.has(id)?n.delete(id):n.add(id);return n;});
 
   const convert = async () => {
     if(!script.trim()||sel.size===0)return;
-    setLoading(true);setError("");setResults(null);
+    setLoading(true);setError("");setResults(null);setStep("hindi");
     const ids=DIALECTS.filter(d=>sel.has(d.id)).map(d=>d.id);
     try {
+      // Step 1: Normalize any input language → clean Hindi
+      const hindiRaw = await streamConvert({
+        model:"anthropic/claude-haiku-4-5",
+        system:`You are a language normalization expert. Convert any input text into clean, standard Hindi (Devanagari script).
+Rules:
+- Bhojpuri/Haryanvi/Rajasthani/any Indian dialect → translate meaning to standard Hindi
+- English/Hinglish → translate to Hindi
+- Already Hindi → clean and return as-is
+- Preserve all names, brand names ("Stage"), and proper nouns exactly
+- Output ONLY the Hindi text. No explanation, no labels, nothing else.`,
+        messages:[{role:"user",content:`Convert to standard Hindi:\n\n${script}`}]
+      });
+      const hindi = hindiRaw.trim();
+
+      // Step 2: Convert Hindi → each selected dialect in parallel
+      setStep("dialects");
       await Promise.all(ids.map(id =>
         streamConvert({
           model:"anthropic/claude-haiku-4-5",
           system:buildSingleConverterSystem(id),
-          messages:[{role:"user",content:`Auto-detect the language of this script, understand its full meaning, then rewrite it completely in authentic ${id} dialect:\n\n${script}`}]
+          messages:[{role:"user",content:`This is a clean Hindi script. Rewrite it completely in authentic ${id} dialect:\n\n${hindi}`}]
         }).then(raw => setResults(prev=>({...(prev||{}), [id]:raw.trim()})))
       ));
     }catch(e){setError(e.message);}
-    setLoading(false);
+    setLoading(false);setStep("");
   };
 
   const copy=(text,id)=>{navigator.clipboard.writeText(text);setCopied(id);setTimeout(()=>setCopied(""),2000);};
@@ -1299,7 +1316,8 @@ function ConverterTab() {
 
       {loading&&<div style={CARD}><div style={{padding:"32px 24px",textAlign:"center"}}>
         <div style={{display:"flex",justifyContent:"center",gap:"10px",marginBottom:"16px"}}>{[0,1,2].map(i=><div key={i} style={{width:"11px",height:"11px",borderRadius:"50%",background:"linear-gradient(135deg,#f59e0b,#ef4444)",boxShadow:"0 0 14px rgba(245,158,11,0.55)",animation:`pulse 1.3s ${i*0.22}s ease-in-out infinite`}}/>)}</div>
-        <div style={{fontSize:"14px",color:"#94a3b8",fontWeight:700,marginBottom:"10px"}}>Converting in parallel…</div>
+        {step==="hindi"&&<><div style={{fontSize:"14px",color:"#94a3b8",fontWeight:700,marginBottom:"6px"}}>Step 1/2 — Normalizing to Hindi…</div><div style={{fontSize:"11px",color:"#475569",marginBottom:"12px"}}>Converting input to standard Hindi base</div></>}
+        {step==="dialects"&&<><div style={{fontSize:"14px",color:"#94a3b8",fontWeight:700,marginBottom:"6px"}}>Step 2/2 — Converting to dialects…</div><div style={{fontSize:"11px",color:"#475569",marginBottom:"12px"}}>Hindi → each dialect in parallel</div></>}
         <div style={{display:"flex",flexWrap:"wrap",gap:"6px",justifyContent:"center"}}>
           {ids.map(id=>{const d=DIALECTS.find(x=>x.id===id);const done=results&&results[id];return <span key={id} style={{fontSize:"11px",padding:"3px 10px",borderRadius:"8px",border:`1px solid ${done?d.color+"60":"rgba(255,255,255,0.08)"}`,color:done?d.color:"#334155",background:done?d.color+"12":"transparent",fontWeight:done?700:400}}>{done?"✓ ":""}{d?.sub}</span>;})}
         </div>
