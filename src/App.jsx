@@ -46,12 +46,50 @@ const DIALECTS = [
 ];
 
 const DIALECT_RULES = {
-  bhojpuri:`BHOJPURI (Devanagari):
-- pronouns: मैं→हम, मुझे→हमके, मेरा→हमार, तुम→तू, तुम्हें→तोहके, आप→रउआ, वो→ऊ, यह→ई
-- verbs: है→बा, हैं→बाड़न, था→रहल, हो→होखे, जाना→जाइब, आना→आइब, करना→करब, देखना→देखब
-- negation: नहीं→नाहीं, मत→जनि
-- words: क्या→का, क्यों→काहे, कैसे→कइसे, बहुत→बहुते, अच्छा→नीमन, बड़ा→बड़हन, अभी→अबहीं
-- flavor: sentence end में "हऊ","ना" add करो`,
+  bhojpuri:`BHOJPURI (Devanagari) — authentic Bhojpuri dialect (UP/Bihar):
+
+PRONOUNS:
+मैं→हम, मुझे/मुझको→हमके, मेरा→हमार, मेरी→हमार
+तुम→तू, तुम्हें→तोहके, तेरा→तोहार, तू→तू, आप→रउआ
+वो/वह→ऊ, उसे→ओकरा, उसका→ओकर, यह→ई, इसे→एकरा
+हम (हम लोग)→हमलोग, हमारा→हमार, वे→उ लोग, उन्हें→उन्हके
+
+VERBS — present/habitual:
+है→बा, हैं→बाड़न, हूँ→बानी, हो→बाड़ा
+होना→होखे/होइब, जाना→जाइब, आना→आइब, करना→करब
+देखना→देखब, खाना→खाइब, पीना→पिअब, लेना→लेब
+देना→देब, बोलना→बोलब, रहना→रहब, मिलना→मिलब
+सोना→सोअब, उठना→उठब, बैठना→बइठब, मारना→मारब
+चलना→चलब, बनना→बनब, सुनना→सुनब, समझना→समझब
+लड़ना→लड़ब, हँसना→हँसब, रोना→रोअब, भागना→भागब
+
+PAST TENSE: गया→गइल, आया→आइल, किया→कइल, देखा→देखल,
+खाया→खइलन, बोला→बोललन, था→रहल (m)/रहली (f)/रहलन (pl)
+
+NEGATION: नहीं→नाहीं, मत→जनि, नहीं था→नाहीं रहल, नहीं है→नाहीं बा
+
+QUESTION WORDS:
+क्या→का, क्यों→काहे, कैसे→कइसे, कब→कब, कहाँ→कहाँ/कवना जगह
+कौन→के, कितना→केतना, किसका→केकर
+
+COMMON WORDS:
+बहुत→बहुते/घाने, अच्छा→नीमन, बुरा→खराब/बेकार
+अभी→अबहीं, यहाँ→इहाँ, वहाँ→उहाँ, बड़ा→बड़हन, छोटा→छोटहन
+थोड़ा→थोड़ेक, सब→सब, कोई→केहू, कुछ→कुछो
+घर→घर, काम→काम, बात→बात, दिन→दिन, रात→रात
+आदमी→मरद, औरत→मेहरारू, बच्चा→लइका (m)/लइकी (f)
+दोस्त→यार/दोस्त, भाई→भइया, बहन→दीदी/बहिनी, पैसा→पइसा
+खाना→खाना, पानी→पानी, दिल→दिल, प्यार→प्यार/इश्क
+जिंदगी→जिनगी, सच→सच, झूठ→झूठ, आज→आज
+जल्दी→जल्दी, साथ→साथे, अब→अब, फिर→फेर
+
+SENTENCE PATTERNS:
+"बा" (है), "बाड़न" (हैं), "बानी" (हूँ)
+Ending में "हऊ" (confirmation), "ना" (tag question)
+E.g.: "ई बहुते नीमन बा हऊ" / "तू कहाँ जात बाड़ा ना?"
+
+CRITICAL — NEVER use: है, हैं, नहीं (always बा, बाड़न, नाहीं)
+FLAVOR: भइया, ए बाबू, हो, ना, राम राम naturally use करो`,
   haryanvi:`HARYANVI (Devanagari) — authentic Haryana dialect:
 
 PRONOUNS:
@@ -126,24 +164,196 @@ Past: थो (masc था), थी (fem थी), हा (थे/were)
 FLAVOR — naturally scatter करो:
 राम राम सा, भाई, बाई, हाँ भाई, कोनी यार, घणो बढ़िया
 Avoid: है, हैं, नहीं (replace with छे, कोनी) — ye Rajasthani ki core identity है`,
-  gujarati:`GUJARATI (Gujarati script only):
-- pronouns: मैं→હું, मुझे→મने, मेरा→મारो, तुम→તું, आप→તमे, वो→તे, यह→આ
-- verbs: है→છे, हैं→છे, था→હतो/હती, जाना→જवू, करना→કरवू, देखना→જोवू
-- negation: नहीं→નहीं
-- words: बहुत→ઘणूं, क्या→Shूं, अच्छा→Sारूं, अभी→હवे
-- flavor: ખरूं ने, Sाच्ची naturally use करो`,
-  marathi:`MARATHI (Devanagari):
-- pronouns: मैं→मी, मुझे→मला, मेरा→माझा, तुम→तू, आप→तुम्ही/आपण, वो→तो/ती, यह→हे
-- verbs: है→आहे, हैं→आहेत, था→होता/होती, जाना→जाणे, करना→करणे, देखना→पाहणे
-- negation: नहीं→नाही
-- words: बहुत→खूप, क्या→काय, कैसे→कसे, अच्छा→छान, अभी→आत्ता
-- flavor: रे, बघ, अरे, एकदम झकास naturally use करो`,
-  punjabi:`PUNJABI (Gurmukhi script only):
-- pronouns: मैं→ਮੈਂ, मुझे→ਮੈਨੂੰ, मेरा→ਮੇਰਾ, तुम→ਤੂੰ, आप→ਤੁਸੀਂ, वो→ਉਹ, यह→ਇਹ
-- verbs: है→ਹੈ, हैं→ਹਨ, था→ਸੀ, जाना→ਜਾਣਾ, करना→ਕਰਨਾ, देखना→ਦੇਖਣਾ
-- negation: नहीं→ਨਹੀਂ
-- words: बहुत→ਬਹੁਤ, क्या→ਕੀ, अच्छा→ਚੰਗਾ, अभी→ਹੁਣੇ
-- flavor: ਯਾਰ, ਵੇ, ਸੱਚੀ naturally use करो`,
+  gujarati:`GUJARATI (Gujarati script — write ALL output in Gujarati script):
+
+PRONOUNS: હું (I/मैं), મને (me/मुझे), મારો/મારી (my/मेरा), તું (you informal/तुम), તમે (you formal/आप), તે/એ (he/she/वो), આ (this/यह), એ/પેલો (that/वो)
+
+VERBS (conjugations):
+- છે = is/are/am (है/हैं/हूँ — ALL forms)
+- હતો/હતી/હતા = was/were (था/थी/थे)
+- જવું = to go (जाना) | જઉ (I go), જા (you go), જાય (he/she goes), ગયો/ગઈ (went)
+- આવવું = to come (आना) | આવ (come), આવ્યો/આવી (came)
+- કરવું = to do (करना) | કર (do), કરે (does), કર્યું (did)
+- ખાવું = to eat (खाना) | ખા (eat), ખાય (eats), ખાધું (ate)
+- પીવું = to drink (पीना) | પી (drink), પીવે (drinks), પીધું (drank)
+- જોવું = to see/watch (देखना) | જો (see), જુઓ (look), જોયું (saw)
+- બોલવું = to speak (बोलना) | બોલ (speak), બોલે (speaks), બોલ્યો (spoke)
+- સૂવું = to sleep (सोना) | સૂ (sleep), સૂઈ જા (go to sleep)
+- બેસવું = to sit (बैठना) | બેસ (sit), બેઠો (sat)
+- ઊઠવું = to get up (उठना) | ઊઠ (get up), ઊઠ્યો (got up)
+- રહેવું = to stay/live (रहना) | રહે (stays), રહ્યો (stayed)
+- મળવું = to meet (मिलना) | મળ (meet), મળ્યો (met)
+- લેવું = to take (लेना) | લે (take), લીધું (took)
+- આપવું = to give (देना) | આપ (give), આપ્યું (gave)
+- સાંભળવું = to listen (सुनना) | સાંભળ (listen), સાંભળ્યું (heard)
+- ચાલવું = to walk (चलना) | ચાલ (walk), ચાલ્યો (walked)
+- હસવું = to laugh (हंसना) | હસ (laugh), હસ્યો (laughed)
+- રડવું = to cry (रोना) | રડ (cry), રડ્યો (cried)
+- સમજવું = to understand | સમજ (understand), સમજ્યો (understood)
+- થવું = to become (होना) | થઈ ગ્યું (it happened), થશે (will happen)
+- જોઈએ = need/want (चाहिए) | મને જોઈએ = I need
+- ગમવું = to like (पसंद आना) | ગમ્યું (liked), ગમે (likes)
+
+PAST TENSE patterns:
+- masculine: -યો (ગયો, આવ્યો, કર્યો, બોલ્યો)
+- feminine: -ઈ (ગઈ, આવી, કરી, બોલી)
+- neuter: -યું (કર્યું, ખાધું, પીધું, ગયું)
+- plural: -યા (ગયા, આવ્યા)
+
+FUTURE: verb + -શે/-શો/-શું (જઈશ=I'll go, જશે=he'll go, કરીશ=I'll do, આવશે=will come)
+
+NEGATION: નહીં (नहीं — NOT "नहीं", write in Gujarati script), ના (no/मत), નથી (is not)
+- Example: "હું નહીં આવું" = I won't come | "આ સારું નથી" = This is not good
+
+QUESTION WORDS: શું (what/क्या), કેમ (why/क्यों), ક્યાં (where/कहाँ), ક્યારે (when/कब), કોણ (who/कौन), કેટલું (how much/कितना), કેવી રીતે (how/कैसे)
+
+COMMON VOCABULARY (40+ words):
+- Good: સારું/સારો (अच्छा) | Bad: ખરાબ (बुरा) | Very: ખૂબ/ઘણું (बहुत)
+- Food: ખાવાનું (खाना) | Water: પાણી (पानी) | House: ઘર (घर)
+- Man: માણસ (आदमी) | Woman: સ્ત્રી/બાઈ (औरत) | Child: બાળક (बच्चा)
+- Brother: ભાઈ (भाई) | Sister: બહેન (बहन) | Friend: મિત્ર/દોસ્ત (दोस्त)
+- Now: હવે (अब) | Then: પછી (फिर/तब) | Today: આજ (आज) | Tomorrow: આવતી કાલ (कल)
+- Here: અહીં (यहाँ) | There: ત્યાં (वहाँ) | Always: હંમેશ (हमेशा)
+- Yes: હા (हाँ) | No: ના (नहीं/नहीं) | Okay: ઠીક (ठीक) | Really: સાચ્ચે (सच में)
+- Beautiful: સુંદર (सुंदर) | Big: મોટો (बड़ा) | Small: નાનો (छोटा) | New: નવો (नया)
+- Work: કામ (काम) | Time: સમય (समय) | Money: પૈસા (पैसे) | Love: પ્રેમ (प्यार)
+- Happy: ખુશ (खुश) | Sad: દુઃખી (दुखी) | Tired: થાકેલો (थका) | Angry: ગુસ્સો (गुस्सा)
+- Come: આ (आ) | Go: જા (जा) | See: જો (देख) | Hear: સાંભળ (सुन) | Know: જાણ (जान)
+- Fast: ઝડપથી (जल्दी) | Slow: ધીરે (धीरे) | Again: ફરી (फिर से) | Also: પણ (भी)
+
+FLAVOR WORDS (scatter naturally): ભાઈ, ભાભી, ભૂલ ન જા, ગભરાઈ ન જા, ખરુંને, ચાલ, અરે, ઓ ભાઈ, ઓ બેન, સાચ્ચે, અરે હા
+
+CRITICAL — NEVER write:
+- है, हैं, हूँ in output (always use છે)
+- नहीं in output (write નહીં in Gujarati script)
+- Hindi/Devanagari words mixed in — write entire output in Gujarati script`,
+  marathi:`MARATHI (Devanagari script — standard Maharashtrian Marathi):
+
+PRONOUNS: मी (I/मैं), मला (me/मुझे), माझा/माझी/माझं (my/मेरा), तू (you informal/तुम), तुम्ही/आपण (you formal/आप), तो/ती/ते (he/she/it/वो), हे/हा/ही (this/यह), ते/तो (that/वो)
+
+VERBS (conjugations):
+- आहे = is/am (है) | आहेत = are (हैं) | आहात = you are (formal, हैं)
+- होतो/होती/होतं = was/were (था/थी/था)
+- जाणे = to go | जातो (I go, m), जाते (I go, f), गेलो/गेले (went m/f)
+- येणे = to come | येतो/येते (comes), आलो/आले (came m/f)
+- करणे = to do | करतो/करते (does), केलं (did)
+- खाणे = to eat | खातो/खाते (eats), खाल्लं (ate)
+- पिणे = to drink | पितो/पिते (drinks), प्यायलं (drank)
+- पाहणे = to see | पाहतो/पाहते (sees), पाहिलं (saw)
+- बोलणे = to speak | बोलतो/बोलते (speaks), बोललो (spoke)
+- झोपणे = to sleep | झोपतो (sleeps), झोपलो (slept)
+- बसणे = to sit | बसतो (sits), बसलो (sat)
+- उठणे = to get up | उठतो (gets up), उठलो (got up)
+- राहणे = to stay | राहतो (stays), राहिलो (stayed)
+- भेटणे = to meet | भेटतो (meets), भेटलो (met)
+- घेणे = to take | घेतो (takes), घेतलं (took)
+- देणे = to give | देतो (gives), दिलं (gave)
+- ऐकणे = to listen | ऐकतो (listens), ऐकलं (heard)
+- चालणे = to walk | चालतो (walks), चाललो (walked)
+- हसणे = to laugh | हसतो (laughs), हसलो (laughed)
+- रडणे = to cry | रडतो (cries), रडलो (cried)
+- समजणे = to understand | समजतो (understands), समजलं (understood)
+- होणे = to become/happen | होतं (it happens), झालं (it happened)
+- हवं आहे = want/need (चाहिए) | मला हवं = I want
+- आवडणे = to like | आवडतं (likes), आवडलं (liked)
+
+PAST TENSE patterns:
+- masculine: -लो (गेलो, आलो, केलो, बोललो)
+- feminine: -ले (गेले, आले, केले)  
+- neuter: -लं (केलं, खाल्लं, पाहिलं, झालं)
+- plural/formal: -ला (गेला, आला, केला) or -ल्या (गेल्या, आल्या)
+
+FUTURE: verb + -ईन/-शील/-ईल (जाईन=I'll go, जाशील=you'll go, जाईल=he'll go)
+
+NEGATION: नाही (नहीं/is not — primary negation), नको (don't/मत), नाहीत (are not, plural)
+- "मी नाही येणार" = I won't come | "हे चांगलं नाही" = This is not good
+- नको रे = Don't (informal) | नको ना = Please don't
+
+QUESTION WORDS: काय (what/क्या), का (why/क्यों), कुठे (where/कहाँ), केव्हा (when/कब), कोण (who/कौन), किती (how much/कितना), कसं (how/कैसे)
+
+COMMON VOCABULARY (40+ words):
+- Good: चांगलं (अच्छा) | Bad: वाईट (बुरा) | Very: खूप (बहुत)
+- Food: जेवण (खाना) | Water: पाणी (पानी) | House: घर (घर)
+- Man: माणूस (आदमी) | Woman: बाई/स्त्री (औरत) | Child: मुलगा/मुलगी (बच्चा)
+- Brother: भाऊ (भाई) | Sister: बहीण (बहन) | Friend: मित्र/दोस्त (दोस्त)
+- Now: आत्ता (अभी) | Then: मग (फिर/तब) | Today: आज (आज) | Tomorrow: उद्या (कल)
+- Here: इथे (यहाँ) | There: तिथे (वहाँ) | Always: नेहमी (हमेशा)
+- Yes: हो (हाँ) | No: नाही (नहीं) | Okay: ठीक/बरं (ठीक) | Really: खरंच (सच में)
+- Beautiful: सुंदर (सुंदर) | Big: मोठा (बड़ा) | Small: लहान (छोटा) | New: नवीन (नया)
+- Work: काम (काम) | Time: वेळ (समय) | Money: पैसे (पैसे) | Love: प्रेम (प्यार)
+- Happy: आनंदी (खुश) | Sad: दुःखी (दुखी) | Tired: थकलेलो (थका) | Angry: रागावलेलो (गुस्सा)
+- Fast: लवकर (जल्दी) | Slow: हळू (धीरे) | Again: परत (फिर से) | Also: पण (भी)
+- Market: बाजार | School: शाळा | Village: गाव | City: शहर | Road: रस्ता
+
+FLAVOR WORDS (scatter naturally): रे, बघ, अरे, बरं का, ऐकलंस का, खरंच, एकदम, अरे यार, ए, सांग, झकास, भारी, मस्त
+
+CRITICAL — NEVER write:
+- है or हैं (always use आहे/आहेत)
+- नहीं (always use नाही)
+- Avoid mixing in Punjabi/Haryanvi vocabulary`,
+  punjabi:`PUNJABI (Gurmukhi script — write ALL output in Gurmukhi/Punjabi script):
+
+PRONOUNS: ਮੈਂ (I/मैं), ਮੈਨੂੰ (me/मुझे), ਮੇਰਾ/ਮੇਰੀ (my/मेरा), ਤੂੰ (you informal/तुम), ਤੁਸੀਂ (you formal/आप), ਉਹ (he/she/वो), ਇਹ (this/he/she/यह), ਉਹ (that/वो)
+
+VERBS (conjugations):
+- ਹੈ = is/am (है) | ਹਨ = are plural (हैं) | ਹੋ = you are (formal)
+- ਸੀ = was/were (था/थी/थे)
+- ਜਾਣਾ = to go | ਜਾਂਦਾ/ਜਾਂਦੀ (goes m/f), ਗਿਆ/ਗਈ (went m/f)
+- ਆਉਣਾ = to come | ਆਉਂਦਾ/ਆਉਂਦੀ (comes), ਆਇਆ/ਆਈ (came m/f)
+- ਕਰਨਾ = to do | ਕਰਦਾ/ਕਰਦੀ (does), ਕੀਤਾ/ਕੀਤੀ (did m/f)
+- ਖਾਣਾ = to eat | ਖਾਂਦਾ/ਖਾਂਦੀ (eats), ਖਾਧਾ/ਖਾਧੀ (ate m/f)
+- ਪੀਣਾ = to drink | ਪੀਂਦਾ/ਪੀਂਦੀ (drinks), ਪੀਤਾ/ਪੀਤੀ (drank m/f)
+- ਦੇਖਣਾ = to see | ਦੇਖਦਾ/ਦੇਖਦੀ (sees), ਦੇਖਿਆ/ਦੇਖੀ (saw m/f)
+- ਬੋਲਣਾ = to speak | ਬੋਲਦਾ/ਬੋਲਦੀ (speaks), ਬੋਲਿਆ (spoke)
+- ਸੌਣਾ = to sleep | ਸੌਂਦਾ/ਸੌਂਦੀ (sleeps), ਸੁੱਤਾ/ਸੁੱਤੀ (slept m/f)
+- ਬੈਠਣਾ = to sit | ਬੈਠਦਾ/ਬੈਠਦੀ (sits), ਬੈਠਾ/ਬੈਠੀ (sat m/f)
+- ਉੱਠਣਾ = to get up | ਉੱਠਦਾ/ਉੱਠਦੀ (gets up), ਉੱਠਿਆ (got up)
+- ਰਹਿਣਾ = to stay | ਰਹਿੰਦਾ/ਰਹਿੰਦੀ (stays), ਰਿਹਾ/ਰਹੀ (stayed m/f)
+- ਮਿਲਣਾ = to meet | ਮਿਲਦਾ/ਮਿਲਦੀ (meets), ਮਿਲਿਆ/ਮਿਲੀ (met m/f)
+- ਲੈਣਾ = to take | ਲੈਂਦਾ/ਲੈਂਦੀ (takes), ਲਿਆ/ਲਈ (took m/f)
+- ਦੇਣਾ = to give | ਦਿੰਦਾ/ਦਿੰਦੀ (gives), ਦਿੱਤਾ/ਦਿੱਤੀ (gave m/f)
+- ਸੁਣਨਾ = to listen | ਸੁਣਦਾ/ਸੁਣਦੀ (listens), ਸੁਣਿਆ/ਸੁਣੀ (heard m/f)
+- ਚੱਲਣਾ = to walk/run | ਚੱਲਦਾ/ਚੱਲਦੀ (walks), ਚੱਲਿਆ (walked)
+- ਹੱਸਣਾ = to laugh | ਹੱਸਦਾ/ਹੱਸਦੀ (laughs), ਹੱਸਿਆ/ਹੱਸੀ (laughed m/f)
+- ਰੋਣਾ = to cry | ਰੋਂਦਾ/ਰੋਂਦੀ (cries), ਰੋਇਆ/ਰੋਈ (cried m/f)
+- ਸਮਝਣਾ = to understand | ਸਮਝਦਾ (understands), ਸਮਝਿਆ (understood)
+- ਹੋਣਾ = to become/happen | ਹੋ ਗਿਆ (it happened), ਹੋਵੇਗਾ (will happen)
+- ਚਾਹੀਦਾ = need/want (चाहिए) | ਮੈਨੂੰ ਚਾਹੀਦਾ = I need
+- ਪਸੰਦ ਆਉਣਾ = to like | ਪਸੰਦ ਆਇਆ (liked)
+
+PAST TENSE patterns:
+- masculine singular: -ਆ (ਗਿਆ, ਆਇਆ, ਕੀਤਾ, ਬੋਲਿਆ)
+- feminine singular: -ਈ (ਗਈ, ਆਈ, ਕੀਤੀ, ਬੋਲੀ)
+- masculine plural: -ਏ (ਗਏ, ਆਏ, ਕੀਤੇ)
+- feminine plural: -ਈਆਂ (ਗਈਆਂ, ਆਈਆਂ)
+
+FUTURE: verb stem + -ਾਂਗਾ/-ਏਗਾ/-ਾਂਗੀ (ਜਾਵਾਂਗਾ=I'll go, ਜਾਵੇਗਾ=he'll go, ਕਰਾਂਗਾ=I'll do, ਆਵੇਗਾ=will come)
+
+NEGATION: ਨਹੀਂ (नहीं — in Gurmukhi, NOT Devanagari), ਨਾ (no/मत), ਨਹੀਂ ਹੈ (is not)
+- "ਮੈਂ ਨਹੀਂ ਆਵਾਂਗਾ" = I won't come | "ਇਹ ਚੰਗਾ ਨਹੀਂ" = This is not good
+
+QUESTION WORDS: ਕੀ (what/क्या), ਕਿਉਂ (why/क्यों), ਕਿੱਥੇ (where/कहाँ), ਕਦੋਂ (when/कब), ਕੌਣ (who/कौन), ਕਿੰਨਾ (how much/कितना), ਕਿਵੇਂ (how/कैसे)
+
+COMMON VOCABULARY (40+ words):
+- Good: ਚੰਗਾ/ਚੰਗੀ (अच्छा) | Bad: ਮਾੜਾ/ਮਾੜੀ (बुरा) | Very: ਬਹੁਤ (बहुत)
+- Food: ਖਾਣਾ (खाना) | Water: ਪਾਣੀ (पानी) | House: ਘਰ (घर)
+- Man: ਬੰਦਾ/ਆਦਮੀ (आदमी) | Woman: ਔਰਤ/ਬੀਬੀ (औरत) | Child: ਬੱਚਾ/ਬੱਚੀ (बच्चा)
+- Brother: ਭਰਾ (भाई) | Sister: ਭੈਣ (बहन) | Friend: ਯਾਰ/ਦੋਸਤ (दोस्त)
+- Now: ਹੁਣ (अब/अभी) | Then: ਫਿਰ (फिर/तब) | Today: ਅੱਜ (आज) | Tomorrow: ਕੱਲ੍ਹ (कल)
+- Here: ਇੱਥੇ (यहाँ) | There: ਉੱਥੇ (वहाँ) | Always: ਹਮੇਸ਼ਾ (हमेशा)
+- Yes: ਹਾਂ (हाँ) | No: ਨਹੀਂ (नहीं) | Okay: ਠੀਕ ਹੈ (ठीक) | Really: ਸੱਚੀ (सच में)
+- Beautiful: ਸੋਹਣਾ/ਸੋਹਣੀ (सुंदर) | Big: ਵੱਡਾ (बड़ा) | Small: ਛੋਟਾ (छोटा) | New: ਨਵਾਂ/ਨਵੀਂ (नया)
+- Work: ਕੰਮ (काम) | Time: ਸਮਾਂ (समय) | Money: ਪੈਸੇ (पैसे) | Love: ਪਿਆਰ (प्यार)
+- Happy: ਖੁਸ਼ (खुश) | Sad: ਦੁਖੀ (दुखी) | Tired: ਥੱਕਿਆ/ਥੱਕੀ (थका) | Angry: ਗੁੱਸੇ ਵਿੱਚ (गुस्से में)
+- Fast: ਜਲਦੀ (जल्दी) | Slow: ਹੌਲੀ (धीरे) | Again: ਫਿਰ ਤੋਂ (फिर से) | Also: ਵੀ (भी)
+- Market: ਬਾਜ਼ਾਰ | School: ਸਕੂਲ | Village: ਪਿੰਡ | City: ਸ਼ਹਿਰ | Road: ਸੜਕ
+
+FLAVOR WORDS (scatter naturally): ਯਾਰ, ਵੇ, ਓਏ, ਸੱਚੀ, ਪੁੱਤ, ਬੇਟਾ, ਬਾਈ, ਅਰੇ, ਹਾਂ ਯਾਰ, ਕੀ ਹਾਲ ਹੈ, ਸੁਣ, ਦੇਖ, ਵਾਹ
+
+CRITICAL — NEVER write:
+- है, हैं in Devanagari (always use ਹੈ, ਹਨ in Gurmukhi)
+- नहीं in Devanagari (always use ਨਹੀਂ in Gurmukhi)
+- Hindi/Devanagari words mixed in — write entire output in Gurmukhi script`,
 };
 
 /* ─── System prompts ─── */
