@@ -941,7 +941,7 @@ const pushHistory = (e,prev) => { const u=[e,...prev].slice(0,10); localStorage.
 
 /* ─── Background ─── */
 const GLYPHS = ["भ","ज","प","र","ण","ह","स","त","ग","लि","रा","ना","बा","ગ","જ","ત","ર","ભ","ੋ","ਭ","ਜ","ਪ","ਰ","ਹ","ੀ"];
-const WORDS  = ["भोजपुरी","हरियाणवी","राजस्थानी","मराठी","ગуजराती","ਪੰਜਾਬੀ","संवाद","कहानी","नाटक","भाषा","ਬੋਲੀ","शब्द"];
+const WORDS  = ["भोजपुरी","हरियाणवी","राजस्थानी","मराठी","ગુજરતિ","ਪੰਜਾਬੀ","संवाद","कहानी","नाटक","भाषा","ਬੋਲੀ","शब्द"];
 const PARTS  = Array.from({length:32},(_,i)=>{const s=i*137.5;return{char:GLYPHS[i%GLYPHS.length],left:+((s*5.13)%100).toFixed(1),dur:+(22+(s*0.71)%26).toFixed(1),delay:-+((s*0.93)%45).toFixed(1),size:+(14+(i*2.1)%12).toFixed(0)};});
 const WPARTS = Array.from({length:12},(_,i)=>{const s=i*89.4;return{word:WORDS[i%WORDS.length],left:+((s*7.3)%88).toFixed(1),top:+((s*4.1+5)%82).toFixed(1),dur:+(20+(s*0.6)%24).toFixed(1),delay:-+((s*1.1)%32).toFixed(1),size:+(11+(i*1.7)%8).toFixed(0)};});
 
