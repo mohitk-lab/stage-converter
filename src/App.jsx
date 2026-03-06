@@ -93,77 +93,109 @@ FLAVOR: भइया, ए बाबू, हो, ना, राम राम natu
   haryanvi:`HARYANVI (Devanagari) — authentic Haryana dialect:
 
 PRONOUNS:
-मैं→म्हैं, मुझे/मुझको→म्हाने, मेरा→म्हारा, मेरी→म्हारी, हम→म्हां, हमारा→म्हारा
-तुम→थारे, तुम्हें→थाने, तेरा→थारा, तू→तू, आप→आपनै
-वो/वह→वो, उसे→उसनै, उसका→उसका, यह→या, इसे→इसनै, ये→ये, वे→वे, उन्हें→उन्नै
+मैं→म्हैं | मुझे/मुझको→म्हाने | मेरा→म्हारा | मेरी→म्हारी | हम→म्हां | हमारा→म्हारा
+तुम→थारे | तुम्हें→थाने | तेरा→थारा | तू→तू | आप→आपनै/थाने
+वो/वह→वो | उसे→उसनै | उसका→उसका | यह→या | इसे→इसनै | वे→वे | उन्हें→उन्नै
 
-VERBS — present tense:
-है→सै, हैं→सैं, हूँ→हूँ, हो→हो
-होना→होणा, जाना→जाणा, करना→करणा, देखना→देखणा, आना→आणा
-खाना→खाणा, पीना→पीणा, लेना→लेणा, देना→देणा, बोलना→बोलणा
-रहना→रहणा, मिलना→मिलणा, सोना→सोणा, उठना→उठणा, बैठना→बैठणा
-मारना→मारणा, चलना→चलणा, बनना→बणणा, सुनना→सुणणा, समझना→समझणा
-लड़ना→लड़णा, हँसना→हँसणा, रोना→रोणा, भागना→भाजणा
+PRESENT COPULA — MANDATORY SUBSTITUTION (no exceptions):
+हूँ → सूं   ← CRITICAL: NEVER write "हूँ" in Haryanvi output
+है  → सै    ← CRITICAL: NEVER write "है" at sentence end — always "सै"
+हैं → सैं
+हो  → सो   (2nd person "you are")
 
-NEGATION: नहीं→ना/कोनी, मत→मत, नहीं होता→होता ना
+INFINITIVES — MANDATORY: every "-ना" becomes "-णा":
+जाना→जाणा | करना→करणा | देखना→देखणा | आना→आणा | खाना→खाणा
+पीना→पीणा | लेना→लेणा | देना→देणा | बोलना→बोलणा | रहना→रहणा
+मिलना→मिलणा | सोना→सोणा | उठना→उठणा | बैठना→बैठणा | मारना→मारणा
+चलना→चालणा | बनना→बणणा | सुनना→सुणणा | समझना→समझणा
+लड़ना→लड़णा | हँसना→हँसणा | रोना→रोणा | भागना→भाजणा
+
+PAST TENSE (gender-marked, close to Hindi but with Haryanvi flavor):
+था → था (m) | थी → थी (f) | थे → थे (pl)
+गया → गया (m) | गई → गई (f) | गए → गए (pl)
+किया → कर्या (m) | करी → करी (f) | करे → करे (pl)
+आया → आया (m) | आई → आई (f) | आए → आए (pl)
+देखा → देख्या (m) | देखी → देखी (f)
+बोला → बोल्या (m) | बोली → बोली (f)
+खाया → खाया (m) | खाई → खाई (f)
+हुआ → हुया (m) | हुई → हुई (f)
+
+FUTURE TENSE:
+जाऊंगा → जावांगा | जाएगा → जावेगा | आएगा → आवेगा
+करूंगा → करांगा | होगा → होवेगा | देखूंगा → देखांगा
+
+NEGATION: नहीं→ना/कोनी | नहीं है→ना सै/कोनी सै | मत→मत
 
 QUESTION WORDS:
-क्या→के, क्यों→क्यूं, कैसे→किसां, कब→कद, कहाँ→कड़ै/कठै, कौन→कौण, कितना→कित्ता
+क्या→के | क्यों→क्यूं | कैसे→किसां | कब→कद | कहाँ→कड़ै/कठै | कौन→कौण | कितना→कित्ता
 
 COMMON WORDS:
-बहुत→घणा, अच्छा→बढ़िया, बुरा→खराब, अभी→अबी, यहाँ→यां, वहाँ→वां
-बड़ा→बड़ा, छोटा→छोटा, थोड़ा→थोड़ा सा, सब→सारे, कोई→कोई
-घर→घर, काम→काम, बात→बात, दिन→दिन, लोग→लोग
-आदमी→मर्द/बंदा, औरत→लुगाई, बच्चा→छोरा (लड़का)/छोरी (लड़की)
-दोस्त→यार, भाई→भाई/भाया, पैसा→पैसा, खाना→खाणा
+बहुत→घणा | अच्छा→बढ़िया | बुरा→खराब | अभी→अबी | यहाँ→यां | वहाँ→वां
+घर→घर | काम→काम | बात→बात | दिन→दिन | लोग→लोग
+बच्चा→छोरा (m)/छोरी (f) | औरत→लुगाई | आदमी→बंदा/मर्द
+दोस्त→यार | भाई→भाई/भाया | पैसा→पैसा
 
-SENTENCE PATTERNS — sentence endings में use करो:
-सै (वो करता सै), सैं (वे जाते सैं), ना (कर ना भाई), री (सुण री)
+SENTENCE PATTERNS — end markers:
+सूं (म्हैं करता सूं) | सै (वो जाता सै) | सैं (वे जाते सैं)
 "देख भाई", "सुण यार", "हो जा", "कर दे", "बता दे"
+Tag endings: ना (कर ना भाई) | री (सुण री)
 
-FLAVOR — naturally scatter करो:
-भाई, यार, छोरा, छोरी, बावली, बाहर सै, घणा बढ़िया, ठाड़ा रह
-Avoid: formal Hindi endings, -ता हूँ (instead use -ता हूँ only if natural, else restructure)`,
+FLAVOR (scatter naturally): भाई, यार, छोरा, छोरी, बावली, घणा बढ़िया, ठाड़ा रह`,
 
   rajasthani:`RAJASTHANI/MARWARI (Devanagari) — authentic Rajasthan dialect:
 
 PRONOUNS:
-मैं→म्हैं, मुझे/मुझको→म्हाने, मेरा→म्हारो, मेरी→म्हारी, हम→म्हे, हमारा→म्हारो
-तुम→थे, तुम्हें→थाने, तेरा→थारो, तू→तूं, आप→आप/थे
-वो/वह→वो/उण, उसे→उणने, उसका→उणरो, यह→आ/इ, इसे→इणने, ये→ये, वे→वे/उणां
+मैं→म्हैं | मुझे/मुझको→म्हाने | मेरा→म्हारो | मेरी→म्हारी | हम→म्हे | हमारा→म्हारो
+तुम→थे | तुम्हें→थाने | तेरा→थारो | तू→तूं | आप→आप/थे
+वो/वह→वो/उण | उसे→उणने | उसका→उणरो | यह→आ/इ | इसे→इणने | वे→वे/उणां
 
-VERBS — present tense (है→छे for Marwari):
-है→छे, हैं→छे, हूँ→हूँ, हो→छो
-होना→होवणो, जाना→जावणो, करना→करणो, देखना→देखणो/निरखणो
-आना→आवणो, खाना→खावणो, पीना→पीवणो, लेना→लेवणो, देना→देवणो
-बोलना→बोलणो, रहना→रहणो, मिलना→मिलणो, सोना→सोवणो
-उठना→उठणो, बैठना→बैठणो, मारना→मारणो, चलना→चालणो
-बनना→बणणो, सुनना→सुणणो, समझना→समझणो, लड़ना→लड़णो
-हँसना→हँसणो, रोना→रोवणो, भागना→भाजणो
+PRESENT COPULA — MANDATORY SUBSTITUTION (no exceptions):
+हूँ → छूं   ← CRITICAL: NEVER write "हूँ" in Rajasthani output
+है  → छे   ← CRITICAL: NEVER write "है" — always "छे"
+हैं → छे   (plural also छे in Marwari)
+हो  → छो   (2nd person "you are")
 
-NEGATION: नहीं→कोनी, नहीं है→कोनी छे, मत→मत, नहीं था→कोनी थो
+INFINITIVES — MANDATORY: every "-ना" becomes "-णो":
+जाना→जावणो | करना→करणो | देखना→देखणो | आना→आवणो | खाना→खावणो
+पीना→पीवणो | लेना→लेवणो | देना→देवणो | बोलना→बोलणो | रहना→रहणो
+मिलना→मिलणो | सोना→सोवणो | उठना→उठणो | बैठना→बैठणो | मारना→मारणो
+चलना→चालणो | बनना→बणणो | सुनना→सुणणो | समझना→समझणो
+लड़ना→लड़णो | हँसना→हँसणो | रोना→रोवणो | भागना→भाजणो
+
+PAST TENSE — critical, very different from Hindi (gender-marked):
+था   → थो (m) | थी → थी (f) | थे → था (pl)
+गया  → गयो (m)  | गई → गई (f)  | गए → गया (pl)
+किया → कियो (m) | करी → करी (f) | किए → किया (pl)
+आया  → आयो (m)  | आई → आई (f)  | आए → आया (pl)
+देखा → देख्यो (m) | देखी → देखी (f)
+बोला → बोल्यो (m) | बोली → बोली (f)
+खाया → खायो (m)  | खाई → खाई (f)
+हुआ  → हुयो (m)  | हुई → हुई (f)
+रहा  → रह्यो (m) | रही → रही (f)
+Examples: "वो गयो" (he went) | "वा गई" (she went) | "म्हैं कियो" (I did)
+
+FUTURE TENSE:
+जाऊंगा→जासूं/जाऊंलो | जाएगा→जावेलो | आएगा→आवेलो
+करूंगा→करसूं/करूंलो | होगा→होवेलो | देखूंगा→देखसूं
+
+NEGATION: नहीं→कोनी | नहीं है→कोनी छे | मत→मत | नहीं था→कोनी थो
 
 QUESTION WORDS:
-क्या→के/शा, क्यों→क्यूं, कैसे→किंयां/कियां, कब→कद, कहाँ→कठे/कठै
-कौन→कुण, कितना→कित्तो, किसका→किणरो
+क्या→के/शा | क्यों→क्यूं | कैसे→किंयां/कियां | कब→कद | कहाँ→कठे/कठै
+कौन→कुण | कितना→कित्तो | किसका→किणरो
 
 COMMON WORDS:
-बहुत→घणो (masc)/घणी (fem), अच्छा→बढ़िया/सारो, बुरा→खराब/बुरो
-अभी→अबार/हाले, यहाँ→इठे/इयां, वहाँ→उठे/उयां
-बड़ा→मोटो/बड़ो, छोटा→नानो/छोटो, थोड़ा→थोड़ो, सब→सगळा
-घर→घर/घरां, काम→काम, बात→बात, दिन→दिन, लोग→लोग/मिनख
-आदमी→मिनख/बंदो, औरत→लुगाई/बाई, बच्चा→छोरो (लड़का)/छोरी (लड़की)
-दोस्त→भायलो/दोस्त, भाई→भाई/भायजी, पैसा→पइसो
-खाना→खाणो, पानी→पाणी, रात→रात, दिल→दिल
+बहुत→घणो (m)/घणी (f) | अच्छा→बढ़िया/सारो | बुरा→खराब/बुरो
+अभी→अबार/हाले | यहाँ→इठे/इयां | वहाँ→उठे/उयां
+बड़ा→मोटो/बड़ो | छोटा→नानो/छोटो | थोड़ा→थोड़ो | सब→सगळा
+घर→घर/घरां | काम→काम | बात→बात | लोग→लोग/मिनख
+आदमी→मिनख/बंदो | औरत→लुगाई/बाई | बच्चा→छोरो (m)/छोरी (f)
+दोस्त→भायलो/दोस्त | भाई→भाई/भायजी | पैसा→पइसो
+पानी→पाणी | दिल→दिल
 
-SENTENCE PATTERNS:
-"छे" for है/हैं, "कोनी" for नहीं/नहीं है
-Past: थो (masc था), थी (fem थी), हा (थे/were)
-"राम राम सा" (greeting), "जय श्री राम" naturally use करो
+SENTENCE PATTERNS: छे (वो करता छे) | कोनी (वो नहीं करता = वो करता कोनी)
 
-FLAVOR — naturally scatter करो:
-राम राम सा, भाई, बाई, हाँ भाई, कोनी यार, घणो बढ़िया
-Avoid: है, हैं, नहीं (replace with छे, कोनी) — ye Rajasthani ki core identity है`,
+FLAVOR (scatter naturally): राम राम सा, भाई, बाई, हाँ भाई, कोनी यार, घणो बढ़िया`,
   gujarati:`GUJARATI (Gujarati script — write ALL output in Gujarati script):
 
 PRONOUNS: હું (I/मैं), મને (me/मुझे), મારો/મારી (my/मेरा), તું (you informal/तुम), તમે (you formal/आप), તે/એ (he/she/वो), આ (this/यह), એ/પેલો (that/वो)
@@ -227,70 +259,62 @@ CRITICAL — NEVER write:
 - है, हैं, हूँ in output (always use છે)
 - नहीं in output (write નહીં in Gujarati script)
 - Hindi/Devanagari words mixed in — write entire output in Gujarati script`,
-  marathi:`MARATHI (Devanagari script — standard Maharashtrian Marathi):
+  marathi:`MARATHI (Devanagari script — spoken Maharashtrian Marathi):
 
-PRONOUNS: मी (I/मैं), मला (me/मुझे), माझा/माझी/माझं (my/मेरा), तू (you informal/तुम), तुम्ही/आपण (you formal/आप), तो/ती/ते (he/she/it/वो), हे/हा/ही (this/यह), ते/तो (that/वो)
+PRONOUNS:
+मी (I/मैं) | मला (me/मुझे) | माझा/माझी/माझं (my/मेरा)
+तू (you inf/तुम) | तुम्ही/आपण (you formal/आप)
+तो (he/वो m) | ती (she/वो f) | ते (they/वे) | हे/हा/ही (this/यह)
 
-VERBS (conjugations):
-- आहे = is/am (है) | आहेत = are (हैं) | आहात = you are (formal, हैं)
-- होतो/होती/होतं = was/were (था/थी/था)
-- जाणे = to go | जातो (I go, m), जाते (I go, f), गेलो/गेले (went m/f)
-- येणे = to come | येतो/येते (comes), आलो/आले (came m/f)
-- करणे = to do | करतो/करते (does), केलं (did)
-- खाणे = to eat | खातो/खाते (eats), खाल्लं (ate)
-- पिणे = to drink | पितो/पिते (drinks), प्यायलं (drank)
-- पाहणे = to see | पाहतो/पाहते (sees), पाहिलं (saw)
-- बोलणे = to speak | बोलतो/बोलते (speaks), बोललो (spoke)
-- झोपणे = to sleep | झोपतो (sleeps), झोपलो (slept)
-- बसणे = to sit | बसतो (sits), बसलो (sat)
-- उठणे = to get up | उठतो (gets up), उठलो (got up)
-- राहणे = to stay | राहतो (stays), राहिलो (stayed)
-- भेटणे = to meet | भेटतो (meets), भेटलो (met)
-- घेणे = to take | घेतो (takes), घेतलं (took)
-- देणे = to give | देतो (gives), दिलं (gave)
-- ऐकणे = to listen | ऐकतो (listens), ऐकलं (heard)
-- चालणे = to walk | चालतो (walks), चाललो (walked)
-- हसणे = to laugh | हसतो (laughs), हसलो (laughed)
-- रडणे = to cry | रडतो (cries), रडलो (cried)
-- समजणे = to understand | समजतो (understands), समजलं (understood)
-- होणे = to become/happen | होतं (it happens), झालं (it happened)
-- हवं आहे = want/need (चाहिए) | मला हवं = I want
-- आवडणे = to like | आवडतं (likes), आवडलं (liked)
+PRESENT COPULA — MANDATORY:
+आहे = is/am (है — NEVER write है) | आहेत = are (हैं — NEVER write हैं)
+आहात = you are (formal) | आहेस = you are (informal तू)
 
-PAST TENSE patterns:
-- masculine: -लो (गेलो, आलो, केलो, बोललो)
-- feminine: -ले (गेले, आले, केले)  
-- neuter: -लं (केलं, खाल्लं, पाहिलं, झालं)
-- plural/formal: -ला (गेला, आला, केला) or -ल्या (गेल्या, आल्या)
+PAST TENSE — use correct gender (this is the most common mistake):
+⚠️ NARRATION is 3rd person — use 3rd person forms, not 1st person!
 
-FUTURE: verb + -ईन/-शील/-ईल (जाईन=I'll go, जाशील=you'll go, जाईल=he'll go)
+3rd person MASCULINE (तो — he):    तो गेला | त्याने केलं | तो आला | तो बोलला | तो राहिला
+3rd person FEMININE (ती — she):    ती गेली | तिने केलं | ती आली | ती बोलली | ती राहिली
+Neuter/action (झालं/केलं etc.):   झालं | केलं | खाल्लं | पाहिलं | दिलं | घेतलं | मिळालं
 
-NEGATION: नाही (नहीं/is not — primary negation), नको (don't/मत), नाहीत (are not, plural)
-- "मी नाही येणार" = I won't come | "हे चांगलं नाही" = This is not good
-- नको रे = Don't (informal) | नको ना = Please don't
+1st person male speaker (मी — I):  मी गेलो | मी केलं | मी आलो | मी बोललो
+1st person female speaker (मी — I): मी गेले | मी केलं | मी आले | मी बोलले
 
-QUESTION WORDS: काय (what/क्या), का (why/क्यों), कुठे (where/कहाँ), केव्हा (when/कब), कोण (who/कौन), किती (how much/कितना), कसं (how/कैसे)
+PAST COPULA: होता (he was) | होती (she was) | होतं (it was) | होते (they were)
 
-COMMON VOCABULARY (40+ words):
-- Good: चांगलं (अच्छा) | Bad: वाईट (बुरा) | Very: खूप (बहुत)
-- Food: जेवण (खाना) | Water: पाणी (पानी) | House: घर (घर)
-- Man: माणूस (आदमी) | Woman: बाई/स्त्री (औरत) | Child: मुलगा/मुलगी (बच्चा)
-- Brother: भाऊ (भाई) | Sister: बहीण (बहन) | Friend: मित्र/दोस्त (दोस्त)
-- Now: आत्ता (अभी) | Then: मग (फिर/तब) | Today: आज (आज) | Tomorrow: उद्या (कल)
-- Here: इथे (यहाँ) | There: तिथे (वहाँ) | Always: नेहमी (हमेशा)
-- Yes: हो (हाँ) | No: नाही (नहीं) | Okay: ठीक/बरं (ठीक) | Really: खरंच (सच में)
-- Beautiful: सुंदर (सुंदर) | Big: मोठा (बड़ा) | Small: लहान (छोटा) | New: नवीन (नया)
-- Work: काम (काम) | Time: वेळ (समय) | Money: पैसे (पैसे) | Love: प्रेम (प्यार)
-- Happy: आनंदी (खुश) | Sad: दुःखी (दुखी) | Tired: थकलेलो (थका) | Angry: रागावलेलो (गुस्सा)
-- Fast: लवकर (जल्दी) | Slow: हळू (धीरे) | Again: परत (फिर से) | Also: पण (भी)
-- Market: बाजार | School: शाळा | Village: गाव | City: शहर | Road: रस्ता
+PRESENT TENSE:
+3rd person m: तो जातो | करतो | येतो | बोलतो | पाहतो | राहतो
+3rd person f: ती जाते | करते | येते | बोलते | पाहते | राहते
+1st person m: मी जातो | करतो | येतो | बोलतो
+1st person f: मी जाते | करते | येते | बोलते
 
-FLAVOR WORDS (scatter naturally): रे, बघ, अरे, बरं का, ऐकलंस का, खरंच, एकदम, अरे यार, ए, सांग, झकास, भारी, मस्त
+FUTURE: -ईन/-शील/-ईल (मी जाईन | तू जाशील | तो/ती जाईल | आम्ही जाऊ)
+
+NEGATION: नाही (primary — NEVER write नहीं) | नाहीत (are not, plural) | नको (don't/मत)
+"ती नाही थांबली" | "हे चांगलं नाही" | "नको रे" | "नको ना"
+
+QUESTION WORDS: काय (क्या) | का (क्यों) | कुठे (कहाँ) | केव्हा (कब) | कोण (कौन) | किती (कितना) | कसं (कैसे)
+
+VERBS (infinitive forms for reference):
+जाणे (to go) | येणे (to come) | करणे (to do) | पाहणे (to see) | सांगणे (to tell)
+राहणे (to stay) | देणे (to give) | घेणे (to take) | बोलणे (to speak) | हसणे (to laugh)
+रडणे (to cry) | झोपणे (to sleep) | उठणे (to get up) | बसणे (to sit) | चालणे (to walk)
+
+COMMON WORDS:
+चांगलं (अच्छा) | वाईट (बुरा) | खूप (बहुत) | आत्ता (अभी) | मग (फिर/तब)
+इथे (यहाँ) | तिथे (वहाँ) | आज (आज) | उद्या (कल) | नेहमी (हमेशा)
+मोठा/मोठी (बड़ा) | लहान (छोटा) | नवीन (नया) | सुंदर (सुंदर)
+जेवण (खाना) | पाणी (पानी) | घर (घर) | वेळ (समय) | पैसे (पैसे) | काम (काम)
+माणूस (आदमी) | बाई (औरत) | मुलगा/मुलगी (बच्चा/बेटी) | भाऊ (भाई) | बहीण (बहन)
+आनंदी (खुश) | दुःखी (दुखी) | थकलेला/थकलेली (थका) | रागावलेला/रागावलेली (गुस्सा)
+लवकर (जल्दी) | हळू (धीरे) | परत (फिर से) | पण (भी) | खरंच (सच में)
+
+FLAVOR (scatter naturally): रे, बघ, अरे, बरं का, सांग, खरंच, एकदम, मस्त, झकास, भारी
 
 CRITICAL — NEVER write:
-- है or हैं (always use आहे/आहेत)
-- नहीं (always use नाही)
-- Avoid mixing in Punjabi/Haryanvi vocabulary`,
+- है or हैं (always आहे/आहेत) — any है/हैं in output = instant failure
+- नहीं (always नाही)
+- Hindi/Haryanvi/Punjabi words mixed in`,
   punjabi:`PUNJABI (Gurmukhi script — write ALL output in Gurmukhi/Punjabi script):
 
 PRONOUNS: ਮੈਂ (I/मैं), ਮੈਨੂੰ (me/मुझे), ਮੇਰਾ/ਮੇਰੀ (my/मेरा), ਤੂੰ (you informal/तुम), ਤੁਸੀਂ (you formal/आप), ਉਹ (he/she/वो), ਇਹ (this/he/she/यह), ਉਹ (that/वो)
@@ -411,49 +435,57 @@ ${tmpl}
 }`;
 };
 
-const buildSingleConverterSystem = (id) =>
-  `You are an expert linguist specializing in Indian regional languages and dialects.
+const buildSingleConverterSystem = (id) => {
+  const checklist = id === "haryanvi" ? `
+━━━ HARYANVI FINAL CHECKLIST — scan your output before responding ━━━
+✅ हूँ → सूं  (MANDATORY — "हूँ" in output = FAILURE)
+✅ है  → सै   (MANDATORY — "है" in output = FAILURE)
+✅ हैं → सैं  (MANDATORY)
+✅ हो  → सो   (2nd person you are)
+✅ ALL "-ना" infinitives → "-णा"  (जाना→जाणा, करना→करणा, देखना→देखणा)
+✅ नहीं → ना / कोनी
+✅ मैं → म्हैं | मेरा → म्हारा | बहुत → घणा | क्या → के | कैसे → किसां
+✅ Past: किया→कर्या (m)/करी (f) | बोला→बोल्या (m)/बोली (f)
+✅ Future: जाएगा→जावेगा | होगा→होवेगा | आएगा→आवेगा
+❌ Zero Bhojpuri words: बा, बाड़न, नाहीं, हमके, ऊ, ओकरा — these are NOT Haryanvi` : id === "rajasthani" ? `
+━━━ RAJASTHANI FINAL CHECKLIST — scan your output before responding ━━━
+✅ हूँ → छूं  (MANDATORY — "हूँ" in output = FAILURE)
+✅ है  → छे   (MANDATORY — "है" in output = FAILURE)
+✅ हैं → छे   (MANDATORY)
+✅ हो  → छो   (2nd person you are)
+✅ ALL "-ना" infinitives → "-णो"  (जाना→जावणो, करना→करणो, देखना→देखणो)
+✅ नहीं → कोनी  (MANDATORY — "नहीं" in output = FAILURE)
+✅ मैं → म्हैं | मेरा → म्हारो | बहुत → घणो/घणी | कहाँ → कठे | कौन → कुण
+✅ Past gender: था→थो (m)/थी (f) | गया→गयो (m)/गई (f) | किया→कियो (m)/करी (f)
+✅ Future: जाएगा→जावेलो | होगा→होवेलो | आएगा→आवेलो
+❌ Zero Bhojpuri words: बा, बाड़न, नाहीं, हमके, ऊ — these are NOT Rajasthani` : id === "marathi" ? `
+━━━ MARATHI FINAL CHECKLIST — scan your output before responding ━━━
+✅ है  → आहे   (MANDATORY — "है" in output = FAILURE)
+✅ हैं → आहेत  (MANDATORY — "हैं" in output = FAILURE)
+✅ नहीं → नाही  (MANDATORY — "नहीं" in output = FAILURE)
+✅ Past 3rd person m: तो गेला, त्याने केलं, तो बोलला, तो राहिला
+✅ Past 3rd person f: ती गेली, तिने केलं, ती बोलली, ती राहिली
+✅ Past neuter: झालं, केलं, खाल्लं, पाहिलं, दिलं
+✅ Present 3rd m: तो जातो/करतो | Present 3rd f: ती जाते/करते
+✅ था → होता (m) / होती (f) / होतं (n)
+❌ ZERO Hindi words: है, हैं, था, नहीं — any one in output = failure` : id === "bhojpuri" ? `
+━━━ BHOJPURI FINAL CHECKLIST ━━━
+✅ है → बा | हैं → बाड़न | हूँ → बानी
+✅ नहीं → नाहीं | मैं → हम | मुझे → हमके | वो → ऊ
+❌ NEVER use "है", "नहीं", "मैं" in output` : "";
 
-STEP 1 — AUTO-DETECT INPUT LANGUAGE:
-The input script may be in ANY language or dialect: Hindi, English, Hinglish, Bhojpuri, Haryanvi, Rajasthani, Gujarati, Marathi, Punjabi, Bengali, or any mix.
-First, silently identify the source language/dialect. Do NOT mention it in your output.
+  return `You are an expert linguist. The input you receive is CLEAN, STANDARD HINDI.
+Your task: rewrite it completely in authentic ${id} dialect.
 
-STEP 2 — UNDERSTAND THE MEANING:
-Read the full script semantically. Understand the story, emotion, characters, and intent — not just the words.
-
-STEP 3 — CONVERT TO ${id.toUpperCase()} DIALECT:
-Rewrite the script completely in authentic ${id} dialect, preserving the original meaning, emotion, and structure.
-- If the input is already in ${id}: refine it to sound more authentic and natural, don't just return it as-is.
-- If the input is in another Indian dialect: understand it fully, then rewrite in ${id}.
-- If the input is in Hindi/Hinglish: convert using the dialect rules below.
-- If the input is in English: translate the meaning first, then write in ${id} dialect.
-- Show names, brand names ("Stage"), and proper nouns must be preserved exactly.
+Rules:
+- Preserve the original meaning, emotion, and structure.
+- Write as a NATIVE SPEAKER of ${id} would naturally speak — not a word-for-word Hindi swap.
+- All names, "Stage", and proper nouns: preserve exactly as given.
+- Output ONLY the converted ${id} text. No explanation, no labels, nothing else.
 
 ${DIALECT_RULES[id]}
-
-${id === "haryanvi" ? `CRITICAL HARYANVI CHECKLIST — verify every sentence:
-✅ Every "है" → "सै" (MANDATORY — the #1 Haryanvi marker)
-✅ Every "हैं" → "सैं"
-✅ Every infinitive "-ना" ending → "-णा" (जाना→जाणा, करना→करणा, देखना→देखणा)
-✅ Every "नहीं" → "ना" or "कोनी"
-✅ "बहुत" → "घणा", "क्या" → "के", "कैसे" → "किसां"
-✅ "मैं" → "म्हैं", "हम" → "म्हां", "मेरा" → "म्हारा"
-❌ NEVER use "है" at end of sentence — always "सै"
-❌ NEVER use plain "-ना" infinitives — always "-णा"` : ""}
-
-${id === "rajasthani" ? `CRITICAL RAJASTHANI CHECKLIST — verify every sentence:
-✅ Every "है/हैं" → "छे" (MANDATORY — the #1 Rajasthani/Marwari marker)
-✅ Every "नहीं" → "कोनी" (MANDATORY — never write "नहीं")
-✅ Every infinitive "-ना" ending → "-णो" (जाना→जावणो, करना→करणो, देखना→देखणो)
-✅ "बहुत" → "घणो/घणी", "क्या" → "के/शा", "कैसे" → "किंयां"
-✅ "मैं" → "म्हैं", "हम" → "म्हे", "मेरा" → "म्हारो"
-✅ "कहाँ" → "कठे", "कौन" → "कुण", "वो" → "उण"
-✅ Use "राम राम सा" naturally in appropriate places
-❌ NEVER use "है" or "हैं" — always "छे"
-❌ NEVER use "नहीं" — always "कोनी"
-❌ NEVER use plain "-ना" infinitives — always "-णो"` : ""}
-
-Respond with ONLY the converted ${id} dialect text. No JSON, no labels, no explanation, no source language mention.`;
+${checklist}`;
+};
 
 const TONES = [
   { id:"dramatic",  icon:"🎬", label:"Dramatic",
