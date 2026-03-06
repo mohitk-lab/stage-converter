@@ -40,7 +40,7 @@ const DIALECTS = [
   { id:"bhojpuri",   label:"भोजपुरी",   sub:"Bhojpuri",   region:"UP / Bihar",  color:"#f97316" },
   { id:"haryanvi",   label:"हरियाणवी",  sub:"Haryanvi",   region:"Haryana",     color:"#22c55e" },
   { id:"rajasthani", label:"राजस्थानी", sub:"Rajasthani", region:"Rajasthan",   color:"#3b82f6" },
-  { id:"gujarati",   label:"ગુજRATI",   sub:"Gujarati",   region:"Gujarat",     color:"#eab308" },
+  { id:"gujarati",   label:"ગુજરતિ",   sub:"Gujarati",   region:"Gujarat",     color:"#eab308" },
   { id:"marathi",    label:"मराठी",      sub:"Marathi",    region:"Maharashtra", color:"#ef4444" },
   { id:"punjabi",    label:"ਪੰਜਾਬੀ",    sub:"Punjabi",    region:"Punjab",      color:"#a855f7" },
 ];
@@ -873,7 +873,7 @@ const buildSinglePromoSystem = (id, tone, contentType, length, intensity, platfo
     bhojpuri:["Stage pe देखीं — सात दिन अनलिमिटेड बा","एक रुपिया में ट्रायल करीं"],
     haryanvi:["Stage पे देखो — सात दिन अनलिमिटेड सै","एक रुपिया में ट्रायल करो"],
     rajasthani:["Stage पर देखो — सात दिन अनलिमिटेड छे","एक रुपिया में ट्रायल करो"],
-    gujarati:["Stage પર જુઓ — સાત દિવસ અनलिमिटेड","એક રૂપિयामां ट्रायल"],
+    gujarati:["Stage પર જુઓ — સાત દિવસ અનલિમિટેડ","એક રૂપિયામાં ટ્રાયલ"],
     marathi:["Stage वर पाहा — सात दिवस अनलिमिटेड","एक रुपयात ट्रायल करा"],
     punjabi:["Stage ਤੇ ਦੇਖੋ — ਸੱਤ ਦਿਨ ਅਨਲਿਮਿਟਿਡ","ਇੱਕ ਰੁਪਏ ਵਿੱਚ ਟ੍ਰਾਇਲ"],
   };
