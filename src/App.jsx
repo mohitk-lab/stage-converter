@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 
-/* ─── Streaming fetch helper ─── */
+/* --- Streaming fetch helper --- */
 async function streamConvert({ model, system, messages }) {
   const res = await fetch("/api/convert", {
     method: "POST",
@@ -35,12 +35,12 @@ async function streamConvert({ model, system, messages }) {
   return content;
 }
 
-/* ─── Languages ─── */
+/* --- Languages --- */
 const LANGUAGES = [
   {
-    id: "hindi", label: "हिन्दी", sub: "Hindi", region: "India", color: "#f97316",
+    id: "hindi", label: "\u0939\u093F\u0928\u094D\u0926\u0940", sub: "Hindi", region: "India", color: "#f97316",
     bg: { grad1: "rgba(249,115,22,0.12)", grad2: "rgba(234,88,12,0.08)", grad3: "rgba(251,146,60,0.06)",
-          glyphs: ["ह","ि","न","द","ी","श","ब","द","क","ह","ा","न","ी","भ","ा","ष","र","स"], accent: "#f97316" }
+          glyphs: ["\u0939","\u093F","\u0928","\u0926","\u0940","\u0936","\u092C","\u0926","\u0915","\u0939","\u093E","\u0928","\u0940","\u092D","\u093E","\u0937","\u0930","\u0938"], accent: "#f97316" }
   },
   {
     id: "english", label: "English", sub: "English", region: "Global", color: "#3b82f6",
@@ -48,60 +48,60 @@ const LANGUAGES = [
           glyphs: ["A","B","C","T","h","e","W","o","r","d","S","p","e","a","k","L","a","n"], accent: "#3b82f6" }
   },
   {
-    id: "haryanvi", label: "हरियाणवी", sub: "Haryanvi", region: "Haryana", color: "#22c55e",
+    id: "haryanvi", label: "\u0939\u0930\u093F\u092F\u093E\u0923\u0935\u0940", sub: "Haryanvi", region: "Haryana", color: "#22c55e",
     bg: { grad1: "rgba(34,197,94,0.12)", grad2: "rgba(132,204,22,0.08)", grad3: "rgba(74,222,128,0.06)",
-          glyphs: ["ह","री","या","ण","वी","सै","घ","णा","भा","ई","छो","रा","म्हैं","यार","बा","त","सु","ण"], accent: "#22c55e" }
+          glyphs: ["\u0939","\u0930\u0940","\u092F\u093E","\u0923","\u0935\u0940","\u0938\u0948","\u0918","\u0923\u093E","\u092D\u093E","\u0908","\u091B\u094B","\u0930\u093E","\u092E\u094D\u0939\u0948\u0902","\u092F\u093E\u0930","\u092C\u093E","\u0924","\u0938\u0941","\u0923"], accent: "#22c55e" }
   },
   {
-    id: "rajasthani", label: "राजस्थानी", sub: "Rajasthani", region: "Rajasthan", color: "#eab308",
+    id: "rajasthani", label: "\u0930\u093E\u091C\u0938\u094D\u0925\u093E\u0928\u0940", sub: "Rajasthani", region: "Rajasthan", color: "#eab308",
     bg: { grad1: "rgba(234,179,8,0.12)", grad2: "rgba(217,119,6,0.08)", grad3: "rgba(250,204,21,0.06)",
-          glyphs: ["रा","ज","स्था","नी","छे","को","णी","म्हा","रो","घ","णो","पा","णी","सा","भा","ई","कठे","थो"], accent: "#eab308" }
+          glyphs: ["\u0930\u093E","\u091C","\u0938\u094D\u0925\u093E","\u0928\u0940","\u091B\u0947","\u0915\u094B","\u0923\u0940","\u092E\u094D\u0939\u093E","\u0930\u094B","\u0918","\u0923\u094B","\u092A\u093E","\u0923\u0940","\u0938\u093E","\u092D\u093E","\u0908","\u0915\u0920\u0947","\u0925\u094B"], accent: "#eab308" }
   },
   {
-    id: "bhojpuri", label: "भोजपुरी", sub: "Bhojpuri", region: "UP / Bihar", color: "#ef4444",
+    id: "bhojpuri", label: "\u092D\u094B\u091C\u092A\u0941\u0930\u0940", sub: "Bhojpuri", region: "UP / Bihar", color: "#ef4444",
     bg: { grad1: "rgba(239,68,68,0.12)", grad2: "rgba(220,38,38,0.08)", grad3: "rgba(248,113,113,0.06)",
-          glyphs: ["भो","ज","पु","री","बा","ना","हीं","हम","के","ऊ","भइ","या","का","हे","ला","इका","जि","न"], accent: "#ef4444" }
+          glyphs: ["\u092D\u094B","\u091C","\u092A\u0941","\u0930\u0940","\u092C\u093E","\u0928\u093E","\u0939\u0940\u0902","\u0939\u092E","\u0915\u0947","\u090A","\u092D\u0907","\u092F\u093E","\u0915\u093E","\u0939\u0947","\u0932\u093E","\u0907\u0915\u093E","\u091C\u093F","\u0928"], accent: "#ef4444" }
   },
   {
-    id: "gujarati", label: "ગુજરાતી", sub: "Gujarati", region: "Gujarat", color: "#a855f7",
+    id: "gujarati", label: "\u0A97\u0AC1\u0A9C\u0AB0\u0ABE\u0AA4\u0AC0", sub: "Gujarati", region: "Gujarat", color: "#a855f7",
     bg: { grad1: "rgba(168,85,247,0.12)", grad2: "rgba(124,58,237,0.08)", grad3: "rgba(192,132,252,0.06)",
-          glyphs: ["ગુ","જ","ર","ત","ી","છે","ભા","ઈ","સા","રું","હું","પા","ણી","ને","કે","મ","આ","વો"], accent: "#a855f7" }
+          glyphs: ["\u0A97\u0AC1","\u0A9C","\u0AB0","\u0AA4","\u0AC0","\u0A9B\u0AC7","\u0AAD\u0ABE","\u0A88","\u0AB8\u0ABE","\u0AB0\u0AC1\u0A82","\u0AB9\u0AC1\u0A82","\u0AAA\u0ABE","\u0AA3\u0AC0","\u0AA8\u0AC7","\u0A95\u0AC7","\u0AAE","\u0A86","\u0AB5\u0ACB"], accent: "#a855f7" }
   },
 ];
 
-/* ─── Dialect Rules ─── */
+/* --- Dialect Rules --- */
 const DIALECT_RULES = {
-  hindi: `HINDI (Standard Khari Boli) — clean, literary Hindi:
+  hindi: `HINDI (Standard Khari Boli) \u2014 clean, literary Hindi:
 
 OUTPUT IN: Devanagari script. Clean, standard Hindi (Khari Boli).
 
 RULES:
-- Write in pure, standard Hindi — no regional dialect markers.
+- Write in pure, standard Hindi \u2014 no regional dialect markers.
 - Use formal/semi-formal register unless the input tone is clearly casual.
 - Preserve the original meaning, emotion, and structure exactly.
 - Do NOT use any Bhojpuri/Haryanvi/Rajasthani/Gujarati dialect words.
 - Avoid English words unless they are commonly used in Hindi (like "phone", "computer").
 - Use proper Hindi grammar: correct gender agreement, verb conjugations, postpositions.
-- If input is already Hindi, clean it up — fix grammar, remove dialect contamination.
+- If input is already Hindi, clean it up \u2014 fix grammar, remove dialect contamination.
 
 COMMON CORRECTIONS:
-- बा/सै/छे → है
-- नाहीं/कोनी → नहीं
-- हमके/म्हाने → मुझे
-- ऊ/वो → वह/वो (standard)
-- काहे/क्यूं → क्यों
-- केतना/कित्ता → कितना
+- \u092C\u093E/\u0938\u0948/\u091B\u0947 \u2192 \u0939\u0948
+- \u0928\u093E\u0939\u0940\u0902/\u0915\u094B\u0928\u0940 \u2192 \u0928\u0939\u0940\u0902
+- \u0939\u092E\u0915\u0947/\u092E\u094D\u0939\u093E\u0928\u0947 \u2192 \u092E\u0941\u091D\u0947
+- \u090A/\u0935\u094B \u2192 \u0935\u0939/\u0935\u094B (standard)
+- \u0915\u093E\u0939\u0947/\u0915\u094D\u092F\u0942\u0902 \u2192 \u0915\u094D\u092F\u094B\u0902
+- \u0915\u0947\u0924\u0928\u093E/\u0915\u093F\u0924\u094D\u0924\u093E \u2192 \u0915\u093F\u0924\u0928\u093E
 
 FLAVOR: Standard, clean, universally understood Hindi. Suitable for formal writing, news, or pan-India audience.`,
 
-  english: `ENGLISH — natural, conversational English:
+  english: `ENGLISH \u2014 natural, conversational English:
 
 OUTPUT IN: English (Latin script).
 
 RULES:
-- Translate to natural, conversational English — NOT literal word-for-word translation.
+- Translate to natural, conversational English \u2014 NOT literal word-for-word translation.
 - Preserve the original meaning, emotion, tone, and narrative structure.
-- Keep cultural references intact — explain briefly in context if needed, but do NOT over-explain.
+- Keep cultural references intact \u2014 explain briefly in context if needed, but do NOT over-explain.
 - Proper nouns, names, brand names, and titles stay as-is (transliterated if in Devanagari).
 - Use contractions naturally (don't, it's, wasn't) for casual tone.
 - Match the register of the original: if input is dramatic, keep it dramatic. If casual, keep it casual.
@@ -109,356 +109,356 @@ RULES:
 - Hindi/Urdu cultural terms that have no direct English equivalent can be kept with brief context.
   e.g. "izzat" can stay as "izzat (honour)" on first use, then just "izzat" after.
 
-FLAVOR: Readable, engaging English that an Indian English speaker would naturally use. Not British-formal, not American-slang — natural Indian English.`,
+FLAVOR: Readable, engaging English that an Indian English speaker would naturally use. Not British-formal, not American-slang \u2014 natural Indian English.`,
 
-  bhojpuri: `BHOJPURI (Devanagari) — authentic Bhojpuri dialect (UP/Bihar):
+  bhojpuri: `BHOJPURI (Devanagari) \u2014 authentic Bhojpuri dialect (UP/Bihar):
 
-★★★ TOP 5 NON-NEGOTIABLE BHOJPURI MARKERS (every output MUST have these) ★★★
-1. है→बा (copula) — NOT सै (that's Haryanvi), NOT छे (that's Rajasthani)
-2. हूँ→बानी — NOT सूं (Haryanvi), NOT छूं (Rajasthani)
-3. हैं→बाड़न — NOT सैं (Haryanvi), NOT छे (Rajasthani)
-4. मैं→हम, मुझे→हमके — NOT म्हैं/म्हाने (Haryanvi/Rajasthani)
-5. नहीं→नाहीं — NOT कोनी (Rajasthani), NOT ना (Haryanvi)
-If your output contains सै/छे/सूं/छूं/म्हैं you have FAILED.
+\u2605\u2605\u2605 TOP 5 NON-NEGOTIABLE BHOJPURI MARKERS (every output MUST have these) \u2605\u2605\u2605
+1. \u0939\u0948\u2192\u092C\u093E (copula) \u2014 NOT \u0938\u0948 (that's Haryanvi), NOT \u091B\u0947 (that's Rajasthani)
+2. \u0939\u0942\u0901\u2192\u092C\u093E\u0928\u0940 \u2014 NOT \u0938\u0942\u0902 (Haryanvi), NOT \u091B\u0942\u0902 (Rajasthani)
+3. \u0939\u0948\u0902\u2192\u092C\u093E\u0921\u093C\u0928 \u2014 NOT \u0938\u0948\u0902 (Haryanvi), NOT \u091B\u0947 (Rajasthani)
+4. \u092E\u0948\u0902\u2192\u0939\u092E, \u092E\u0941\u091D\u0947\u2192\u0939\u092E\u0915\u0947 \u2014 NOT \u092E\u094D\u0939\u0948\u0902/\u092E\u094D\u0939\u093E\u0928\u0947 (Haryanvi/Rajasthani)
+5. \u0928\u0939\u0940\u0902\u2192\u0928\u093E\u0939\u0940\u0902 \u2014 NOT \u0915\u094B\u0928\u0940 (Rajasthani), NOT \u0928\u093E (Haryanvi)
+If your output contains \u0938\u0948/\u091B\u0947/\u0938\u0942\u0902/\u091B\u0942\u0902/\u092E\u094D\u0939\u0948\u0902 you have FAILED.
 
 PRONOUNS:
-मैं→हम, मुझे/मुझको→हमके, मेरा→हमार, मेरी→हमार
-तुम→तू, तुम्हें→तोहके, तेरा→तोहार, तू→तू, आप→रउआ
-वो/वह→ऊ, उसे→ओकरा, उसका→ओकर, यह→ई, इसे→एकरा
-हम (हम लोग)→हमलोग, हमारा→हमार, वे→उ लोग, उन्हें→उन्हके
+\u092E\u0948\u0902\u2192\u0939\u092E, \u092E\u0941\u091D\u0947/\u092E\u0941\u091D\u0915\u094B\u2192\u0939\u092E\u0915\u0947, \u092E\u0947\u0930\u093E\u2192\u0939\u092E\u093E\u0930, \u092E\u0947\u0930\u0940\u2192\u0939\u092E\u093E\u0930
+\u0924\u0941\u092E\u2192\u0924\u0942, \u0924\u0941\u092E\u094D\u0939\u0947\u0902\u2192\u0924\u094B\u0939\u0915\u0947, \u0924\u0947\u0930\u093E\u2192\u0924\u094B\u0939\u093E\u0930, \u0924\u0942\u2192\u0924\u0942, \u0906\u092A\u2192\u0930\u0909\u0906
+\u0935\u094B/\u0935\u0939\u2192\u090A, \u0909\u0938\u0947\u2192\u0913\u0915\u0930\u093E, \u0909\u0938\u0915\u093E\u2192\u0913\u0915\u0930, \u092F\u0939\u2192\u0908, \u0907\u0938\u0947\u2192\u090F\u0915\u0930\u093E
+\u0939\u092E (\u0939\u092E \u0932\u094B\u0917)\u2192\u0939\u092E\u0932\u094B\u0917, \u0939\u092E\u093E\u0930\u093E\u2192\u0939\u092E\u093E\u0930, \u0935\u0947\u2192\u0909 \u0932\u094B\u0917, \u0909\u0928\u094D\u0939\u0947\u0902\u2192\u0909\u0928\u094D\u0939\u0915\u0947
 
-VERBS — present/habitual:
-है→बा, हैं→बाड़न, हूँ→बानी, हो→बाड़ा
-होना→होखे/होइब, जाना→जाइब, आना→आइब, करना→करब
-देखना→देखब, खाना→खाइब, पीना→पिअब, लेना→लेब
-देना→देब, बोलना→बोलब, रहना→रहब, मिलना→मिलब
-सोना→सोअब, उठना→उठब, बैठना→बइठब, मारना→मारब
-चलना→चलब, बनना→बनब, सुनना→सुनब, समझना→समझब
-लड़ना→लड़ब, हँसना→हँसब, रोना→रोअब, भागना→भागब
+VERBS \u2014 present/habitual:
+\u0939\u0948\u2192\u092C\u093E, \u0939\u0948\u0902\u2192\u092C\u093E\u0921\u093C\u0928, \u0939\u0942\u0901\u2192\u092C\u093E\u0928\u0940, \u0939\u094B\u2192\u092C\u093E\u0921\u093C\u093E
+\u0939\u094B\u0928\u093E\u2192\u0939\u094B\u0916\u0947/\u0939\u094B\u0907\u092C, \u091C\u093E\u0928\u093E\u2192\u091C\u093E\u0907\u092C, \u0906\u0928\u093E\u2192\u0906\u0907\u092C, \u0915\u0930\u0928\u093E\u2192\u0915\u0930\u092C
+\u0926\u0947\u0916\u0928\u093E\u2192\u0926\u0947\u0916\u092C, \u0916\u093E\u0928\u093E\u2192\u0916\u093E\u0907\u092C, \u092A\u0940\u0928\u093E\u2192\u092A\u093F\u0905\u092C, \u0932\u0947\u0928\u093E\u2192\u0932\u0947\u092C
+\u0926\u0947\u0928\u093E\u2192\u0926\u0947\u092C, \u092C\u094B\u0932\u0928\u093E\u2192\u092C\u094B\u0932\u092C, \u0930\u0939\u0928\u093E\u2192\u0930\u0939\u092C, \u092E\u093F\u0932\u0928\u093E\u2192\u092E\u093F\u0932\u092C
+\u0938\u094B\u0928\u093E\u2192\u0938\u094B\u0905\u092C, \u0909\u0920\u0928\u093E\u2192\u0909\u0920\u092C, \u092C\u0948\u0920\u0928\u093E\u2192\u092C\u0907\u0920\u092C, \u092E\u093E\u0930\u0928\u093E\u2192\u092E\u093E\u0930\u092C
+\u091A\u0932\u0928\u093E\u2192\u091A\u0932\u092C, \u092C\u0928\u0928\u093E\u2192\u092C\u0928\u092C, \u0938\u0941\u0928\u0928\u093E\u2192\u0938\u0941\u0928\u092C, \u0938\u092E\u091D\u0928\u093E\u2192\u0938\u092E\u091D\u092C
+\u0932\u0921\u093C\u0928\u093E\u2192\u0932\u0921\u093C\u092C, \u0939\u0901\u0938\u0928\u093E\u2192\u0939\u0901\u0938\u092C, \u0930\u094B\u0928\u093E\u2192\u0930\u094B\u0905\u092C, \u092D\u093E\u0917\u0928\u093E\u2192\u092D\u093E\u0917\u092C
 
-PAST TENSE: गया→गइल, आया→आइल, किया→कइल, देखा→देखल,
-खाया→खइलन, बोला→बोललन, था→रहल (m)/रहली (f)/रहलन (pl)
+PAST TENSE: \u0917\u092F\u093E\u2192\u0917\u0907\u0932, \u0906\u092F\u093E\u2192\u0906\u0907\u0932, \u0915\u093F\u092F\u093E\u2192\u0915\u0907\u0932, \u0926\u0947\u0916\u093E\u2192\u0926\u0947\u0916\u0932,
+\u0916\u093E\u092F\u093E\u2192\u0916\u0907\u0932\u0928, \u092C\u094B\u0932\u093E\u2192\u092C\u094B\u0932\u0932\u0928, \u0925\u093E\u2192\u0930\u0939\u0932 (m)/\u0930\u0939\u0932\u0940 (f)/\u0930\u0939\u0932\u0928 (pl)
 
-NEGATION: नहीं→नाहीं, मत→जनि, नहीं था→नाहीं रहल, नहीं है→नाहीं बा
+NEGATION: \u0928\u0939\u0940\u0902\u2192\u0928\u093E\u0939\u0940\u0902, \u092E\u0924\u2192\u091C\u0928\u093F, \u0928\u0939\u0940\u0902 \u0925\u093E\u2192\u0928\u093E\u0939\u0940\u0902 \u0930\u0939\u0932, \u0928\u0939\u0940\u0902 \u0939\u0948\u2192\u0928\u093E\u0939\u0940\u0902 \u092C\u093E
 
 QUESTION WORDS:
-क्या→का, क्यों→काहे, कैसे→कइसे, कब→कब, कहाँ→कहाँ/कवना जगह
-कौन→के, कितना→केतना, किसका→केकर
+\u0915\u094D\u092F\u093E\u2192\u0915\u093E, \u0915\u094D\u092F\u094B\u0902\u2192\u0915\u093E\u0939\u0947, \u0915\u0948\u0938\u0947\u2192\u0915\u0907\u0938\u0947, \u0915\u092C\u2192\u0915\u092C, \u0915\u0939\u093E\u0901\u2192\u0915\u0939\u093E\u0901/\u0915\u0935\u0928\u093E \u091C\u0917\u0939
+\u0915\u094C\u0928\u2192\u0915\u0947, \u0915\u093F\u0924\u0928\u093E\u2192\u0915\u0947\u0924\u0928\u093E, \u0915\u093F\u0938\u0915\u093E\u2192\u0915\u0947\u0915\u0930
 
 COMMON WORDS:
-बहुत→बहुते/घाने, अच्छा→नीमन, बुरा→खराब/बेकार
-अभी→अबहीं, यहाँ→इहाँ, वहाँ→उहाँ, बड़ा→बड़हन, छोटा→छोटहन
-थोड़ा→थोड़ेक, सब→सब, कोई→केहू, कुछ→कुछो
-घर→घर, काम→काम, बात→बात, दिन→दिन, रात→रात
-आदमी→मरद, औरत→मेहरारू, बच्चा→लइका (m)/लइकी (f)
-दोस्त→यार/दोस्त, भाई→भइया, बहन→दीदी/बहिनी, पैसा→पइसा
-खाना→खाना, पानी→पानी, दिल→दिल, प्यार→प्यार/इश्क
-जिंदगी→जिनगी, सच→सच, झूठ→झूठ, आज→आज
-जल्दी→जल्दी, साथ→साथे, अब→अब, फिर→फेर
+\u092C\u0939\u0941\u0924\u2192\u092C\u0939\u0941\u0924\u0947/\u0918\u093E\u0928\u0947, \u0905\u091A\u094D\u091B\u093E\u2192\u0928\u0940\u092E\u0928, \u092C\u0941\u0930\u093E\u2192\u0916\u0930\u093E\u092C/\u092C\u0947\u0915\u093E\u0930
+\u0905\u092D\u0940\u2192\u0905\u092C\u0939\u0940\u0902, \u092F\u0939\u093E\u0901\u2192\u0907\u0939\u093E\u0901, \u0935\u0939\u093E\u0901\u2192\u0909\u0939\u093E\u0901, \u092C\u0921\u093C\u093E\u2192\u092C\u0921\u093C\u0939\u0928, \u091B\u094B\u091F\u093E\u2192\u091B\u094B\u091F\u0939\u0928
+\u0925\u094B\u0921\u093C\u093E\u2192\u0925\u094B\u0921\u093C\u0947\u0915, \u0938\u092C\u2192\u0938\u092C, \u0915\u094B\u0908\u2192\u0915\u0947\u0939\u0942, \u0915\u0941\u091B\u2192\u0915\u0941\u091B\u094B
+\u0918\u0930\u2192\u0918\u0930, \u0915\u093E\u092E\u2192\u0915\u093E\u092E, \u092C\u093E\u0924\u2192\u092C\u093E\u0924, \u0926\u093F\u0928\u2192\u0926\u093F\u0928, \u0930\u093E\u0924\u2192\u0930\u093E\u0924
+\u0906\u0926\u092E\u0940\u2192\u092E\u0930\u0926, \u0914\u0930\u0924\u2192\u092E\u0947\u0939\u0930\u093E\u0930\u0942, \u092C\u091A\u094D\u091A\u093E\u2192\u0932\u0907\u0915\u093E (m)/\u0932\u0907\u0915\u0940 (f)
+\u0926\u094B\u0938\u094D\u0924\u2192\u092F\u093E\u0930/\u0926\u094B\u0938\u094D\u0924, \u092D\u093E\u0908\u2192\u092D\u0907\u092F\u093E, \u092C\u0939\u0928\u2192\u0926\u0940\u0926\u0940/\u092C\u0939\u093F\u0928\u0940, \u092A\u0948\u0938\u093E\u2192\u092A\u0907\u0938\u093E
+\u0916\u093E\u0928\u093E\u2192\u0916\u093E\u0928\u093E, \u092A\u093E\u0928\u0940\u2192\u092A\u093E\u0928\u0940, \u0926\u093F\u0932\u2192\u0926\u093F\u0932, \u092A\u094D\u092F\u093E\u0930\u2192\u092A\u094D\u092F\u093E\u0930/\u0907\u0936\u094D\u0915
+\u091C\u093F\u0902\u0926\u0917\u0940\u2192\u091C\u093F\u0928\u0917\u0940, \u0938\u091A\u2192\u0938\u091A, \u091D\u0942\u0920\u2192\u091D\u0942\u0920, \u0906\u091C\u2192\u0906\u091C
+\u091C\u0932\u094D\u0926\u0940\u2192\u091C\u0932\u094D\u0926\u0940, \u0938\u093E\u0925\u2192\u0938\u093E\u0925\u0947, \u0905\u092C\u2192\u0905\u092C, \u092B\u093F\u0930\u2192\u092B\u0947\u0930
 
 SENTENCE PATTERNS:
-"बा" (है), "बाड़न" (हैं), "बानी" (हूँ)
-Ending में "हऊ" (confirmation), "ना" (tag question)
-E.g.: "ई बहुते नीमन बा हऊ" / "तू कहाँ जात बाड़ा ना?"
+"\u092C\u093E" (\u0939\u0948), "\u092C\u093E\u0921\u093C\u0928" (\u0939\u0948\u0902), "\u092C\u093E\u0928\u0940" (\u0939\u0942\u0901)
+Ending \u092E\u0947\u0902 "\u0939\u0909" (confirmation), "\u0928\u093E" (tag question)
+E.g.: "\u0908 \u092C\u0939\u0941\u0924\u0947 \u0928\u0940\u092E\u0928 \u092C\u093E \u0939\u0909" / "\u0924\u0942 \u0915\u0939\u093E\u0901 \u091C\u093E\u0924 \u092C\u093E\u0921\u093C\u093E \u0928\u093E?"
 
-CRITICAL — NEVER use: है, हैं, नहीं (always बा, बाड़न, नाहीं)
-FLAVOR: भइया, ए बाबू, हो, ना, राम राम naturally use करो`,
+CRITICAL \u2014 NEVER use: \u0939\u0948, \u0939\u0948\u0902, \u0928\u0939\u0940\u0902 (always \u092C\u093E, \u092C\u093E\u0921\u093C\u0928, \u0928\u093E\u0939\u0940\u0902)
+FLAVOR: \u092D\u0907\u092F\u093E, \u090F \u092C\u093E\u092C\u0942, \u0939\u094B, \u0928\u093E, \u0930\u093E\u092E \u0930\u093E\u092E naturally use \u0915\u0930\u094B`,
 
-  haryanvi: `HARYANVI (Devanagari) — authentic Haryana dialect:
+  haryanvi: `HARYANVI (Devanagari) \u2014 authentic Haryana dialect:
 
-★★★ TOP 5 NON-NEGOTIABLE HARYANVI MARKERS (every output MUST have these) ★★★
-1. है→सै (copula) — NOT बा (that's Bhojpuri), NOT छे (that's Rajasthani)
-2. हूँ→सूं — NOT बानी (Bhojpuri), NOT छूं (Rajasthani)
-3. Infinitives end in -णा (जाणा, करणा) — NOT -णो (Rajasthani), NOT -ब (Bhojpuri)
-4. Past tense: किया→कर्या, देखा→देख्या — NOT कियो/देख्यो (Rajasthani), NOT कइल/देखल (Bhojpuri)
-5. नहीं→ना/कोनी — NOT नाहीं (Bhojpuri)
-If your output contains बा/छे/बानी/छूं/-णो/नाहीं you have FAILED.
+\u2605\u2605\u2605 TOP 5 NON-NEGOTIABLE HARYANVI MARKERS (every output MUST have these) \u2605\u2605\u2605
+1. \u0939\u0948\u2192\u0938\u0948 (copula) \u2014 NOT \u092C\u093E (that's Bhojpuri), NOT \u091B\u0947 (that's Rajasthani)
+2. \u0939\u0942\u0901\u2192\u0938\u0942\u0902 \u2014 NOT \u092C\u093E\u0928\u0940 (Bhojpuri), NOT \u091B\u0942\u0902 (Rajasthani)
+3. Infinitives end in -\u0923\u093E (\u091C\u093E\u0923\u093E, \u0915\u0930\u0923\u093E) \u2014 NOT -\u0923\u094B (Rajasthani), NOT -\u092C (Bhojpuri)
+4. Past tense: \u0915\u093F\u092F\u093E\u2192\u0915\u0930\u094D\u092F\u093E, \u0926\u0947\u0916\u093E\u2192\u0926\u0947\u0916\u094D\u092F\u093E \u2014 NOT \u0915\u093F\u092F\u094B/\u0926\u0947\u0916\u094D\u092F\u094B (Rajasthani), NOT \u0915\u0907\u0932/\u0926\u0947\u0916\u0932 (Bhojpuri)
+5. \u0928\u0939\u0940\u0902\u2192\u0928\u093E/\u0915\u094B\u0928\u0940 \u2014 NOT \u0928\u093E\u0939\u0940\u0902 (Bhojpuri)
+If your output contains \u092C\u093E/\u091B\u0947/\u092C\u093E\u0928\u0940/\u091B\u0942\u0902/-\u0923\u094B/\u0928\u093E\u0939\u0940\u0902 you have FAILED.
 
 PRONOUNS:
-मैं→म्हैं | मुझे/मुझको→म्हाने | मेरा→म्हारा | मेरी→म्हारी | हम→म्हां | हमारा→म्हारा
-तुम→थारे | तुम्हें→थाने | तेरा→थारा | तू→तू | आप→आपनै/थाने
-वो/वह→वो | उसे→उसनै | उसका→उसका | यह→या | इसे→इसनै | वे→वे | उन्हें→उन्नै
+\u092E\u0948\u0902\u2192\u092E\u094D\u0939\u0948\u0902 | \u092E\u0941\u091D\u0947/\u092E\u0941\u091D\u0915\u094B\u2192\u092E\u094D\u0939\u093E\u0928\u0947 | \u092E\u0947\u0930\u093E\u2192\u092E\u094D\u0939\u093E\u0930\u093E | \u092E\u0947\u0930\u0940\u2192\u092E\u094D\u0939\u093E\u0930\u0940 | \u0939\u092E\u2192\u092E\u094D\u0939\u093E\u0902 | \u0939\u092E\u093E\u0930\u093E\u2192\u092E\u094D\u0939\u093E\u0930\u093E
+\u0924\u0941\u092E\u2192\u0925\u093E\u0930\u0947 | \u0924\u0941\u092E\u094D\u0939\u0947\u0902\u2192\u0925\u093E\u0928\u0947 | \u0924\u0947\u0930\u093E\u2192\u0925\u093E\u0930\u093E | \u0924\u0942\u2192\u0924\u0942 | \u0906\u092A\u2192\u0906\u092A\u0928\u0948/\u0925\u093E\u0928\u0947
+\u0935\u094B/\u0935\u0939\u2192\u0935\u094B | \u0909\u0938\u0947\u2192\u0909\u0938\u0928\u0948 | \u0909\u0938\u0915\u093E\u2192\u0909\u0938\u0915\u093E | \u092F\u0939\u2192\u092F\u093E | \u0907\u0938\u0947\u2192\u0907\u0938\u0928\u0948 | \u0935\u0947\u2192\u0935\u0947 | \u0909\u0928\u094D\u0939\u0947\u0902\u2192\u0909\u0928\u094D\u0928\u0948
 
-PRESENT COPULA — MANDATORY SUBSTITUTION (no exceptions):
-हूँ → सूं   CRITICAL: NEVER write "हूँ" in Haryanvi output
-है  → सै    CRITICAL: NEVER write "है" at sentence end — always "सै"
-हैं → सैं
-हो  → सो   (2nd person "you are")
+PRESENT COPULA \u2014 MANDATORY SUBSTITUTION (no exceptions):
+\u0939\u0942\u0901 \u2192 \u0938\u0942\u0902   CRITICAL: NEVER write "\u0939\u0942\u0901" in Haryanvi output
+\u0939\u0948  \u2192 \u0938\u0948    CRITICAL: NEVER write "\u0939\u0948" at sentence end \u2014 always "\u0938\u0948"
+\u0939\u0948\u0902 \u2192 \u0938\u0948\u0902
+\u0939\u094B  \u2192 \u0938\u094B   (2nd person "you are")
 
-INFINITIVES — MANDATORY: every "-ना" becomes "-णा":
-जाना→जाणा | करना→करणा | देखना→देखणा | आना→आणा | खाना→खाणा
-पीना→पीणा | लेना→लेणा | देना→देणा | बोलना→बोलणा | रहना→रहणा
-मिलना→मिलणा | सोना→सोणा | उठना→उठणा | बैठना→बैठणा | मारना→मारणा
-चलना→चालणा | बनना→बणणा | सुनना→सुणणा | समझना→समझणा
-लड़ना→लड़णा | हँसना→हँसणा | रोना→रोणा | भागना→भाजणा
+INFINITIVES \u2014 MANDATORY: every "-\u0928\u093E" becomes "-\u0923\u093E":
+\u091C\u093E\u0928\u093E\u2192\u091C\u093E\u0923\u093E | \u0915\u0930\u0928\u093E\u2192\u0915\u0930\u0923\u093E | \u0926\u0947\u0916\u0928\u093E\u2192\u0926\u0947\u0916\u0923\u093E | \u0906\u0928\u093E\u2192\u0906\u0923\u093E | \u0916\u093E\u0928\u093E\u2192\u0916\u093E\u0923\u093E
+\u092A\u0940\u0928\u093E\u2192\u092A\u0940\u0923\u093E | \u0932\u0947\u0928\u093E\u2192\u0932\u0947\u0923\u093E | \u0926\u0947\u0928\u093E\u2192\u0926\u0947\u0923\u093E | \u092C\u094B\u0932\u0928\u093E\u2192\u092C\u094B\u0932\u0923\u093E | \u0930\u0939\u0928\u093E\u2192\u0930\u0939\u0923\u093E
+\u092E\u093F\u0932\u0928\u093E\u2192\u092E\u093F\u0932\u0923\u093E | \u0938\u094B\u0928\u093E\u2192\u0938\u094B\u0923\u093E | \u0909\u0920\u0928\u093E\u2192\u0909\u0920\u0923\u093E | \u092C\u0948\u0920\u0928\u093E\u2192\u092C\u0948\u0920\u0923\u093E | \u092E\u093E\u0930\u0928\u093E\u2192\u092E\u093E\u0930\u0923\u093E
+\u091A\u0932\u0928\u093E\u2192\u091A\u093E\u0932\u0923\u093E | \u092C\u0928\u0928\u093E\u2192\u092C\u0923\u0923\u093E | \u0938\u0941\u0928\u0928\u093E\u2192\u0938\u0941\u0923\u0923\u093E | \u0938\u092E\u091D\u0928\u093E\u2192\u0938\u092E\u091D\u0923\u093E
+\u0932\u0921\u093C\u0928\u093E\u2192\u0932\u0921\u093C\u0923\u093E | \u0939\u0901\u0938\u0928\u093E\u2192\u0939\u0901\u0938\u0923\u093E | \u0930\u094B\u0928\u093E\u2192\u0930\u094B\u0923\u093E | \u092D\u093E\u0917\u0928\u093E\u2192\u092D\u093E\u091C\u0923\u093E
 
 PAST TENSE (gender-marked, close to Hindi but with Haryanvi flavor):
-था → था (m) | थी → थी (f) | थे → थे (pl)
-गया → गया (m) | गई → गई (f) | गए → गए (pl)
-किया → कर्या (m) | करी → करी (f) | करे → करे (pl)
-आया → आया (m) | आई → आई (f) | आए → आए (pl)
-देखा → देख्या (m) | देखी → देखी (f)
-बोला → बोल्या (m) | बोली → बोली (f)
-खाया → खाया (m) | खाई → खाई (f)
-हुआ → हुया (m) | हुई → हुई (f)
+\u0925\u093E \u2192 \u0925\u093E (m) | \u0925\u0940 \u2192 \u0925\u0940 (f) | \u0925\u0947 \u2192 \u0925\u0947 (pl)
+\u0917\u092F\u093E \u2192 \u0917\u092F\u093E (m) | \u0917\u0908 \u2192 \u0917\u0908 (f) | \u0917\u090F \u2192 \u0917\u090F (pl)
+\u0915\u093F\u092F\u093E \u2192 \u0915\u0930\u094D\u092F\u093E (m) | \u0915\u0930\u0940 \u2192 \u0915\u0930\u0940 (f) | \u0915\u0930\u0947 \u2192 \u0915\u0930\u0947 (pl)
+\u0906\u092F\u093E \u2192 \u0906\u092F\u093E (m) | \u0906\u0908 \u2192 \u0906\u0908 (f) | \u0906\u090F \u2192 \u0906\u090F (pl)
+\u0926\u0947\u0916\u093E \u2192 \u0926\u0947\u0916\u094D\u092F\u093E (m) | \u0926\u0947\u0916\u0940 \u2192 \u0926\u0947\u0916\u0940 (f)
+\u092C\u094B\u0932\u093E \u2192 \u092C\u094B\u0932\u094D\u092F\u093E (m) | \u092C\u094B\u0932\u0940 \u2192 \u092C\u094B\u0932\u0940 (f)
+\u0916\u093E\u092F\u093E \u2192 \u0916\u093E\u092F\u093E (m) | \u0916\u093E\u0908 \u2192 \u0916\u093E\u0908 (f)
+\u0939\u0941\u0906 \u2192 \u0939\u0941\u092F\u093E (m) | \u0939\u0941\u0908 \u2192 \u0939\u0941\u0908 (f)
 
 FUTURE TENSE:
-जाऊंगा → जावांगा | जाएगा → जावेगा | आएगा → आवेगा
-करूंगा → करांगा | होगा → होवेगा | देखूंगा → देखांगा
+\u091C\u093E\u090A\u0901\u0917\u093E \u2192 \u091C\u093E\u0935\u093E\u0902\u0917\u093E | \u091C\u093E\u090F\u0917\u093E \u2192 \u091C\u093E\u0935\u0947\u0917\u093E | \u0906\u090F\u0917\u093E \u2192 \u0906\u0935\u0947\u0917\u093E
+\u0915\u0930\u0942\u0901\u0917\u093E \u2192 \u0915\u0930\u093E\u0902\u0917\u093E | \u0939\u094B\u0917\u093E \u2192 \u0939\u094B\u0935\u0947\u0917\u093E | \u0926\u0947\u0916\u0942\u0901\u0917\u093E \u2192 \u0926\u0947\u0916\u093E\u0902\u0917\u093E
 
-NEGATION: नहीं→ना/कोनी | नहीं है→ना सै/कोनी सै | मत→मत
+NEGATION: \u0928\u0939\u0940\u0902\u2192\u0928\u093E/\u0915\u094B\u0928\u0940 | \u0928\u0939\u0940\u0902 \u0939\u0948\u2192\u0928\u093E \u0938\u0948/\u0915\u094B\u0928\u0940 \u0938\u0948 | \u092E\u0924\u2192\u092E\u0924
 
 QUESTION WORDS:
-क्या→के | क्यों→क्यूं | कैसे→किसां | कब→कद | कहाँ→कड़ै/कठै | कौन→कौण | कितना→कित्ता
+\u0915\u094D\u092F\u093E\u2192\u0915\u0947 | \u0915\u094D\u092F\u094B\u0902\u2192\u0915\u094D\u092F\u0942\u0902 | \u0915\u0948\u0938\u0947\u2192\u0915\u093F\u0938\u093E\u0902 | \u0915\u092C\u2192\u0915\u0926 | \u0915\u0939\u093E\u0901\u2192\u0915\u0921\u093C\u0948/\u0915\u0920\u0948 | \u0915\u094C\u0928\u2192\u0915\u094C\u0923 | \u0915\u093F\u0924\u0928\u093E\u2192\u0915\u093F\u0924\u094D\u0924\u093E
 
 COMMON WORDS:
-बहुत→घणा | अच्छा→बढ़िया | बुरा→खराब | अभी→अबी | यहाँ→यां | वहाँ→वां
-घर→घर | काम→काम | बात→बात | दिन→दिन | लोग→लोग
-बच्चा→छोरा (m)/छोरी (f) | औरत→लुगाई | आदमी→बंदा/मर्द
-दोस्त→यार | भाई→भाई/भाया | पैसा→पैसा
+\u092C\u0939\u0941\u0924\u2192\u0918\u0923\u093E | \u0905\u091A\u094D\u091B\u093E\u2192\u092C\u0922\u093C\u093F\u092F\u093E | \u092C\u0941\u0930\u093E\u2192\u0916\u0930\u093E\u092C | \u0905\u092D\u0940\u2192\u0905\u092C\u0940 | \u092F\u0939\u093E\u0901\u2192\u092F\u093E\u0902 | \u0935\u0939\u093E\u0901\u2192\u0935\u093E\u0902
+\u0918\u0930\u2192\u0918\u0930 | \u0915\u093E\u092E\u2192\u0915\u093E\u092E | \u092C\u093E\u0924\u2192\u092C\u093E\u0924 | \u0926\u093F\u0928\u2192\u0926\u093F\u0928 | \u0932\u094B\u0917\u2192\u0932\u094B\u0917
+\u092C\u091A\u094D\u091A\u093E\u2192\u091B\u094B\u0930\u093E (m)/\u091B\u094B\u0930\u0940 (f) | \u0914\u0930\u0924\u2192\u0932\u0941\u0917\u093E\u0908 | \u0906\u0926\u092E\u0940\u2192\u092C\u0902\u0926\u093E/\u092E\u0930\u094D\u0926
+\u0926\u094B\u0938\u094D\u0924\u2192\u092F\u093E\u0930 | \u092D\u093E\u0908\u2192\u092D\u093E\u0908/\u092D\u093E\u092F\u093E | \u092A\u0948\u0938\u093E\u2192\u092A\u0948\u0938\u093E
 
-SENTENCE PATTERNS — end markers:
-सूं (म्हैं करता सूं) | सै (वो जाता सै) | सैं (वे जाते सैं)
-"देख भाई", "सुण यार", "हो जा", "कर दे", "बता दे"
-Tag endings: ना (कर ना भाई) | री (सुण री)
+SENTENCE PATTERNS \u2014 end markers:
+\u0938\u0942\u0902 (\u092E\u094D\u0939\u0948\u0902 \u0915\u0930\u0924\u093E \u0938\u0942\u0902) | \u0938\u0948 (\u0935\u094B \u091C\u093E\u0924\u093E \u0938\u0948) | \u0938\u0948\u0902 (\u0935\u0947 \u091C\u093E\u0924\u0947 \u0938\u0948\u0902)
+"\u0926\u0947\u0916 \u092D\u093E\u0908", "\u0938\u0941\u0923 \u092F\u093E\u0930", "\u0939\u094B \u091C\u093E", "\u0915\u0930 \u0926\u0947", "\u092C\u0924\u093E \u0926\u0947"
+Tag endings: \u0928\u093E (\u0915\u0930 \u0928\u093E \u092D\u093E\u0908) | \u0930\u0940 (\u0938\u0941\u0923 \u0930\u0940)
 
-FLAVOR (scatter naturally): भाई, यार, छोरा, छोरी, बावली, घणा बढ़िया, ठाड़ा रह`,
+FLAVOR (scatter naturally): \u092D\u093E\u0908, \u092F\u093E\u0930, \u091B\u094B\u0930\u093E, \u091B\u094B\u0930\u0940, \u092C\u093E\u0935\u0932\u0940, \u0918\u0923\u093E \u092C\u0922\u093C\u093F\u092F\u093E, \u0920\u093E\u0921\u093C\u093E \u0930\u0939`,
 
-  rajasthani: `RAJASTHANI/MARWARI (Devanagari) — authentic Rajasthan dialect:
+  rajasthani: `RAJASTHANI/MARWARI (Devanagari) \u2014 authentic Rajasthan dialect:
 
-★★★ TOP 5 NON-NEGOTIABLE RAJASTHANI MARKERS (every output MUST have these) ★★★
-1. है→छे (copula) — NOT सै (that's Haryanvi), NOT बा (that's Bhojpuri)
-2. हूँ→छूं — NOT सूं (Haryanvi), NOT बानी (Bhojpuri)
-3. Infinitives end in -णो (जावणो, करणो) — NOT -णा (Haryanvi), NOT -ब (Bhojpuri)
-4. Past tense: था→थो, गया→गयो, किया→कियो — NOT कर्या/देख्या (Haryanvi), NOT गइल/कइल (Bhojpuri)
-5. नहीं→कोनी — NOT नाहीं (Bhojpuri), NOT ना (Haryanvi standalone)
-If your output contains सै/बा/सूं/बानी/-णा endings/नाहीं you have FAILED.
+\u2605\u2605\u2605 TOP 5 NON-NEGOTIABLE RAJASTHANI MARKERS (every output MUST have these) \u2605\u2605\u2605
+1. \u0939\u0948\u2192\u091B\u0947 (copula) \u2014 NOT \u0938\u0948 (that's Haryanvi), NOT \u092C\u093E (that's Bhojpuri)
+2. \u0939\u0942\u0901\u2192\u091B\u0942\u0902 \u2014 NOT \u0938\u0942\u0902 (Haryanvi), NOT \u092C\u093E\u0928\u0940 (Bhojpuri)
+3. Infinitives end in -\u0923\u094B (\u091C\u093E\u0935\u0923\u094B, \u0915\u0930\u0923\u094B) \u2014 NOT -\u0923\u093E (Haryanvi), NOT -\u092C (Bhojpuri)
+4. Past tense: \u0925\u093E\u2192\u0925\u094B, \u0917\u092F\u093E\u2192\u0917\u092F\u094B, \u0915\u093F\u092F\u093E\u2192\u0915\u093F\u092F\u094B \u2014 NOT \u0915\u0930\u094D\u092F\u093E/\u0926\u0947\u0916\u094D\u092F\u093E (Haryanvi), NOT \u0917\u0907\u0932/\u0915\u0907\u0932 (Bhojpuri)
+5. \u0928\u0939\u0940\u0902\u2192\u0915\u094B\u0928\u0940 \u2014 NOT \u0928\u093E\u0939\u0940\u0902 (Bhojpuri), NOT \u0928\u093E (Haryanvi standalone)
+If your output contains \u0938\u0948/\u092C\u093E/\u0938\u0942\u0902/\u092C\u093E\u0928\u0940/-\u0923\u093E endings/\u0928\u093E\u0939\u0940\u0902 you have FAILED.
 
 PRONOUNS:
-मैं→म्हैं | मुझे/मुझको→म्हाने | मेरा→म्हारो | मेरी→म्हारी | हम→म्हे | हमारा→म्हारो
-तुम→थे | तुम्हें→थाने | तेरा→थारो | तू→तूं | आप→आप/थे
-वो/वह→वो/उण | उसे→उणने | उसका→उणरो | यह→आ/इ | इसे→इणने | वे→वे/उणां
+\u092E\u0948\u0902\u2192\u092E\u094D\u0939\u0948\u0902 | \u092E\u0941\u091D\u0947/\u092E\u0941\u091D\u0915\u094B\u2192\u092E\u094D\u0939\u093E\u0928\u0947 | \u092E\u0947\u0930\u093E\u2192\u092E\u094D\u0939\u093E\u0930\u094B | \u092E\u0947\u0930\u0940\u2192\u092E\u094D\u0939\u093E\u0930\u0940 | \u0939\u092E\u2192\u092E\u094D\u0939\u0947 | \u0939\u092E\u093E\u0930\u093E\u2192\u092E\u094D\u0939\u093E\u0930\u094B
+\u0924\u0941\u092E\u2192\u0925\u0947 | \u0924\u0941\u092E\u094D\u0939\u0947\u0902\u2192\u0925\u093E\u0928\u0947 | \u0924\u0947\u0930\u093E\u2192\u0925\u093E\u0930\u094B | \u0924\u0942\u2192\u0924\u0942\u0902 | \u0906\u092A\u2192\u0906\u092A/\u0925\u0947
+\u0935\u094B/\u0935\u0939\u2192\u0935\u094B/\u0909\u0923 | \u0909\u0938\u0947\u2192\u0909\u0923\u0928\u0947 | \u0909\u0938\u0915\u093E\u2192\u0909\u0923\u0930\u094B | \u092F\u0939\u2192\u0906/\u0907 | \u0907\u0938\u0947\u2192\u0907\u0923\u0928\u0947 | \u0935\u0947\u2192\u0935\u0947/\u0909\u0923\u093E\u0902
 
-PRESENT COPULA — MANDATORY SUBSTITUTION (no exceptions):
-हूँ → छूं   CRITICAL: NEVER write "हूँ" in Rajasthani output
-है  → छे   CRITICAL: NEVER write "है" — always "छे"
-हैं → छे   (plural also छे in Marwari)
-हो  → छो   (2nd person "you are")
+PRESENT COPULA \u2014 MANDATORY SUBSTITUTION (no exceptions):
+\u0939\u0942\u0901 \u2192 \u091B\u0942\u0902   CRITICAL: NEVER write "\u0939\u0942\u0901" in Rajasthani output
+\u0939\u0948  \u2192 \u091B\u0947   CRITICAL: NEVER write "\u0939\u0948" \u2014 always "\u091B\u0947"
+\u0939\u0948\u0902 \u2192 \u091B\u0947   (plural also \u091B\u0947 in Marwari)
+\u0939\u094B  \u2192 \u091B\u094B   (2nd person "you are")
 
-INFINITIVES — MANDATORY: every "-ना" becomes "-णो":
-जाना→जावणो | करना→करणो | देखना→देखणो | आना→आवणो | खाना→खावणो
-पीना→पीवणो | लेना→लेवणो | देना→देवणो | बोलना→बोलणो | रहना→रहणो
-मिलना→मिलणो | सोना→सोवणो | उठना→उठणो | बैठना→बैठणो | मारना→मारणो
-चलना→चालणो | बनना→बणणो | सुनना→सुणणो | समझना→समझणो
-लड़ना→लड़णो | हँसना→हँसणो | रोना→रोवणो | भागना→भाजणो
+INFINITIVES \u2014 MANDATORY: every "-\u0928\u093E" becomes "-\u0923\u094B":
+\u091C\u093E\u0928\u093E\u2192\u091C\u093E\u0935\u0923\u094B | \u0915\u0930\u0928\u093E\u2192\u0915\u0930\u0923\u094B | \u0926\u0947\u0916\u0928\u093E\u2192\u0926\u0947\u0916\u0923\u094B | \u0906\u0928\u093E\u2192\u0906\u0935\u0923\u094B | \u0916\u093E\u0928\u093E\u2192\u0916\u093E\u0935\u0923\u094B
+\u092A\u0940\u0928\u093E\u2192\u092A\u0940\u0935\u0923\u094B | \u0932\u0947\u0928\u093E\u2192\u0932\u0947\u0935\u0923\u094B | \u0926\u0947\u0928\u093E\u2192\u0926\u0947\u0935\u0923\u094B | \u092C\u094B\u0932\u0928\u093E\u2192\u092C\u094B\u0932\u0923\u094B | \u0930\u0939\u0928\u093E\u2192\u0930\u0939\u0923\u094B
+\u092E\u093F\u0932\u0928\u093E\u2192\u092E\u093F\u0932\u0923\u094B | \u0938\u094B\u0928\u093E\u2192\u0938\u094B\u0935\u0923\u094B | \u0909\u0920\u0928\u093E\u2192\u0909\u0920\u0923\u094B | \u092C\u0948\u0920\u0928\u093E\u2192\u092C\u0948\u0920\u0923\u094B | \u092E\u093E\u0930\u0928\u093E\u2192\u092E\u093E\u0930\u0923\u094B
+\u091A\u0932\u0928\u093E\u2192\u091A\u093E\u0932\u0923\u094B | \u092C\u0928\u0928\u093E\u2192\u092C\u0923\u0923\u094B | \u0938\u0941\u0928\u0928\u093E\u2192\u0938\u0941\u0923\u0923\u094B | \u0938\u092E\u091D\u0928\u093E\u2192\u0938\u092E\u091D\u0923\u094B
+\u0932\u0921\u093C\u0928\u093E\u2192\u0932\u0921\u093C\u0923\u094B | \u0939\u0901\u0938\u0928\u093E\u2192\u0939\u0901\u0938\u0923\u094B | \u0930\u094B\u0928\u093E\u2192\u0930\u094B\u0935\u0923\u094B | \u092D\u093E\u0917\u0928\u093E\u2192\u092D\u093E\u091C\u0923\u094B
 
-PAST TENSE — critical, very different from Hindi (gender-marked):
-था   → थो (m) | थी → थी (f) | थे → था (pl)
-गया  → गयो (m)  | गई → गई (f)  | गए → गया (pl)
-किया → कियो (m) | करी → करी (f) | किए → किया (pl)
-आया  → आयो (m)  | आई → आई (f)  | आए → आया (pl)
-देखा → देख्यो (m) | देखी → देखी (f)
-बोला → बोल्यो (m) | बोली → बोली (f)
-खाया → खायो (m)  | खाई → खाई (f)
-हुआ  → हुयो (m)  | हुई → हुई (f)
-रहा  → रह्यो (m) | रही → रही (f)
-Examples: "वो गयो" (he went) | "वा गई" (she went) | "म्हैं कियो" (I did)
+PAST TENSE \u2014 critical, very different from Hindi (gender-marked):
+\u0925\u093E   \u2192 \u0925\u094B (m) | \u0925\u0940 \u2192 \u0925\u0940 (f) | \u0925\u0947 \u2192 \u0925\u093E (pl)
+\u0917\u092F\u093E  \u2192 \u0917\u092F\u094B (m)  | \u0917\u0908 \u2192 \u0917\u0908 (f)  | \u0917\u090F \u2192 \u0917\u092F\u093E (pl)
+\u0915\u093F\u092F\u093E \u2192 \u0915\u093F\u092F\u094B (m) | \u0915\u0930\u0940 \u2192 \u0915\u0930\u0940 (f) | \u0915\u093F\u090F \u2192 \u0915\u093F\u092F\u093E (pl)
+\u0906\u092F\u093E  \u2192 \u0906\u092F\u094B (m)  | \u0906\u0908 \u2192 \u0906\u0908 (f)  | \u0906\u090F \u2192 \u0906\u092F\u093E (pl)
+\u0926\u0947\u0916\u093E \u2192 \u0926\u0947\u0916\u094D\u092F\u094B (m) | \u0926\u0947\u0916\u0940 \u2192 \u0926\u0947\u0916\u0940 (f)
+\u092C\u094B\u0932\u093E \u2192 \u092C\u094B\u0932\u094D\u092F\u094B (m) | \u092C\u094B\u0932\u0940 \u2192 \u092C\u094B\u0932\u0940 (f)
+\u0916\u093E\u092F\u093E \u2192 \u0916\u093E\u092F\u094B (m)  | \u0916\u093E\u0908 \u2192 \u0916\u093E\u0908 (f)
+\u0939\u0941\u0906  \u2192 \u0939\u0941\u092F\u094B (m)  | \u0939\u0941\u0908 \u2192 \u0939\u0941\u0908 (f)
+\u0930\u0939\u093E  \u2192 \u0930\u0939\u094D\u092F\u094B (m) | \u0930\u0939\u0940 \u2192 \u0930\u0939\u0940 (f)
+Examples: "\u0935\u094B \u0917\u092F\u094B" (he went) | "\u0935\u093E \u0917\u0908" (she went) | "\u092E\u094D\u0939\u0948\u0902 \u0915\u093F\u092F\u094B" (I did)
 
 FUTURE TENSE:
-जाऊंगा→जासूं/जाऊंलो | जाएगा→जावेलो | आएगा→आवेलो
-करूंगा→करसूं/करूंलो | होगा→होवेलो | देखूंगा→देखसूं
+\u091C\u093E\u090A\u0901\u0917\u093E\u2192\u091C\u093E\u0938\u0942\u0902/\u091C\u093E\u090A\u0902\u0932\u094B | \u091C\u093E\u090F\u0917\u093E\u2192\u091C\u093E\u0935\u0947\u0932\u094B | \u0906\u090F\u0917\u093E\u2192\u0906\u0935\u0947\u0932\u094B
+\u0915\u0930\u0942\u0901\u0917\u093E\u2192\u0915\u0930\u0938\u0942\u0902/\u0915\u0930\u0942\u0902\u0932\u094B | \u0939\u094B\u0917\u093E\u2192\u0939\u094B\u0935\u0947\u0932\u094B | \u0926\u0947\u0916\u0942\u0901\u0917\u093E\u2192\u0926\u0947\u0916\u0938\u0942\u0902
 
-NEGATION: नहीं→कोनी | नहीं है→कोनी छे | मत→मत | नहीं था→कोनी थो
+NEGATION: \u0928\u0939\u0940\u0902\u2192\u0915\u094B\u0928\u0940 | \u0928\u0939\u0940\u0902 \u0939\u0948\u2192\u0915\u094B\u0928\u0940 \u091B\u0947 | \u092E\u0924\u2192\u092E\u0924 | \u0928\u0939\u0940\u0902 \u0925\u093E\u2192\u0915\u094B\u0928\u0940 \u0925\u094B
 
 QUESTION WORDS:
-क्या→के/शा | क्यों→क्यूं | कैसे→किंयां/कियां | कब→कद | कहाँ→कठे/कठै
-कौन→कुण | कितना→कित्तो | किसका→किणरो
+\u0915\u094D\u092F\u093E\u2192\u0915\u0947/\u0936\u093E | \u0915\u094D\u092F\u094B\u0902\u2192\u0915\u094D\u092F\u0942\u0902 | \u0915\u0948\u0938\u0947\u2192\u0915\u093F\u0902\u092F\u093E\u0902/\u0915\u093F\u092F\u093E\u0902 | \u0915\u092C\u2192\u0915\u0926 | \u0915\u0939\u093E\u0901\u2192\u0915\u0920\u0947/\u0915\u0920\u0948
+\u0915\u094C\u0928\u2192\u0915\u0941\u0923 | \u0915\u093F\u0924\u0928\u093E\u2192\u0915\u093F\u0924\u094D\u0924\u094B | \u0915\u093F\u0938\u0915\u093E\u2192\u0915\u093F\u0923\u0930\u094B
 
 COMMON WORDS:
-बहुत→घणो (m)/घणी (f) | अच्छा→बढ़िया/सारो | बुरा→खराब/बुरो
-अभी→अबार/हाले | यहाँ→इठे/इयां | वहाँ→उठे/उयां
-बड़ा→मोटो/बड़ो | छोटा→नानो/छोटो | थोड़ा→थोड़ो | सब→सगळा
-घर→घर/घरां | काम→काम | बात→बात | लोग→लोग/मिनख
-आदमी→मिनख/बंदो | औरत→लुगाई/बाई | बच्चा→छोरो (m)/छोरी (f)
-दोस्त→भायलो/दोस्त | भाई→भाई/भायजी | पैसा→पइसो
-पानी→पाणी | दिल→दिल
+\u092C\u0939\u0941\u0924\u2192\u0918\u0923\u094B (m)/\u0918\u0923\u0940 (f) | \u0905\u091A\u094D\u091B\u093E\u2192\u092C\u0922\u093C\u093F\u092F\u093E/\u0938\u093E\u0930\u094B | \u092C\u0941\u0930\u093E\u2192\u0916\u0930\u093E\u092C/\u092C\u0941\u0930\u094B
+\u0905\u092D\u0940\u2192\u0905\u092C\u093E\u0930/\u0939\u093E\u0932\u0947 | \u092F\u0939\u093E\u0901\u2192\u0907\u0920\u0947/\u0907\u092F\u093E\u0902 | \u0935\u0939\u093E\u0901\u2192\u0909\u0920\u0947/\u0909\u092F\u093E\u0902
+\u092C\u0921\u093C\u093E\u2192\u092E\u094B\u091F\u094B/\u092C\u0921\u093C\u094B | \u091B\u094B\u091F\u093E\u2192\u0928\u093E\u0928\u094B/\u091B\u094B\u091F\u094B | \u0925\u094B\u0921\u093C\u093E\u2192\u0925\u094B\u0921\u093C\u094B | \u0938\u092C\u2192\u0938\u0917\u0933\u093E
+\u0918\u0930\u2192\u0918\u0930/\u0918\u0930\u093E\u0902 | \u0915\u093E\u092E\u2192\u0915\u093E\u092E | \u092C\u093E\u0924\u2192\u092C\u093E\u0924 | \u0932\u094B\u0917\u2192\u0932\u094B\u0917/\u092E\u093F\u0928\u0916
+\u0906\u0926\u092E\u0940\u2192\u092E\u093F\u0928\u0916/\u092C\u0902\u0926\u094B | \u0914\u0930\u0924\u2192\u0932\u0941\u0917\u093E\u0908/\u092C\u093E\u0908 | \u092C\u091A\u094D\u091A\u093E\u2192\u091B\u094B\u0930\u094B (m)/\u091B\u094B\u0930\u0940 (f)
+\u0926\u094B\u0938\u094D\u0924\u2192\u092D\u093E\u092F\u0932\u094B/\u0926\u094B\u0938\u094D\u0924 | \u092D\u093E\u0908\u2192\u092D\u093E\u0908/\u092D\u093E\u092F\u091C\u0940 | \u092A\u0948\u0938\u093E\u2192\u092A\u0907\u0938\u094B
+\u092A\u093E\u0928\u0940\u2192\u092A\u093E\u0923\u0940 | \u0926\u093F\u0932\u2192\u0926\u093F\u0932
 
-SENTENCE PATTERNS: छे (वो करता छे) | कोनी (वो नहीं करता = वो करता कोनी)
+SENTENCE PATTERNS: \u091B\u0947 (\u0935\u094B \u0915\u0930\u0924\u093E \u091B\u0947) | \u0915\u094B\u0928\u0940 (\u0935\u094B \u0928\u0939\u0940\u0902 \u0915\u0930\u0924\u093E = \u0935\u094B \u0915\u0930\u0924\u093E \u0915\u094B\u0928\u0940)
 
-FLAVOR (scatter naturally): राम राम सा, भाई, बाई, हाँ भाई, कोनी यार, घणो बढ़िया`,
+FLAVOR (scatter naturally): \u0930\u093E\u092E \u0930\u093E\u092E \u0938\u093E, \u092D\u093E\u0908, \u092C\u093E\u0908, \u0939\u093E\u0901 \u092D\u093E\u0908, \u0915\u094B\u0928\u0940 \u092F\u093E\u0930, \u0918\u0923\u094B \u092C\u0922\u093C\u093F\u092F\u093E`,
 
-  gujarati: `GUJARATI (Gujarati script — write ALL output in Gujarati script):
+  gujarati: `GUJARATI (Gujarati script \u2014 write ALL output in Gujarati script):
 
-PRONOUNS: હું (I), મને (me), મારો/મારી (my), તું (you informal), તમે (you formal), તે/એ (he/she), આ (this), એ/પેલો (that)
+PRONOUNS: \u0AB9\u0AC1\u0A82 (I), \u0AAE\u0AA8\u0AC7 (me), \u0AAE\u0ABE\u0AB0\u0ACB/\u0AAE\u0ABE\u0AB0\u0AC0 (my), \u0AA4\u0AC1\u0A82 (you informal), \u0AA4\u0AAE\u0AC7 (you formal), \u0AA4\u0AC7/\u0A8F (he/she), \u0A86 (this), \u0A8F/\u0AAA\u0AC7\u0AB2\u0ACB (that)
 
 VERBS (conjugations):
-- છે = is/are/am (ALL forms)
-- હતો/હતી/હતા = was/were
-- જવું = to go | જઉ (I go), જા (you go), જાય (he/she goes), ગયો/ગઈ (went)
-- આવવું = to come | આવ (come), આવ્યો/આવી (came)
-- કરવું = to do | કર (do), કરે (does), કર્યું (did)
-- ખાવું = to eat | ખા (eat), ખાય (eats), ખાધું (ate)
-- પીવું = to drink | પી (drink), પીવે (drinks), પીધું (drank)
-- જોવું = to see/watch | જો (see), જુઓ (look), જોયું (saw)
-- બોલવું = to speak | બોલ (speak), બોલે (speaks), બોલ્યો (spoke)
-- સૂવું = to sleep | સૂ (sleep), સૂઈ જા (go to sleep)
-- બેસવું = to sit | બેસ (sit), બેઠો (sat)
-- ઊઠવું = to get up | ઊઠ (get up), ઊઠ્યો (got up)
-- રહેવું = to stay/live | રહે (stays), રહ્યો (stayed)
-- મળવું = to meet | મળ (meet), મળ્યો (met)
-- લેવું = to take | લે (take), લીધું (took)
-- આપવું = to give | આપ (give), આપ્યું (gave)
-- સાંભળવું = to listen | સાંભળ (listen), સાંભળ્યું (heard)
-- ચાલવું = to walk | ચાલ (walk), ચાલ્યો (walked)
-- હસવું = to laugh | હસ (laugh), હસ્યો (laughed)
-- રડવું = to cry | રડ (cry), રડ્યો (cried)
-- સમજવું = to understand | સમજ (understand), સમજ્યો (understood)
-- થવું = to become | થઈ ગ્યું (it happened), થશે (will happen)
-- જોઈએ = need/want | મને જોઈએ = I need
-- ગમવું = to like | ગમ્યું (liked), ગમે (likes)
+- \u0A9B\u0AC7 = is/are/am (ALL forms)
+- \u0AB9\u0AA4\u0ACB/\u0AB9\u0AA4\u0AC0/\u0AB9\u0AA4\u0ABE = was/were
+- \u0A9C\u0AB5\u0AC1\u0A82 = to go | \u0A9C\u0A89 (I go), \u0A9C\u0ABE (you go), \u0A9C\u0ABE\u0AAF (he/she goes), \u0A97\u0AAF\u0ACB/\u0A97\u0A88 (went)
+- \u0A86\u0AB5\u0AB5\u0AC1\u0A82 = to come | \u0A86\u0AB5 (come), \u0A86\u0AB5\u0ACD\u0AAF\u0ACB/\u0A86\u0AB5\u0AC0 (came)
+- \u0A95\u0AB0\u0AB5\u0AC1\u0A82 = to do | \u0A95\u0AB0 (do), \u0A95\u0AB0\u0AC7 (does), \u0A95\u0AB0\u0ACD\u0AAF\u0AC1\u0A82 (did)
+- \u0A96\u0ABE\u0AB5\u0AC1\u0A82 = to eat | \u0A96\u0ABE (eat), \u0A96\u0ABE\u0AAF (eats), \u0A96\u0ABE\u0AA7\u0AC1\u0A82 (ate)
+- \u0AAA\u0AC0\u0AB5\u0AC1\u0A82 = to drink | \u0AAA\u0AC0 (drink), \u0AAA\u0AC0\u0AB5\u0AC7 (drinks), \u0AAA\u0AC0\u0AA7\u0AC1\u0A82 (drank)
+- \u0A9C\u0ACB\u0AB5\u0AC1\u0A82 = to see/watch | \u0A9C\u0ACB (see), \u0A9C\u0AC1\u0A93 (look), \u0A9C\u0ACB\u0AAF\u0AC1\u0A82 (saw)
+- \u0AAC\u0ACB\u0AB2\u0AB5\u0AC1\u0A82 = to speak | \u0AAC\u0ACB\u0AB2 (speak), \u0AAC\u0ACB\u0AB2\u0AC7 (speaks), \u0AAC\u0ACB\u0AB2\u0ACD\u0AAF\u0ACB (spoke)
+- \u0AB8\u0AC2\u0AB5\u0AC1\u0A82 = to sleep | \u0AB8\u0AC2 (sleep), \u0AB8\u0AC2\u0A88 \u0A9C\u0ABE (go to sleep)
+- \u0AAC\u0AC7\u0AB8\u0AB5\u0AC1\u0A82 = to sit | \u0AAC\u0AC7\u0AB8 (sit), \u0AAC\u0AC7\u0AA0\u0ACB (sat)
+- \u0A8A\u0AA0\u0AB5\u0AC1\u0A82 = to get up | \u0A8A\u0AA0 (get up), \u0A8A\u0AA0\u0ACD\u0AAF\u0ACB (got up)
+- \u0AB0\u0AB9\u0AC7\u0AB5\u0AC1\u0A82 = to stay/live | \u0AB0\u0AB9\u0AC7 (stays), \u0AB0\u0AB9\u0ACD\u0AAF\u0ACB (stayed)
+- \u0AAE\u0AB3\u0AB5\u0AC1\u0A82 = to meet | \u0AAE\u0AB3 (meet), \u0AAE\u0AB3\u0ACD\u0AAF\u0ACB (met)
+- \u0AB2\u0AC7\u0AB5\u0AC1\u0A82 = to take | \u0AB2\u0AC7 (take), \u0AB2\u0AC0\u0AA7\u0AC1\u0A82 (took)
+- \u0A86\u0AAA\u0AB5\u0AC1\u0A82 = to give | \u0A86\u0AAA (give), \u0A86\u0AAA\u0ACD\u0AAF\u0AC1\u0A82 (gave)
+- \u0AB8\u0ABE\u0A82\u0AAD\u0AB3\u0AB5\u0AC1\u0A82 = to listen | \u0AB8\u0ABE\u0A82\u0AAD\u0AB3 (listen), \u0AB8\u0ABE\u0A82\u0AAD\u0AB3\u0ACD\u0AAF\u0AC1\u0A82 (heard)
+- \u0A9A\u0ABE\u0AB2\u0AB5\u0AC1\u0A82 = to walk | \u0A9A\u0ABE\u0AB2 (walk), \u0A9A\u0ABE\u0AB2\u0ACD\u0AAF\u0ACB (walked)
+- \u0AB9\u0AB8\u0AB5\u0AC1\u0A82 = to laugh | \u0AB9\u0AB8 (laugh), \u0AB9\u0AB8\u0ACD\u0AAF\u0ACB (laughed)
+- \u0AB0\u0AA1\u0AB5\u0AC1\u0A82 = to cry | \u0AB0\u0AA1 (cry), \u0AB0\u0AA1\u0ACD\u0AAF\u0ACB (cried)
+- \u0AB8\u0AAE\u0A9C\u0AB5\u0AC1\u0A82 = to understand | \u0AB8\u0AAE\u0A9C (understand), \u0AB8\u0AAE\u0A9C\u0ACD\u0AAF\u0ACB (understood)
+- \u0AA5\u0AB5\u0AC1\u0A82 = to become | \u0AA5\u0A88 \u0A97\u0ACD\u0AAF\u0AC1\u0A82 (it happened), \u0AA5\u0AB6\u0AC7 (will happen)
+- \u0A9C\u0ACB\u0A88\u0A8F = need/want | \u0AAE\u0AA8\u0AC7 \u0A9C\u0ACB\u0A88\u0A8F = I need
+- \u0A97\u0AAE\u0AB5\u0AC1\u0A82 = to like | \u0A97\u0AAE\u0ACD\u0AAF\u0AC1\u0A82 (liked), \u0A97\u0AAE\u0AC7 (likes)
 
 PAST TENSE patterns:
-- masculine: -યો (ગયો, આવ્યો, કર્યો, બોલ્યો)
-- feminine: -ઈ (ગઈ, આવી, કરી, બોલી)
-- neuter: -યું (કર્યું, ખાધું, પીધું, ગયું)
-- plural: -યા (ગયા, આવ્યા)
+- masculine: -\u0AAF\u0ACB (\u0A97\u0AAF\u0ACB, \u0A86\u0AB5\u0ACD\u0AAF\u0ACB, \u0A95\u0AB0\u0ACD\u0AAF\u0ACB, \u0AAC\u0ACB\u0AB2\u0ACD\u0AAF\u0ACB)
+- feminine: -\u0A88 (\u0A97\u0A88, \u0A86\u0AB5\u0AC0, \u0A95\u0AB0\u0AC0, \u0AAC\u0ACB\u0AB2\u0AC0)
+- neuter: -\u0AAF\u0AC1\u0A82 (\u0A95\u0AB0\u0ACD\u0AAF\u0AC1\u0A82, \u0A96\u0ABE\u0AA7\u0AC1\u0A82, \u0AAA\u0AC0\u0AA7\u0AC1\u0A82, \u0A97\u0AAF\u0AC1\u0A82)
+- plural: -\u0AAF\u0ABE (\u0A97\u0AAF\u0ABE, \u0A86\u0AB5\u0ACD\u0AAF\u0ABE)
 
-FUTURE: verb + -શે/-શો/-શું (જઈશ=I'll go, જશે=he'll go, કરીશ=I'll do, આવશે=will come)
+FUTURE: verb + -\u0AB6\u0AC7/-\u0AB6\u0ACB/-\u0AB6\u0AC1\u0A82 (\u0A9C\u0A88\u0AB6=I'll go, \u0A9C\u0AB6\u0AC7=he'll go, \u0A95\u0AB0\u0AC0\u0AB6=I'll do, \u0A86\u0AB5\u0AB6\u0AC7=will come)
 
-NEGATION: નહીં (NOT Devanagari "नहीं"), ના (no), નથી (is not)
+NEGATION: \u0AA8\u0AB9\u0AC0\u0A82 (NOT Devanagari "\u0928\u0939\u0940\u0902"), \u0AA8\u0ABE (no), \u0AA8\u0AA5\u0AC0 (is not)
 
-QUESTION WORDS: શું (what), કેમ (why), ક્યાં (where), ક્યારે (when), કોણ (who), કેટલું (how much), કેવી રીતે (how)
+QUESTION WORDS: \u0AB6\u0AC1\u0A82 (what), \u0A95\u0AC7\u0AAE (why), \u0A95\u0ACD\u0AAF\u0ABE\u0A82 (where), \u0A95\u0ACD\u0AAF\u0ABE\u0AB0\u0AC7 (when), \u0A95\u0ACB\u0AA3 (who), \u0A95\u0AC7\u0A9F\u0AB2\u0AC1\u0A82 (how much), \u0A95\u0AC7\u0AB5\u0AC0 \u0AB0\u0AC0\u0AA4\u0AC7 (how)
 
 COMMON VOCABULARY:
-Good: સારું/સારો | Bad: ખરાબ | Very: ખૂબ/ઘણું
-Food: ખાવાનું | Water: પાણી | House: ઘર
-Man: માણસ | Woman: સ્ત્રી/બાઈ | Child: બાળક
-Brother: ભાઈ | Sister: બહેન | Friend: મિત્ર/દોસ્ત
-Now: હવે | Then: પછી | Today: આજ | Tomorrow: આવતી કાલ
-Here: અહીં | There: ત્યાં | Always: હંમેશ
-Yes: હા | No: ના | Okay: ઠીક | Really: સાચ્ચે
-Beautiful: સુંદર | Big: મોટો | Small: નાનો | New: નવો
-Work: કામ | Time: સમય | Money: પૈસા | Love: પ્રેમ
+Good: \u0AB8\u0ABE\u0AB0\u0AC1\u0A82/\u0AB8\u0ABE\u0AB0\u0ACB | Bad: \u0A96\u0AB0\u0ABE\u0AAC | Very: \u0A96\u0AC2\u0AAC/\u0A98\u0AA3\u0AC1\u0A82
+Food: \u0A96\u0ABE\u0AB5\u0ABE\u0AA8\u0AC1\u0A82 | Water: \u0AAA\u0ABE\u0AA3\u0AC0 | House: \u0A98\u0AB0
+Man: \u0AAE\u0ABE\u0AA3\u0AB8 | Woman: \u0AB8\u0ACD\u0AA4\u0ACD\u0AB0\u0AC0/\u0AAC\u0ABE\u0A88 | Child: \u0AAC\u0ABE\u0AB3\u0A95
+Brother: \u0AAD\u0ABE\u0A88 | Sister: \u0AAC\u0AB9\u0AC7\u0AA8 | Friend: \u0AAE\u0ABF\u0AA4\u0ACD\u0AB0/\u0AA6\u0ACB\u0AB8\u0ACD\u0AA4
+Now: \u0AB9\u0AB5\u0AC7 | Then: \u0AAA\u0A9B\u0AC0 | Today: \u0A86\u0A9C | Tomorrow: \u0A86\u0AB5\u0AA4\u0AC0 \u0A95\u0ABE\u0AB2
+Here: \u0A85\u0AB9\u0AC0\u0A82 | There: \u0AA4\u0ACD\u0AAF\u0ABE\u0A82 | Always: \u0AB9\u0A82\u0AAE\u0AC7\u0AB6
+Yes: \u0AB9\u0ABE | No: \u0AA8\u0ABE | Okay: \u0AA0\u0AC0\u0A95 | Really: \u0AB8\u0ABE\u0A9A\u0ACD\u0A9A\u0AC7
+Beautiful: \u0AB8\u0AC1\u0A82\u0AA6\u0AB0 | Big: \u0AAE\u0ACB\u0A9F\u0ACB | Small: \u0AA8\u0ABE\u0AA8\u0ACB | New: \u0AA8\u0AB5\u0ACB
+Work: \u0A95\u0ABE\u0AAE | Time: \u0AB8\u0AAE\u0AAF | Money: \u0AAA\u0AC8\u0AB8\u0ABE | Love: \u0AAA\u0ACD\u0AB0\u0AC7\u0AAE
 
-FLAVOR WORDS (scatter naturally): ભાઈ, ભાભી, ખરુંને, ચાલ, અરે, ઓ ભાઈ, ઓ બેન, સાચ્ચે
+FLAVOR WORDS (scatter naturally): \u0AAD\u0ABE\u0A88, \u0AAD\u0ABE\u0AAD\u0AC0, \u0A96\u0AB0\u0AC1\u0A82\u0AA8\u0AC7, \u0A9A\u0ABE\u0AB2, \u0A85\u0AB0\u0AC7, \u0A93 \u0AAD\u0ABE\u0A88, \u0A93 \u0AAC\u0AC7\u0AA8, \u0AB8\u0ABE\u0A9A\u0ACD\u0A9A\u0AC7
 
-CRITICAL — NEVER write:
-- Devanagari in output — write ENTIRE output in Gujarati script
+CRITICAL \u2014 NEVER write:
+- Devanagari in output \u2014 write ENTIRE output in Gujarati script
 - Hindi words mixed in`,
 };
 
-/* ─── Few-shot examples for each dialect ─── */
+/* --- Few-shot examples for each dialect --- */
 const FEW_SHOT_EXAMPLES = {
   bhojpuri: [
-    { role: "user", content: "मैं बहुत खुश हूँ क्योंकि आज मेरा दोस्त आया है। हम दोनों साथ में खाना खाएंगे।" },
-    { role: "assistant", content: "हम बहुते खुश बानी काहे कि आज हमार यार आइल बा। हमदोनों साथे खाना खाइब।" },
-    { role: "user", content: "वो बहुत अच्छा आदमी है लेकिन उसकी बीवी को कोई नहीं जानता। वो कहाँ गया?" },
-    { role: "assistant", content: "ऊ बहुते नीमन मरद बा लेकिन ओकर मेहरारू के केहू नाहीं जानत बा। ऊ कहाँ गइल?" },
+    { role: "user", content: "\u092E\u0948\u0902 \u092C\u0939\u0941\u0924 \u0916\u0941\u0936 \u0939\u0942\u0901 \u0915\u094D\u092F\u094B\u0902\u0915\u093F \u0906\u091C \u092E\u0947\u0930\u093E \u0926\u094B\u0938\u094D\u0924 \u0906\u092F\u093E \u0939\u0948\u0964 \u0939\u092E \u0926\u094B\u0928\u094B\u0902 \u0938\u093E\u0925 \u092E\u0947\u0902 \u0916\u093E\u0928\u093E \u0916\u093E\u090F\u0902\u0917\u0947\u0964" },
+    { role: "assistant", content: "\u0939\u092E \u092C\u0939\u0941\u0924\u0947 \u0916\u0941\u0936 \u092C\u093E\u0928\u0940 \u0915\u093E\u0939\u0947 \u0915\u093F \u0906\u091C \u0939\u092E\u093E\u0930 \u092F\u093E\u0930 \u0906\u0907\u0932 \u092C\u093E\u0964 \u0939\u092E\u0926\u094B\u0928\u094B\u0902 \u0938\u093E\u0925\u0947 \u0916\u093E\u0928\u093E \u0916\u093E\u0907\u092C\u0964" },
+    { role: "user", content: "\u0935\u094B \u092C\u0939\u0941\u0924 \u0905\u091A\u094D\u091B\u093E \u0906\u0926\u092E\u0940 \u0939\u0948 \u0932\u0947\u0915\u093F\u0928 \u0909\u0938\u0915\u0940 \u092C\u0940\u0935\u0940 \u0915\u094B \u0915\u094B\u0908 \u0928\u0939\u0940\u0902 \u091C\u093E\u0928\u0924\u093E\u0964 \u0935\u094B \u0915\u0939\u093E\u0901 \u0917\u092F\u093E?" },
+    { role: "assistant", content: "\u090A \u092C\u0939\u0941\u0924\u0947 \u0928\u0940\u092E\u0928 \u092E\u0930\u0926 \u092C\u093E \u0932\u0947\u0915\u093F\u0928 \u0913\u0915\u0930 \u092E\u0947\u0939\u0930\u093E\u0930\u0942 \u0915\u0947 \u0915\u0947\u0939\u0942 \u0928\u093E\u0939\u0940\u0902 \u091C\u093E\u0928\u0924 \u092C\u093E\u0964 \u090A \u0915\u0939\u093E\u0901 \u0917\u0907\u0932?" },
   ],
   haryanvi: [
-    { role: "user", content: "मैं बहुत खुश हूँ क्योंकि आज मेरा दोस्त आया है। हम दोनों साथ में खाना खाएंगे।" },
-    { role: "assistant", content: "म्हैं घणा खुश सूं क्यूंकि आज म्हारा यार आया सै। म्हां दोनों साथ खाणा खावांगे।" },
-    { role: "user", content: "वो बहुत अच्छा आदमी है लेकिन उसकी बीवी को कोई नहीं जानता। वो कहाँ गया?" },
-    { role: "assistant", content: "वो घणा बढ़िया बंदा सै लेकिन उसकी लुगाई नै कोए ना जाणै। वो कड़ै गया?" },
+    { role: "user", content: "\u092E\u0948\u0902 \u092C\u0939\u0941\u0924 \u0916\u0941\u0936 \u0939\u0942\u0901 \u0915\u094D\u092F\u094B\u0902\u0915\u093F \u0906\u091C \u092E\u0947\u0930\u093E \u0926\u094B\u0938\u094D\u0924 \u0906\u092F\u093E \u0939\u0948\u0964 \u0939\u092E \u0926\u094B\u0928\u094B\u0902 \u0938\u093E\u0925 \u092E\u0947\u0902 \u0916\u093E\u0928\u093E \u0916\u093E\u090F\u0902\u0917\u0947\u0964" },
+    { role: "assistant", content: "\u092E\u094D\u0939\u0948\u0902 \u0918\u0923\u093E \u0916\u0941\u0936 \u0938\u0942\u0902 \u0915\u094D\u092F\u0942\u0902\u0915\u093F \u0906\u091C \u092E\u094D\u0939\u093E\u0930\u093E \u092F\u093E\u0930 \u0906\u092F\u093E \u0938\u0948\u0964 \u092E\u094D\u0939\u093E\u0902 \u0926\u094B\u0928\u094B\u0902 \u0938\u093E\u0925 \u0916\u093E\u0923\u093E \u0916\u093E\u0935\u093E\u0902\u0917\u0947\u0964" },
+    { role: "user", content: "\u0935\u094B \u092C\u0939\u0941\u0924 \u0905\u091A\u094D\u091B\u093E \u0906\u0926\u092E\u0940 \u0939\u0948 \u0932\u0947\u0915\u093F\u0928 \u0909\u0938\u0915\u0940 \u092C\u0940\u0935\u0940 \u0915\u094B \u0915\u094B\u0908 \u0928\u0939\u0940\u0902 \u091C\u093E\u0928\u0924\u093E\u0964 \u0935\u094B \u0915\u0939\u093E\u0901 \u0917\u092F\u093E?" },
+    { role: "assistant", content: "\u0935\u094B \u0918\u0923\u093E \u092C\u0922\u093C\u093F\u092F\u093E \u092C\u0902\u0926\u093E \u0938\u0948 \u0932\u0947\u0915\u093F\u0928 \u0909\u0938\u0915\u0940 \u0932\u0941\u0917\u093E\u0908 \u0928\u0948 \u0915\u094B\u090F \u0928\u093E \u091C\u093E\u0923\u0948\u0964 \u0935\u094B \u0915\u0921\u093C\u0948 \u0917\u092F\u093E?" },
   ],
   rajasthani: [
-    { role: "user", content: "मैं बहुत खुश हूँ क्योंकि आज मेरा दोस्त आया है। हम दोनों साथ में खाना खाएंगे।" },
-    { role: "assistant", content: "म्हैं घणो खुश छूं क्यूंकि आज म्हारो भायलो आयो छे। म्हे दोनूं साथै खावणो छे।" },
-    { role: "user", content: "वो बहुत अच्छा आदमी है लेकिन उसकी बीवी को कोई नहीं जानता। वो कहाँ गया?" },
-    { role: "assistant", content: "वो घणो सारो मिनख छे पण उणरी लुगाई नै कोई कोनी जाणे। वो कठे गयो?" },
+    { role: "user", content: "\u092E\u0948\u0902 \u092C\u0939\u0941\u0924 \u0916\u0941\u0936 \u0939\u0942\u0901 \u0915\u094D\u092F\u094B\u0902\u0915\u093F \u0906\u091C \u092E\u0947\u0930\u093E \u0926\u094B\u0938\u094D\u0924 \u0906\u092F\u093E \u0939\u0948\u0964 \u0939\u092E \u0926\u094B\u0928\u094B\u0902 \u0938\u093E\u0925 \u092E\u0947\u0902 \u0916\u093E\u0928\u093E \u0916\u093E\u090F\u0902\u0917\u0947\u0964" },
+    { role: "assistant", content: "\u092E\u094D\u0939\u0948\u0902 \u0918\u0923\u094B \u0916\u0941\u0936 \u091B\u0942\u0902 \u0915\u094D\u092F\u0942\u0902\u0915\u093F \u0906\u091C \u092E\u094D\u0939\u093E\u0930\u094B \u092D\u093E\u092F\u0932\u094B \u0906\u092F\u094B \u091B\u0947\u0964 \u092E\u094D\u0939\u0947 \u0926\u094B\u0928\u0942\u0902 \u0938\u093E\u0925\u0948 \u0916\u093E\u0935\u0923\u094B \u091B\u0947\u0964" },
+    { role: "user", content: "\u0935\u094B \u092C\u0939\u0941\u0924 \u0905\u091A\u094D\u091B\u093E \u0906\u0926\u092E\u0940 \u0939\u0948 \u0932\u0947\u0915\u093F\u0928 \u0909\u0938\u0915\u0940 \u092C\u0940\u0935\u0940 \u0915\u094B \u0915\u094B\u0908 \u0928\u0939\u0940\u0902 \u091C\u093E\u0928\u0924\u093E\u0964 \u0935\u094B \u0915\u0939\u093E\u0901 \u0917\u092F\u093E?" },
+    { role: "assistant", content: "\u0935\u094B \u0918\u0923\u094B \u0938\u093E\u0930\u094B \u092E\u093F\u0928\u0916 \u091B\u0947 \u092A\u0923 \u0909\u0923\u0930\u0940 \u0932\u0941\u0917\u093E\u0908 \u0928\u0948 \u0915\u094B\u0908 \u0915\u094B\u0928\u0940 \u091C\u093E\u0923\u0947\u0964 \u0935\u094B \u0915\u0920\u0947 \u0917\u092F\u094B?" },
   ],
   gujarati: [
-    { role: "user", content: "मैं बहुत खुश हूँ क्योंकि आज मेरा दोस्त आया है। हम दोनों साथ में खाना खाएंगे।" },
-    { role: "assistant", content: "હું ખૂબ ખુશ છું કારણ કે આજે મારો દોસ્ત આવ્યો છે. અમે બંને સાથે જમીશું." },
-    { role: "user", content: "वो बहुत अच्छा आदमी है लेकिन उसकी बीवी को कोई नहीं जानता। वो कहाँ गया?" },
-    { role: "assistant", content: "એ ખૂબ સારો માણસ છે પણ એની વાઈફને કોઈ નથી ઓળખતું. એ ક્યાં ગયો?" },
+    { role: "user", content: "\u092E\u0948\u0902 \u092C\u0939\u0941\u0924 \u0916\u0941\u0936 \u0939\u0942\u0901 \u0915\u094D\u092F\u094B\u0902\u0915\u093F \u0906\u091C \u092E\u0947\u0930\u093E \u0926\u094B\u0938\u094D\u0924 \u0906\u092F\u093E \u0939\u0948\u0964 \u0939\u092E \u0926\u094B\u0928\u094B\u0902 \u0938\u093E\u0925 \u092E\u0947\u0902 \u0916\u093E\u0928\u093E \u0916\u093E\u090F\u0902\u0917\u0947\u0964" },
+    { role: "assistant", content: "\u0AB9\u0AC1\u0A82 \u0A96\u0AC2\u0AAC \u0A96\u0AC1\u0AB6 \u0A9B\u0AC1\u0A82 \u0A95\u0ABE\u0AB0\u0AA3 \u0A95\u0AC7 \u0A86\u0A9C\u0AC7 \u0AAE\u0ABE\u0AB0\u0ACB \u0AA6\u0ACB\u0AB8\u0ACD\u0AA4 \u0A86\u0AB5\u0ACD\u0AAF\u0ACB \u0A9B\u0AC7. \u0A85\u0AAE\u0AC7 \u0AAC\u0A82\u0AA8\u0AC7 \u0AB8\u0ABE\u0AA5\u0AC7 \u0A9C\u0AAE\u0AC0\u0AB6\u0AC1\u0A82." },
+    { role: "user", content: "\u0935\u094B \u092C\u0939\u0941\u0924 \u0905\u091A\u094D\u091B\u093E \u0906\u0926\u092E\u0940 \u0939\u0948 \u0932\u0947\u0915\u093F\u0928 \u0909\u0938\u0915\u0940 \u092C\u0940\u0935\u0940 \u0915\u094B \u0915\u094B\u0908 \u0928\u0939\u0940\u0902 \u091C\u093E\u0928\u0924\u093E\u0964 \u0935\u094B \u0915\u0939\u093E\u0901 \u0917\u092F\u093E?" },
+    { role: "assistant", content: "\u0A8F \u0A96\u0AC2\u0AAC \u0AB8\u0ABE\u0AB0\u0ACB \u0AAE\u0ABE\u0AA3\u0AB8 \u0A9B\u0AC7 \u0AAA\u0AA3 \u0A8F\u0AA8\u0AC0 \u0AB5\u0ABE\u0A88\u0AAB\u0AA8\u0AC7 \u0A95\u0ACB\u0A88 \u0AA8\u0AA5\u0AC0 \u0A93\u0AB3\u0A96\u0AA4\u0AC1\u0A82. \u0A8F \u0A95\u0ACD\u0AAF\u0ABE\u0A82 \u0A97\u0AAF\u0ACB?" },
   ],
   hindi: [
     { role: "user", content: "bhai aaj mera dost aaya hai, hum dono saath me khaana khayenge. bahut maza aayega." },
-    { role: "assistant", content: "भाई आज मेरा दोस्त आया है, हम दोनों साथ में खाना खाएंगे। बहुत मज़ा आएगा।" },
+    { role: "assistant", content: "\u092D\u093E\u0908 \u0906\u091C \u092E\u0947\u0930\u093E \u0926\u094B\u0938\u094D\u0924 \u0906\u092F\u093E \u0939\u0948, \u0939\u092E \u0926\u094B\u0928\u094B\u0902 \u0938\u093E\u0925 \u092E\u0947\u0902 \u0916\u093E\u0928\u093E \u0916\u093E\u090F\u0902\u0917\u0947\u0964 \u092C\u0939\u0941\u0924 \u092E\u091C\u093C\u093E \u0906\u090F\u0917\u093E\u0964" },
   ],
   english: [
-    { role: "user", content: "भाई आज मेरा दोस्त आया है, हम दोनों साथ में खाना खाएंगे। बहुत मज़ा आएगा।" },
-    { role: "assistant", content: "Bro, my friend came over today — we're both gonna eat together. It's gonna be a blast." },
+    { role: "user", content: "\u092D\u093E\u0908 \u0906\u091C \u092E\u0947\u0930\u093E \u0926\u094B\u0938\u094D\u0924 \u0906\u092F\u093E \u0939\u0948, \u0939\u092E \u0926\u094B\u0928\u094B\u0902 \u0938\u093E\u0925 \u092E\u0947\u0902 \u0916\u093E\u0928\u093E \u0916\u093E\u090F\u0902\u0917\u0947\u0964 \u092C\u0939\u0941\u0924 \u092E\u091C\u093C\u093E \u0906\u090F\u0917\u093E\u0964" },
+    { role: "assistant", content: "Bro, my friend came over today \u2014 we're both gonna eat together. It's gonna be a blast." },
   ],
 };
 
-/* ─── Contrastive reference for confusable dialects ─── */
+/* --- Contrastive reference for confusable dialects --- */
 const CONTRASTIVE_TABLE = `
-=== CRITICAL: Same sentences in each dialect — study the differences ===
+=== CRITICAL: Same sentences in each dialect \u2014 study the differences ===
 
-Hindi: वो अच्छा आदमी है। मैं वहाँ नहीं जाऊंगा।
-Bhojpuri: ऊ नीमन मरद बा। हम उहाँ नाहीं जाइब।
-Haryanvi: वो बढ़िया बंदा सै। म्हैं वां ना जावांगा।
-Rajasthani: वो सारो मिनख छे। म्हैं उठे कोनी जासूं।
+Hindi: \u0935\u094B \u0905\u091A\u094D\u091B\u093E \u0906\u0926\u092E\u0940 \u0939\u0948\u0964 \u092E\u0948\u0902 \u0935\u0939\u093E\u0901 \u0928\u0939\u0940\u0902 \u091C\u093E\u090A\u0901\u0917\u093E\u0964
+Bhojpuri: \u090A \u0928\u0940\u092E\u0928 \u092E\u0930\u0926 \u092C\u093E\u0964 \u0939\u092E \u0909\u0939\u093E\u0901 \u0928\u093E\u0939\u0940\u0902 \u091C\u093E\u0907\u092C\u0964
+Haryanvi: \u0935\u094B \u092C\u0922\u093C\u093F\u092F\u093E \u092C\u0902\u0926\u093E \u0938\u0948\u0964 \u092E\u094D\u0939\u0948\u0902 \u0935\u093E\u0902 \u0928\u093E \u091C\u093E\u0935\u093E\u0902\u0917\u093E\u0964
+Rajasthani: \u0935\u094B \u0938\u093E\u0930\u094B \u092E\u093F\u0928\u0916 \u091B\u0947\u0964 \u092E\u094D\u0939\u0948\u0902 \u0909\u0920\u0947 \u0915\u094B\u0928\u0940 \u091C\u093E\u0938\u0942\u0902\u0964
 
-Hindi: मैं काम कर रहा हूँ। वे लोग आ रहे हैं।
-Bhojpuri: हम काम करत बानी। उ लोग आवत बाड़न।
-Haryanvi: म्हैं काम करता सूं। वे लोग आते सैं।
-Rajasthani: म्हैं काम करता छूं। वे लोग आवे छे।
+Hindi: \u092E\u0948\u0902 \u0915\u093E\u092E \u0915\u0930 \u0930\u0939\u093E \u0939\u0942\u0901\u0964 \u0935\u0947 \u0932\u094B\u0917 \u0906 \u0930\u0939\u0947 \u0939\u0948\u0902\u0964
+Bhojpuri: \u0939\u092E \u0915\u093E\u092E \u0915\u0930\u0924 \u092C\u093E\u0928\u0940\u0964 \u0909 \u0932\u094B\u0917 \u0906\u0935\u0924 \u092C\u093E\u0921\u093C\u0928\u0964
+Haryanvi: \u092E\u094D\u0939\u0948\u0902 \u0915\u093E\u092E \u0915\u0930\u0924\u093E \u0938\u0942\u0902\u0964 \u0935\u0947 \u0932\u094B\u0917 \u0906\u0924\u0947 \u0938\u0948\u0902\u0964
+Rajasthani: \u092E\u094D\u0939\u0948\u0902 \u0915\u093E\u092E \u0915\u0930\u0924\u093E \u091B\u0942\u0902\u0964 \u0935\u0947 \u0932\u094B\u0917 \u0906\u0935\u0947 \u091B\u0947\u0964
 
-Hindi: यह बहुत अच्छा है। उसने क्या किया?
-Bhojpuri: ई बहुते नीमन बा। ओकरा का कइल?
-Haryanvi: या घणा बढ़िया सै। उसनै के कर्या?
-Rajasthani: आ घणो सारो छे। उणने के कियो?
+Hindi: \u092F\u0939 \u092C\u0939\u0941\u0924 \u0905\u091A\u094D\u091B\u093E \u0939\u0948\u0964 \u0909\u0938\u0928\u0947 \u0915\u094D\u092F\u093E \u0915\u093F\u092F\u093E?
+Bhojpuri: \u0908 \u092C\u0939\u0941\u0924\u0947 \u0928\u0940\u092E\u0928 \u092C\u093E\u0964 \u0913\u0915\u0930\u093E \u0915\u093E \u0915\u0907\u0932?
+Haryanvi: \u092F\u093E \u0918\u0923\u093E \u092C\u0922\u093C\u093F\u092F\u093E \u0938\u0948\u0964 \u0909\u0938\u0928\u0948 \u0915\u0947 \u0915\u0930\u094D\u092F\u093E?
+Rajasthani: \u0906 \u0918\u0923\u094B \u0938\u093E\u0930\u094B \u091B\u0947\u0964 \u0909\u0923\u0928\u0947 \u0915\u0947 \u0915\u093F\u092F\u094B?
 
-Hindi: मुझे जाना है। तुम कहाँ रहते हो?
-Bhojpuri: हमके जाइब बा। तू कहाँ रहत बाड़ा?
-Haryanvi: म्हाने जाणा सै। थारे कड़ै रहते सो?
-Rajasthani: म्हाने जावणो छे। थे कठे रहो छो?
+Hindi: \u092E\u0941\u091D\u0947 \u091C\u093E\u0928\u093E \u0939\u0948\u0964 \u0924\u0941\u092E \u0915\u0939\u093E\u0901 \u0930\u0939\u0924\u0947 \u0939\u094B?
+Bhojpuri: \u0939\u092E\u0915\u0947 \u091C\u093E\u0907\u092C \u092C\u093E\u0964 \u0924\u0942 \u0915\u0939\u093E\u0901 \u0930\u0939\u0924 \u092C\u093E\u0921\u093C\u093E?
+Haryanvi: \u092E\u094D\u0939\u093E\u0928\u0947 \u091C\u093E\u0923\u093E \u0938\u0948\u0964 \u0925\u093E\u0930\u0947 \u0915\u0921\u093C\u0948 \u0930\u0939\u0924\u0947 \u0938\u094B?
+Rajasthani: \u092E\u094D\u0939\u093E\u0928\u0947 \u091C\u093E\u0935\u0923\u094B \u091B\u0947\u0964 \u0925\u0947 \u0915\u0920\u0947 \u0930\u0939\u094B \u091B\u094B?
 
-Hindi: मैंने उसे नहीं बताया। वो बहुत गुस्सा करेगा।
-Bhojpuri: हम ओकरा नाहीं बतइलीं। ऊ बहुते गुस्सा करी।
-Haryanvi: म्हैं उसनै ना बताया। वो घणा गुस्सा करेगा।
-Rajasthani: म्हैं उणने कोनी बतायो। वो घणो गुस्सो करेलो।
+Hindi: \u092E\u0948\u0902\u0928\u0947 \u0909\u0938\u0947 \u0928\u0939\u0940\u0902 \u092C\u0924\u093E\u092F\u093E\u0964 \u0935\u094B \u092C\u0939\u0941\u0924 \u0917\u0941\u0938\u094D\u0938\u093E \u0915\u0930\u0947\u0917\u093E\u0964
+Bhojpuri: \u0939\u092E \u0913\u0915\u0930\u093E \u0928\u093E\u0939\u0940\u0902 \u092C\u0924\u0907\u0932\u0940\u0902\u0964 \u090A \u092C\u0939\u0941\u0924\u0947 \u0917\u0941\u0938\u094D\u0938\u093E \u0915\u0930\u0940\u0964
+Haryanvi: \u092E\u094D\u0939\u0948\u0902 \u0909\u0938\u0928\u0948 \u0928\u093E \u092C\u0924\u093E\u092F\u093E\u0964 \u0935\u094B \u0918\u0923\u093E \u0917\u0941\u0938\u094D\u0938\u093E \u0915\u0930\u0947\u0917\u093E\u0964
+Rajasthani: \u092E\u094D\u0939\u0948\u0902 \u0909\u0923\u0928\u0947 \u0915\u094B\u0928\u0940 \u092C\u0924\u093E\u092F\u094B\u0964 \u0935\u094B \u0918\u0923\u094B \u0917\u0941\u0938\u094D\u0938\u094B \u0915\u0930\u0947\u0932\u094B\u0964
 
-Hindi: तुम कब आओगे? मैं इंतज़ार कर रहा हूँ।
-Bhojpuri: तू कब आइब? हम इंतज़ार करत बानी।
-Haryanvi: तू कद आवेगा? म्हैं इंतज़ार करता सूं।
-Rajasthani: तूं कद आवेलो? म्हैं इंतज़ार करता छूं।
+Hindi: \u0924\u0941\u092E \u0915\u092C \u0906\u0913\u0917\u0947? \u092E\u0948\u0902 \u0907\u0902\u0924\u091C\u093C\u093E\u0930 \u0915\u0930 \u0930\u0939\u093E \u0939\u0942\u0901\u0964
+Bhojpuri: \u0924\u0942 \u0915\u092C \u0906\u0907\u092C? \u0939\u092E \u0907\u0902\u0924\u091C\u093C\u093E\u0930 \u0915\u0930\u0924 \u092C\u093E\u0928\u0940\u0964
+Haryanvi: \u0924\u0942 \u0915\u0926 \u0906\u0935\u0947\u0917\u093E? \u092E\u094D\u0939\u0948\u0902 \u0907\u0902\u0924\u091C\u093C\u093E\u0930 \u0915\u0930\u0924\u093E \u0938\u0942\u0902\u0964
+Rajasthani: \u0924\u0942\u0902 \u0915\u0926 \u0906\u0935\u0947\u0932\u094B? \u092E\u094D\u0939\u0948\u0902 \u0907\u0902\u0924\u091C\u093C\u093E\u0930 \u0915\u0930\u0924\u093E \u091B\u0942\u0902\u0964
 `;
 
-/* ─── System prompt builder ─── */
+/* --- System prompt builder --- */
 const buildSingleConverterSystem = (id) => {
   const checklist = id === "haryanvi" ? `
 HARYANVI FINAL CHECKLIST:
-- हूँ → सूं (MANDATORY)
-- है → सै (MANDATORY)
-- हैं → सैं (MANDATORY)
-- ALL "-ना" infinitives → "-णा" (NOT "-णो" — that's Rajasthani!)
-- नहीं → ना / कोनी
-- मैं → म्हैं | मेरा → म्हारा | बहुत → घणा
-- Past: किया→कर्या (m)/करी (f) (NOT कियो — that's Rajasthani!)
-- ZERO Bhojpuri words: बा, बाड़न, बानी, नाहीं, हमके, ऊ, ओकर, केतना
-- ZERO Rajasthani words: छे, छूं, छो, -णो endings, म्हारो, थो, गयो, कियो, देख्यो, घणो, सगळा, कठे
-SELF-CHECK: Scan output — if you see छे/छूं/बा/बानी/-णो/नाहीं, REWRITE those words.` : id === "rajasthani" ? `
+- \u0939\u0942\u0901 \u2192 \u0938\u0942\u0902 (MANDATORY)
+- \u0939\u0948 \u2192 \u0938\u0948 (MANDATORY)
+- \u0939\u0948\u0902 \u2192 \u0938\u0948\u0902 (MANDATORY)
+- ALL "-\u0928\u093E" infinitives \u2192 "-\u0923\u093E" (NOT "-\u0923\u094B" \u2014 that's Rajasthani!)
+- \u0928\u0939\u0940\u0902 \u2192 \u0928\u093E / \u0915\u094B\u0928\u0940
+- \u092E\u0948\u0902 \u2192 \u092E\u094D\u0939\u0948\u0902 | \u092E\u0947\u0930\u093E \u2192 \u092E\u094D\u0939\u093E\u0930\u093E | \u092C\u0939\u0941\u0924 \u2192 \u0918\u0923\u093E
+- Past: \u0915\u093F\u092F\u093E\u2192\u0915\u0930\u094D\u092F\u093E (m)/\u0915\u0930\u0940 (f) (NOT \u0915\u093F\u092F\u094B \u2014 that's Rajasthani!)
+- ZERO Bhojpuri words: \u092C\u093E, \u092C\u093E\u0921\u093C\u0928, \u092C\u093E\u0928\u0940, \u0928\u093E\u0939\u0940\u0902, \u0939\u092E\u0915\u0947, \u090A, \u0913\u0915\u0930, \u0915\u0947\u0924\u0928\u093E
+- ZERO Rajasthani words: \u091B\u0947, \u091B\u0942\u0902, \u091B\u094B, -\u0923\u094B endings, \u092E\u094D\u0939\u093E\u0930\u094B, \u0925\u094B, \u0917\u092F\u094B, \u0915\u093F\u092F\u094B, \u0926\u0947\u0916\u094D\u092F\u094B, \u0918\u0923\u094B, \u0938\u0917\u0933\u093E, \u0915\u0920\u0947
+SELF-CHECK: Scan output \u2014 if you see \u091B\u0947/\u091B\u0942\u0902/\u092C\u093E/\u092C\u093E\u0928\u0940/-\u0923\u094B/\u0928\u093E\u0939\u0940\u0902, REWRITE those words.` : id === "rajasthani" ? `
 RAJASTHANI FINAL CHECKLIST:
-- हूँ → छूं (MANDATORY)
-- है → छे (MANDATORY)
-- ALL "-ना" infinitives → "-णो" (NOT "-णा" — that's Haryanvi!)
-- नहीं → कोनी (MANDATORY)
-- मैं → म्हैं | मेरा → म्हारो (NOT म्हारा — that's Haryanvi!) | बहुत → घणो/घणी
-- Past: था→थो (m) | गया→गयो (m) (NOT कर्या/देख्या — that's Haryanvi!)
-- ZERO Bhojpuri words: बा, बाड़न, बानी, नाहीं, हमके, ऊ, ओकर, केतना, बहुते
-- ZERO Haryanvi words: सै, सूं, सैं, सो, -णा endings, म्हारा, कर्या, देख्या, कित्ता, कड़ै
-SELF-CHECK: Scan output — if you see सै/सूं/बा/बानी/-णा endings/नाहीं, REWRITE those words.` : id === "bhojpuri" ? `
+- \u0939\u0942\u0901 \u2192 \u091B\u0942\u0902 (MANDATORY)
+- \u0939\u0948 \u2192 \u091B\u0947 (MANDATORY)
+- ALL "-\u0928\u093E" infinitives \u2192 "-\u0923\u094B" (NOT "-\u0923\u093E" \u2014 that's Haryanvi!)
+- \u0928\u0939\u0940\u0902 \u2192 \u0915\u094B\u0928\u0940 (MANDATORY)
+- \u092E\u0948\u0902 \u2192 \u092E\u094D\u0939\u0948\u0902 | \u092E\u0947\u0930\u093E \u2192 \u092E\u094D\u0939\u093E\u0930\u094B (NOT \u092E\u094D\u0939\u093E\u0930\u093E \u2014 that's Haryanvi!) | \u092C\u0939\u0941\u0924 \u2192 \u0918\u0923\u094B/\u0918\u0923\u0940
+- Past: \u0925\u093E\u2192\u0925\u094B (m) | \u0917\u092F\u093E\u2192\u0917\u092F\u094B (m) (NOT \u0915\u0930\u094D\u092F\u093E/\u0926\u0947\u0916\u094D\u092F\u093E \u2014 that's Haryanvi!)
+- ZERO Bhojpuri words: \u092C\u093E, \u092C\u093E\u0921\u093C\u0928, \u092C\u093E\u0928\u0940, \u0928\u093E\u0939\u0940\u0902, \u0939\u092E\u0915\u0947, \u090A, \u0913\u0915\u0930, \u0915\u0947\u0924\u0928\u093E, \u092C\u0939\u0941\u0924\u0947
+- ZERO Haryanvi words: \u0938\u0948, \u0938\u0942\u0902, \u0938\u0948\u0902, \u0938\u094B, -\u0923\u093E endings, \u092E\u094D\u0939\u093E\u0930\u093E, \u0915\u0930\u094D\u092F\u093E, \u0926\u0947\u0916\u094D\u092F\u093E, \u0915\u093F\u0924\u094D\u0924\u093E, \u0915\u0921\u093C\u0948
+SELF-CHECK: Scan output \u2014 if you see \u0938\u0948/\u0938\u0942\u0902/\u092C\u093E/\u092C\u093E\u0928\u0940/-\u0923\u093E endings/\u0928\u093E\u0939\u0940\u0902, REWRITE those words.` : id === "bhojpuri" ? `
 BHOJPURI FINAL CHECKLIST:
-- है → बा | हैं → बाड़न | हूँ → बानी (MANDATORY)
-- नहीं → नाहीं | मैं → हम | मुझे → हमके | वो → ऊ
-- NEVER use "है", "नहीं", "मैं" in output
-- ZERO Haryanvi words: सै, सूं, सैं, -णा endings, म्हैं, म्हाने, म्हारा, घणा, कर्या, कड़ै
-- ZERO Rajasthani words: छे, छूं, -णो endings, म्हारो, कोनी, घणो, गयो, थो, कठे
-SELF-CHECK: Scan output — if you see सै/छे/सूं/छूं/म्हैं/कोनी, REWRITE those words.` : id === "hindi" ? `
+- \u0939\u0948 \u2192 \u092C\u093E | \u0939\u0948\u0902 \u2192 \u092C\u093E\u0921\u093C\u0928 | \u0939\u0942\u0901 \u2192 \u092C\u093E\u0928\u0940 (MANDATORY)
+- \u0928\u0939\u0940\u0902 \u2192 \u0928\u093E\u0939\u0940\u0902 | \u092E\u0948\u0902 \u2192 \u0939\u092E | \u092E\u0941\u091D\u0947 \u2192 \u0939\u092E\u0915\u0947 | \u0935\u094B \u2192 \u090A
+- NEVER use "\u0939\u0948", "\u0928\u0939\u0940\u0902", "\u092E\u0948\u0902" in output
+- ZERO Haryanvi words: \u0938\u0948, \u0938\u0942\u0902, \u0938\u0948\u0902, -\u0923\u093E endings, \u092E\u094D\u0939\u0948\u0902, \u092E\u094D\u0939\u093E\u0928\u0947, \u092E\u094D\u0939\u093E\u0930\u093E, \u0918\u0923\u093E, \u0915\u0930\u094D\u092F\u093E, \u0915\u0921\u093C\u0948
+- ZERO Rajasthani words: \u091B\u0947, \u091B\u0942\u0902, -\u0923\u094B endings, \u092E\u094D\u0939\u093E\u0930\u094B, \u0915\u094B\u0928\u0940, \u0918\u0923\u094B, \u0917\u092F\u094B, \u0925\u094B, \u0915\u0920\u0947
+SELF-CHECK: Scan output \u2014 if you see \u0938\u0948/\u091B\u0947/\u0938\u0942\u0902/\u091B\u0942\u0902/\u092E\u094D\u0939\u0948\u0902/\u0915\u094B\u0928\u0940, REWRITE those words.` : id === "hindi" ? `
 HINDI FINAL CHECKLIST:
-- Remove ALL dialect markers (बा, सै, छे, etc.)
-- Use standard है/हैं/था/थी
-- Use standard नहीं (not नाहीं/कोनी)
+- Remove ALL dialect markers (\u092C\u093E, \u0938\u0948, \u091B\u0947, etc.)
+- Use standard \u0939\u0948/\u0939\u0948\u0902/\u0925\u093E/\u0925\u0940
+- Use standard \u0928\u0939\u0940\u0902 (not \u0928\u093E\u0939\u0940\u0902/\u0915\u094B\u0928\u0940)
 - Clean, grammatically correct Khari Boli` : id === "english" ? `
 ENGLISH FINAL CHECKLIST:
 - Natural, conversational English
 - NO Hindi/Devanagari words in output (except proper nouns/cultural terms)
 - Preserve tone and emotion of original
-- Not literal translation — capture the meaning and feel` : "";
+- Not literal translation \u2014 capture the meaning and feel` : "";
 
   const needsContrastive = ["bhojpuri", "haryanvi", "rajasthani"].includes(id);
   const contrastiveDialects = {
@@ -468,20 +468,20 @@ ENGLISH FINAL CHECKLIST:
   };
 
   const opening = needsContrastive
-    ? `You are an expert linguist specializing in North Indian dialects. Your task: rewrite the given input text in authentic ${id} dialect — which is COMPLETELY DISTINCT from ${contrastiveDialects[id]}. Pay careful attention to the dialect-specific markers below. Mixing up dialects is a CRITICAL FAILURE.`
+    ? `You are an expert linguist specializing in North Indian dialects. Your task: rewrite the given input text in authentic ${id} dialect \u2014 which is COMPLETELY DISTINCT from ${contrastiveDialects[id]}. Pay careful attention to the dialect-specific markers below. Mixing up dialects is a CRITICAL FAILURE.`
     : `You are an expert linguist. Your task: rewrite the given input text in authentic ${id === "hindi" ? "standard Hindi" : id === "english" ? "English" : id + " dialect"}.`;
 
   return `${opening}
 
-STEP 1 — AUTO-DETECT INPUT LANGUAGE:
+STEP 1 \u2014 AUTO-DETECT INPUT LANGUAGE:
 The input may be in ANY language: Hindi, English, Hinglish, Bhojpuri, Haryanvi, Rajasthani, Gujarati, or any mix.
 Silently identify the source language. Do NOT mention it in your output.
 
-STEP 2 — UNDERSTAND THE MEANING:
+STEP 2 \u2014 UNDERSTAND THE MEANING:
 First mentally translate the input to standard Hindi to normalize it. Then extract the MEANING, story, emotion, and intent. Do NOT just swap words.
 
-STEP 3 — REWRITE in ${id === "hindi" ? "standard Hindi" : id === "english" ? "natural English" : "authentic " + id + " dialect"}:
-- Write as a NATIVE SPEAKER would naturally speak — not a word-for-word swap.
+STEP 3 \u2014 REWRITE in ${id === "hindi" ? "standard Hindi" : id === "english" ? "natural English" : "authentic " + id + " dialect"}:
+- Write as a NATIVE SPEAKER would naturally speak \u2014 not a word-for-word swap.
 - Preserve the original meaning, emotion, and structure.
 - All names and proper nouns: preserve exactly as given.
 - Output ONLY the converted text. No explanation, no labels, nothing else.
@@ -490,93 +490,193 @@ ${DIALECT_RULES[id]}
 ${checklist}`;
 };
 
-/* ─── Dynamic Language Background ─── */
-function LanguageBackground({ langId }) {
-  const lang = LANGUAGES.find(l => l.id === langId) || LANGUAGES[0];
-  const { bg } = lang;
-  const glyphs = bg.glyphs;
-  const parts = Array.from({ length: 28 }, (_, i) => {
-    const s = i * 137.5;
-    return {
-      char: glyphs[i % glyphs.length],
-      left: +((s * 5.13) % 100).toFixed(1),
-      dur: +(22 + (s * 0.71) % 26).toFixed(1),
-      delay: -+((s * 0.93) % 45).toFixed(1),
-      size: +(14 + (i * 2.1) % 12).toFixed(0),
-    };
-  });
+/* ============================================
+   CLAYMORPHISM UI + MULTI-LANGUAGE SECTION
+============================================ */
 
-  return (
-    <>
-      <style>{`
-        @keyframes sF{0%{transform:translateY(100vh);opacity:0;}10%{opacity:.15;}90%{opacity:.15;}100%{transform:translateY(-10vh);opacity:0;}}
-        @keyframes blobFloat{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(20px,-15px) scale(1.04);}66%{transform:translate(-12px,10px) scale(0.97);}}
-      `}</style>
-      {/* Ambient blobs */}
-      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: -1, overflow: "hidden", transition: "opacity 0.6s ease" }}>
-        <div style={{ position: "absolute", top: "-10%", right: "-5%", width: "700px", height: "500px", borderRadius: "50%", background: `radial-gradient(ellipse at center, ${bg.grad1} 0%, transparent 70%)`, animation: "blobFloat 18s ease-in-out infinite", filter: "blur(40px)", transition: "background 0.8s ease" }} />
-        <div style={{ position: "absolute", bottom: "-10%", left: "-5%", width: "600px", height: "500px", borderRadius: "50%", background: `radial-gradient(ellipse at center, ${bg.grad2} 0%, transparent 70%)`, animation: "blobFloat 22s ease-in-out infinite reverse", filter: "blur(40px)", transition: "background 0.8s ease" }} />
-        <div style={{ position: "absolute", top: "35%", left: "30%", width: "500px", height: "400px", borderRadius: "50%", background: `radial-gradient(ellipse at center, ${bg.grad3} 0%, transparent 70%)`, animation: "blobFloat 16s 4s ease-in-out infinite", filter: "blur(50px)", transition: "background 0.8s ease" }} />
-      </div>
-      {/* Floating glyphs */}
-      <div style={{ position: "fixed", inset: 0, overflow: "hidden", pointerEvents: "none", zIndex: -1, userSelect: "none" }}>
-        {parts.map((p, i) => (
-          <span key={`${langId}-${i}`} style={{ position: "absolute", left: `${p.left}%`, bottom: 0, fontSize: `${p.size}px`, color: lang.color, textShadow: `0 0 10px ${lang.color}`, opacity: 0.18, animation: `sF ${p.dur}s ${p.delay}s linear infinite`, fontFamily: "serif" }}>{p.char}</span>
-        ))}
-      </div>
-    </>
-  );
-}
+/* --- Global CSS (Claymorphism) --- */
+const CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
-/* ─── Logo ─── */
+  @keyframes fadeUp    {from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes pulse     {0%,100%{opacity:.3;transform:scale(.7);}50%{opacity:1;transform:scale(1);}}
+  @keyframes spin      {to{transform:rotate(360deg);}}
+  @keyframes ruhiShine {0%{background-position:-300% center;}100%{background-position:300% center;}}
+  @keyframes goldShine {0%{background-position:-200% center;}100%{background-position:200% center;}}
+  @keyframes float     {0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+  @keyframes connPulse {0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4);}60%{box-shadow:0 0 0 5px rgba(34,197,94,0);}}
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #f0ebe3; font-family: 'Inter','Segoe UI',sans-serif; }
+
+  .clay {
+    background: linear-gradient(145deg, #f5f0e8, #e8e0d4);
+    border-radius: 24px;
+    box-shadow:
+      8px 8px 16px rgba(166,152,130,0.4),
+      -6px -6px 14px rgba(255,255,255,0.8),
+      inset 0 2px 0 rgba(255,255,255,0.6),
+      inset 0 -1px 0 rgba(166,152,130,0.15);
+    border: 1px solid rgba(255,255,255,0.5);
+  }
+  .clay-inner {
+    background: linear-gradient(145deg, #ece7dd, #e0d8cc);
+    border-radius: 18px;
+    box-shadow:
+      inset 4px 4px 8px rgba(166,152,130,0.3),
+      inset -3px -3px 6px rgba(255,255,255,0.5);
+    border: 1px solid rgba(255,255,255,0.3);
+  }
+  .clay-btn {
+    background: linear-gradient(145deg, #f5f0e8, #e0d8cc);
+    border-radius: 16px;
+    box-shadow:
+      5px 5px 10px rgba(166,152,130,0.4),
+      -4px -4px 8px rgba(255,255,255,0.7),
+      inset 0 1px 0 rgba(255,255,255,0.5);
+    border: 1px solid rgba(255,255,255,0.4);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .clay-btn:hover {
+    box-shadow:
+      3px 3px 6px rgba(166,152,130,0.5),
+      -2px -2px 5px rgba(255,255,255,0.6),
+      inset 0 1px 0 rgba(255,255,255,0.4);
+    transform: translateY(1px);
+  }
+  .clay-btn:active {
+    box-shadow:
+      inset 3px 3px 6px rgba(166,152,130,0.35),
+      inset -2px -2px 5px rgba(255,255,255,0.4);
+    transform: translateY(2px);
+  }
+  .clay-btn-primary {
+    background: linear-gradient(145deg, #ffb347, #e89520);
+    color: #fff;
+    border: 1px solid rgba(255,200,100,0.4);
+    box-shadow:
+      5px 5px 12px rgba(200,130,20,0.4),
+      -4px -4px 8px rgba(255,220,150,0.3),
+      inset 0 2px 0 rgba(255,255,255,0.3);
+    font-weight: 700;
+  }
+  .clay-btn-primary:hover {
+    box-shadow:
+      3px 3px 8px rgba(200,130,20,0.5),
+      -2px -2px 5px rgba(255,220,150,0.3),
+      inset 0 2px 0 rgba(255,255,255,0.25);
+    transform: translateY(1px);
+  }
+  .clay-btn-primary:disabled {
+    background: linear-gradient(145deg, #d4cfc5, #c8c0b4);
+    color: #9e9688;
+    cursor: not-allowed;
+    box-shadow:
+      4px 4px 8px rgba(166,152,130,0.3),
+      -3px -3px 6px rgba(255,255,255,0.5);
+  }
+
+  .ruhi-title {
+    font-size: 72px;
+    background: linear-gradient(90deg,#92400e,#d97706,#f59e0b,#fde68a,#f59e0b,#d97706,#92400e);
+    background-size: 300% auto;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: ruhiShine 6s linear infinite;
+    text-shadow: none;
+    filter: drop-shadow(0 2px 4px rgba(146,64,14,0.15));
+  }
+  .gold-shine {
+    background: linear-gradient(90deg,#92400e,#f59e0b 25%,#fde68a 50%,#f59e0b 75%,#92400e);
+    background-size: 200% auto;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: goldShine 3s linear infinite;
+    font-weight: 700;
+  }
+  .live-dot { animation: connPulse 2s ease infinite; }
+
+  .lang-chip {
+    transition: all 0.2s ease;
+    cursor: pointer;
+    user-select: none;
+  }
+  .lang-chip:hover { transform: translateY(-2px); }
+
+  .ta-focus:focus-within {
+    box-shadow:
+      inset 4px 4px 8px rgba(166,152,130,0.35),
+      inset -3px -3px 6px rgba(255,255,255,0.45),
+      0 0 0 3px rgba(245,158,11,0.15) !important;
+  }
+
+  @media(max-width:600px){
+    .topbar-c{padding:0 14px !important;height:54px !important;}
+    .main-c{padding:20px 12px 70px !important;}
+    .ruhi-title{font-size:44px !important;letter-spacing:-2px !important;}
+    .lang-grid{grid-template-columns:repeat(2, 1fr) !important;}
+  }
+  @media(max-width:400px){.ruhi-title{font-size:36px !important;}}
+`;
+
+/* --- Logo --- */
 function Logo() {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-      <div style={{ width: "33px", height: "33px", borderRadius: "10px", background: "linear-gradient(135deg,#f59e0b,#ef4444)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "17px", fontWeight: 900, color: "#fff", boxShadow: "0 0 16px rgba(245,158,11,0.45)" }}>R</div>
+      <div className="clay-btn" style={{ width: "36px", height: "36px", borderRadius: "12px", background: "linear-gradient(135deg,#f59e0b,#ef4444)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "17px", fontWeight: 900, color: "#fff", border: "none" }}>R</div>
       <div>
-        <div style={{ fontSize: "15px", fontWeight: 900, letterSpacing: "-0.5px", lineHeight: 1.1, background: "linear-gradient(90deg,#f1f5f9,#fbbf24 60%,#ef4444)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Ruhi</div>
-        <div style={{ fontSize: "8px", color: "#334155", letterSpacing: "1.8px", fontWeight: 700, textTransform: "uppercase" }}>Script Converter</div>
+        <div style={{ fontSize: "15px", fontWeight: 900, letterSpacing: "-0.5px", lineHeight: 1.1, color: "#78350f" }}>Ruhi</div>
+        <div style={{ fontSize: "8px", color: "#92400e", letterSpacing: "1.8px", fontWeight: 700, textTransform: "uppercase" }}>Script Converter</div>
       </div>
     </div>
   );
 }
 
-/* ─── Language Cards (single select) ─── */
-function LanguageCards({ selected, onSelect }) {
+/* --- Language Cards (multi-select) --- */
+function LanguageCards({ selected, onToggle }) {
   return (
-    <div style={{ background: "rgba(255,255,255,0.035)", backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: "16px", overflow: "hidden", marginBottom: "12px", boxShadow: "0 4px 24px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06)" }}>
-      <div style={{ padding: "13px 20px", borderBottom: "1px solid rgba(255,255,255,0.05)", display: "flex", alignItems: "center", gap: "8px" }}>
-        <span style={{ fontSize: "12px" }}>🌐</span>
-        <span style={{ fontSize: "10.5px", fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", color: "#475569" }}>Convert To</span>
+    <div className="clay" style={{ padding: 0, marginBottom: "16px", overflow: "hidden" }}>
+      <div style={{ padding: "14px 22px", borderBottom: "1px solid rgba(166,152,130,0.15)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span style={{ fontSize: "14px" }}>&#127760;</span>
+          <span style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "1.2px", textTransform: "uppercase", color: "#78350f" }}>Convert To</span>
+        </div>
+        <span style={{ fontSize: "10px", color: "#92400e", fontWeight: 600 }}>{selected.length} selected</span>
       </div>
-      <div style={{ padding: "14px 18px", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: "10px" }}>
+      <div className="lang-grid" style={{ padding: "16px 18px", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(155px, 1fr))", gap: "12px" }}>
         {LANGUAGES.map(d => {
-          const on = selected === d.id;
+          const on = selected.includes(d.id);
           return (
-            <div key={d.id} onClick={() => onSelect(d.id)} style={{
-              padding: "14px 16px", borderRadius: "14px", cursor: "pointer", userSelect: "none",
-              border: `1.5px solid ${on ? d.color + "70" : "rgba(255,255,255,0.07)"}`,
-              background: on ? d.color + "18" : "rgba(255,255,255,0.025)",
-              backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
-              boxShadow: on ? `0 0 28px ${d.color}30,inset 0 1px 0 rgba(255,255,255,0.1)` : "inset 0 1px 0 rgba(255,255,255,0.04)",
-              transition: "all 0.22s ease", position: "relative", overflow: "hidden"
+            <div key={d.id} onClick={() => onToggle(d.id)} className="lang-chip" style={{
+              padding: "14px 16px", borderRadius: "18px",
+              background: on
+                ? `linear-gradient(145deg, ${d.color}20, ${d.color}10)`
+                : "linear-gradient(145deg, #f5f0e8, #e8e0d4)",
+              border: on ? `2px solid ${d.color}60` : "1px solid rgba(255,255,255,0.4)",
+              boxShadow: on
+                ? `4px 4px 10px ${d.color}25, -3px -3px 8px rgba(255,255,255,0.6), inset 0 1px 0 rgba(255,255,255,0.4)`
+                : "4px 4px 10px rgba(166,152,130,0.3), -3px -3px 8px rgba(255,255,255,0.7), inset 0 1px 0 rgba(255,255,255,0.5)",
+              position: "relative", overflow: "hidden"
             }}>
-              {on && <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "2px", background: `linear-gradient(90deg, transparent, ${d.color}, transparent)` }} />}
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 <div style={{
-                  width: "38px", height: "38px", borderRadius: "10px", flexShrink: 0,
-                  background: on ? d.color + "20" : "rgba(255,255,255,0.04)",
-                  border: `1px solid ${on ? d.color + "40" : "rgba(255,255,255,0.06)"}`,
+                  width: "40px", height: "40px", borderRadius: "14px", flexShrink: 0,
+                  background: on ? `linear-gradient(135deg, ${d.color}30, ${d.color}15)` : "linear-gradient(145deg, #ece7dd, #ddd5c9)",
+                  boxShadow: on
+                    ? `inset 2px 2px 4px ${d.color}15, inset -2px -2px 4px rgba(255,255,255,0.5)`
+                    : "inset 2px 2px 4px rgba(166,152,130,0.2), inset -2px -2px 4px rgba(255,255,255,0.5)",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: "17px", fontWeight: 900, color: on ? d.color : "#334155",
-                  transition: "all 0.2s", boxShadow: on ? `0 0 12px ${d.color}25` : "none"
+                  fontSize: "18px", fontWeight: 900, color: on ? d.color : "#8b7355",
+                  border: `1px solid ${on ? d.color + "30" : "rgba(255,255,255,0.3)"}`,
+                  transition: "all 0.2s"
                 }}>{d.label.charAt(0)}</div>
                 <div>
-                  <div style={{ fontSize: "14px", fontWeight: 800, color: on ? "#f1f5f9" : "#64748b", lineHeight: 1.2, transition: "color 0.2s" }}>{d.label}</div>
-                  <div style={{ fontSize: "10px", color: on ? "#94a3b8" : "#2d3748", marginTop: "2px" }}>{d.sub} · {d.region}</div>
+                  <div style={{ fontSize: "13.5px", fontWeight: 800, color: on ? "#1e1b18" : "#6b5e50", lineHeight: 1.2, transition: "color 0.2s" }}>{d.label}</div>
+                  <div style={{ fontSize: "10px", color: on ? "#78350f" : "#a09080", marginTop: "2px" }}>{d.sub} &middot; {d.region}</div>
                 </div>
               </div>
-              {on && <div style={{ position: "absolute", bottom: "8px", right: "10px", width: "18px", height: "18px", borderRadius: "50%", background: d.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", color: "#fff", fontWeight: 900, boxShadow: `0 0 8px ${d.color}60` }}>&#10003;</div>}
+              {on && <div style={{ position: "absolute", bottom: "8px", right: "10px", width: "20px", height: "20px", borderRadius: "50%", background: `linear-gradient(135deg, ${d.color}, ${d.color}cc)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", color: "#fff", fontWeight: 900, boxShadow: `2px 2px 4px ${d.color}40, -1px -1px 3px rgba(255,255,255,0.3)` }}>&#10003;</div>}
             </div>
           );
         })}
@@ -585,105 +685,69 @@ function LanguageCards({ selected, onSelect }) {
   );
 }
 
-/* ─── Result Card (single) ─── */
+/* --- Result Card --- */
 function ResultCard({ result, lang, copied, onCopy }) {
   if (!result) return null;
   const wc = result.trim() ? result.trim().split(/\s+/).length : 0;
   return (
-    <div style={{
-      background: "rgba(255,255,255,0.03)", backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)",
-      border: `1px solid ${lang.color}28`, borderLeft: `3px solid ${lang.color}`,
-      borderRadius: "15px", padding: "18px", marginBottom: "11px",
-      boxShadow: `0 0 30px ${lang.color}0a,0 4px 20px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.05)`,
+    <div className="clay" style={{
+      borderLeft: `4px solid ${lang.color}`, padding: "18px", marginBottom: "14px",
       animation: "fadeUp 0.35s ease both"
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "14px", flexWrap: "wrap", gap: "8px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "11px" }}>
-          <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: lang.color + "14", border: `1px solid ${lang.color}28`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", fontWeight: 900, color: lang.color, flexShrink: 0 }}>{lang.label.charAt(0)}</div>
+          <div style={{ width: "38px", height: "38px", borderRadius: "12px", background: `linear-gradient(135deg, ${lang.color}25, ${lang.color}10)`, border: `1px solid ${lang.color}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", fontWeight: 900, color: lang.color, flexShrink: 0, boxShadow: `inset 2px 2px 4px ${lang.color}10, inset -2px -2px 3px rgba(255,255,255,0.5)` }}>{lang.label.charAt(0)}</div>
           <div>
-            <div style={{ fontSize: "15px", fontWeight: 800, color: "#f1f5f9" }}>{lang.label}</div>
-            <div style={{ fontSize: "10.5px", color: "#475569" }}>{lang.sub} · {lang.region}</div>
+            <div style={{ fontSize: "15px", fontWeight: 800, color: "#1e1b18" }}>{lang.label}</div>
+            <div style={{ fontSize: "10.5px", color: "#78350f" }}>{lang.sub} &middot; {lang.region}</div>
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span style={{ fontSize: "10px", color: "#334155", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "6px", padding: "3px 8px" }}>{wc} words</span>
-          <button onClick={() => onCopy(result, lang.id)} style={{ padding: "6px 14px", borderRadius: "8px", border: `1px solid ${lang.color}25`, cursor: "pointer", background: copied === lang.id ? lang.color + "18" : "transparent", color: copied === lang.id ? lang.color : "#475569", fontSize: "11.5px", fontWeight: 700, transition: "all 0.15s" }}>
+          <span style={{ fontSize: "10px", color: "#78350f", background: "rgba(245,158,11,0.08)", borderRadius: "8px", padding: "3px 10px", fontWeight: 600 }}>{wc} words</span>
+          <button onClick={() => onCopy(result, lang.id)} className="clay-btn" style={{ padding: "6px 14px", fontSize: "11.5px", fontWeight: 700, color: copied === lang.id ? lang.color : "#6b5e50", background: copied === lang.id ? `linear-gradient(145deg, ${lang.color}15, ${lang.color}08)` : undefined }}>
             {copied === lang.id ? "Copied!" : "Copy"}
           </button>
         </div>
       </div>
-      <div style={{ fontSize: "13.5px", lineHeight: 1.9, color: "#cbd5e1", background: "rgba(0,0,0,0.25)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", padding: "14px 16px", borderRadius: "10px", whiteSpace: "pre-wrap", border: "1px solid rgba(255,255,255,0.05)", boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)" }}>{result}</div>
+      <div className="clay-inner" style={{ fontSize: "13.5px", lineHeight: 1.9, color: "#3d3425", padding: "14px 16px", whiteSpace: "pre-wrap" }}>{result}</div>
     </div>
   );
 }
 
-/* ─── Global CSS ─── */
-const CSS = `
-  @keyframes fadeUp    {from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-  @keyframes pulse     {0%,100%{opacity:.3;transform:scale(.7);}50%{opacity:1;transform:scale(1);}}
-  @keyframes readyGlow {0%,100%{box-shadow:0 0 16px rgba(245,158,11,0.28),0 3px 14px rgba(0,0,0,0.3);}50%{box-shadow:0 0 30px rgba(245,158,11,0.5),0 4px 18px rgba(0,0,0,0.4);}}
-  @keyframes goldShine {0%{background-position:-200% center;}100%{background-position:200% center;}}
-  @keyframes connPulse {0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4);}60%{box-shadow:0 0 0 5px rgba(34,197,94,0);}}
-  @keyframes ruhiShine {0%{background-position:-300% center;}100%{background-position:300% center;}}
-  @keyframes ruhiGlow  {0%,100%{text-shadow:0 0 16px rgba(245,158,11,0.22);}50%{text-shadow:0 0 28px rgba(245,158,11,0.4);}}
-  @keyframes spin      {to{transform:rotate(360deg);}}
-
-  .ruhi-title {
-    font-size:80px;
-    background:linear-gradient(90deg,#a16207 0%,#ca8a04 20%,#eab308 35%,#fde68a 50%,#eab308 65%,#ca8a04 80%,#a16207 100%);
-    background-size:300% auto; -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-    animation:ruhiShine 6s linear infinite, ruhiGlow 4s ease-in-out infinite;
-  }
-  .gold-shine {
-    background:linear-gradient(90deg,#92400e,#f59e0b 25%,#fde68a 50%,#f59e0b 75%,#92400e);
-    background-size:200% auto; -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-    background-clip:text; animation:goldShine 3s linear infinite; font-weight:700;
-  }
-  .pb { transition:all 0.2s ease; }
-  .pb:hover  { transform:translateY(-2px); box-shadow:0 0 32px rgba(245,158,11,0.5),0 5px 20px rgba(0,0,0,0.4) !important; }
-  .pb:active { transform:translateY(0); }
-  .pb-ready  { animation:readyGlow 2.5s ease-in-out infinite; }
-  .live-dot  { animation:connPulse 2s ease infinite; }
-  .gb { transition:all 0.14s; }
-  .gb:hover  { background:rgba(255,255,255,0.07) !important; }
-  .gb:active { transform:scale(.97); }
-  .ta-wrap { transition:border-color 0.2s,box-shadow 0.2s; }
-  .ta-wrap:focus-within { border-color:rgba(245,158,11,0.38) !important; box-shadow:0 0 0 3px rgba(245,158,11,0.10), 0 0 20px rgba(245,158,11,0.08) !important; }
-
-  @media(max-width:600px){
-    .topbar{padding:0 14px !important;height:54px !important;}
-    .main{padding:20px 12px 70px !important;}
-    .ruhi-title{font-size:48px !important;letter-spacing:-2px !important;}
-    .lang-grid{grid-template-columns:repeat(2, 1fr) !important;}
-  }
-  @media(max-width:400px){.ruhi-title{font-size:38px !important;}}
-`;
-
-/* ═══════════════════════
+/* ==============================
    ROOT APP
-═══════════════════════ */
+============================== */
 export default function App() {
-  const [selected, setSelected] = useState("hindi");
+  const [selected, setSelected] = useState(["hindi"]);
   const [script, setScript] = useState("");
-  const [result, setResult] = useState(null);
+  const [results, setResults] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState("");
-  const [detectedLang, setDetectedLang] = useState("");
 
-  const selectedLang = LANGUAGES.find(l => l.id === selected) || LANGUAGES[0];
+  const toggleLang = (id) => {
+    setSelected(prev =>
+      prev.includes(id) ? (prev.length > 1 ? prev.filter(x => x !== id) : prev) : [...prev, id]
+    );
+  };
 
   const convert = async () => {
-    if (!script.trim()) return;
-    setLoading(true); setError(""); setResult(null); setDetectedLang("");
+    if (!script.trim() || selected.length === 0) return;
+    setLoading(true); setError(""); setResults({});
     try {
-      const examples = FEW_SHOT_EXAMPLES[selected] || [];
-      const raw = await streamConvert({
-        model: "anthropic/claude-sonnet-4-5",
-        system: buildSingleConverterSystem(selected),
-        messages: [...examples, { role: "user", content: script }]
+      const promises = selected.map(async (langId) => {
+        const examples = FEW_SHOT_EXAMPLES[langId] || [];
+        const raw = await streamConvert({
+          model: "anthropic/claude-sonnet-4-5",
+          system: buildSingleConverterSystem(langId),
+          messages: [...examples, { role: "user", content: script }]
+        });
+        return { langId, text: raw.trim() };
       });
-      setResult(raw.trim());
+      const all = await Promise.all(promises);
+      const map = {};
+      all.forEach(r => { map[r.langId] = r.text; });
+      setResults(map);
     } catch (e) {
       setError(e.message);
     }
@@ -694,124 +758,128 @@ export default function App() {
 
   const wc = script.trim() ? script.trim().split(/\s+/).length : 0;
   const cp = Math.min((script.length / 2000) * 100, 100);
-  const can = !loading && !!script.trim();
-
-  const CARD = { background: "rgba(255,255,255,0.035)", backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: "16px", overflow: "hidden", marginBottom: "12px", boxShadow: "0 4px 24px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06)" };
-
-  const ROOT = { fontFamily: "'Inter','Segoe UI',sans-serif", background: "#07070f", minHeight: "100vh", color: "#fff", position: "relative", isolation: "isolate" };
-  const TOPBAR = { padding: "0 28px", height: "60px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(7,7,15,0.65)", backdropFilter: "blur(28px)", WebkitBackdropFilter: "blur(28px)", position: "sticky", top: 0, zIndex: 10, borderBottom: "1px solid rgba(255,255,255,0.07)", boxShadow: "0 1px 0 rgba(245,158,11,0.12),0 8px 32px rgba(0,0,0,0.6),inset 0 -1px 0 rgba(255,255,255,0.04)" };
+  const can = !loading && !!script.trim() && selected.length > 0;
 
   return (
-    <div style={ROOT}>
-      <LanguageBackground langId={selected} />
+    <div style={{ fontFamily: "'Inter','Segoe UI',sans-serif", background: "#f0ebe3", minHeight: "100vh", color: "#1e1b18" }}>
       <style>{CSS}</style>
-      <div style={{ position: "relative", zIndex: 1 }}>
 
-        {/* Topbar */}
-        <div style={TOPBAR} className="topbar">
-          <Logo />
-          <div className="live-dot" style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11.5px", color: "#22c55e", background: "rgba(34,197,94,0.07)", border: "1px solid rgba(34,197,94,0.18)", padding: "4px 11px", borderRadius: "20px" }}>
-            <span style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
-            <span className="api-label">Connected</span>
+      {/* Topbar */}
+      <div className="topbar-c" style={{ padding: "0 28px", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(145deg, #f5f0e8ee, #ece7ddee)", backdropFilter: "blur(20px)", position: "sticky", top: 0, zIndex: 10, borderBottom: "1px solid rgba(166,152,130,0.15)", boxShadow: "0 4px 12px rgba(166,152,130,0.15)" }}>
+        <Logo />
+        <div className="live-dot" style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11.5px", color: "#16a34a", padding: "5px 12px", borderRadius: "14px", background: "linear-gradient(145deg, #f0ebe3, #e4ddd1)", boxShadow: "3px 3px 6px rgba(166,152,130,0.3), -2px -2px 5px rgba(255,255,255,0.7), inset 0 1px 0 rgba(255,255,255,0.4)", border: "1px solid rgba(34,197,94,0.2)" }}>
+          <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
+          Connected
+        </div>
+      </div>
+
+      {/* Main */}
+      <div className="main-c" style={{ maxWidth: "800px", margin: "0 auto", padding: "36px 22px 80px" }}>
+
+        {/* Title */}
+        <div style={{ textAlign: "center", marginBottom: "8px" }}>
+          <h1 className="ruhi-title" style={{ margin: 0, fontWeight: 900, letterSpacing: "-3px", lineHeight: 1, userSelect: "none" }}>RUHI</h1>
+        </div>
+        <div style={{ textAlign: "center", marginBottom: "28px" }}>
+          <p style={{ fontSize: "13.5px", color: "#78350f", margin: 0, lineHeight: 1.7 }}>
+            Kisi bhi bhasha mein likho &mdash; AI detect karega aur aapki chosen bhasha(on) mein convert karega.
+            <br /><span style={{ fontSize: "11px", color: "#a08060" }}>Multiple languages ek saath select kar sakte ho!</span>
+          </p>
+        </div>
+
+        {/* Language Cards */}
+        <LanguageCards selected={selected} onToggle={toggleLang} />
+
+        {/* Script Input */}
+        <div className="clay ta-focus" style={{ marginBottom: "16px", overflow: "hidden" }}>
+          <div style={{ padding: "14px 22px", borderBottom: "1px solid rgba(166,152,130,0.12)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span>&#9997;&#65039;</span>
+              <span style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "1.2px", textTransform: "uppercase", color: "#78350f" }}>Script Input</span>
+            </div>
+            <div style={{ display: "flex", gap: "14px" }}>
+              <span style={{ fontSize: "11px", color: "#92400e", fontWeight: 600 }}>{wc} words</span>
+              <span style={{ fontSize: "11px", color: script.length > 2000 ? "#dc2626" : "#92400e", fontWeight: 600 }}>{script.length} chars</span>
+            </div>
+          </div>
+          <div style={{ padding: "18px 22px" }}>
+            <textarea value={script} onChange={e => setScript(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && e.ctrlKey) convert(); }}
+              placeholder={"Kisi bhi bhasha mein script paste karo...\n\nHindi, English, Bhojpuri, Gujarati, Haryanvi, Rajasthani, ya koi bhi mix.\n\nMultiple languages select karke ek saath convert karo!"}
+              style={{ width: "100%", background: "transparent", border: "none", outline: "none", color: "#3d3425", fontSize: "14px", resize: "none", lineHeight: 1.9, fontFamily: "'Inter','Segoe UI',sans-serif", minHeight: "140px", boxSizing: "border-box" }}
+            />
+            {script.length > 0 && (
+              <div style={{ marginTop: "8px", height: "3px", borderRadius: "2px", background: "rgba(166,152,130,0.15)", overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${cp}%`, borderRadius: "2px", background: cp > 90 ? "linear-gradient(90deg,#f97316,#ef4444)" : "linear-gradient(90deg,#f59e0b,#d97706)", transition: "width 0.3s" }} />
+              </div>
+            )}
+          </div>
+          <div style={{ padding: "14px 22px", borderTop: "1px solid rgba(166,152,130,0.1)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(166,152,130,0.04)", flexWrap: "wrap", gap: "8px" }}>
+            <span style={{ fontSize: "11px", color: "#a08060", fontWeight: 500 }}>Ctrl + Enter</span>
+            <button onClick={convert} disabled={!can} className={can ? "clay-btn-primary" : "clay-btn-primary"} style={{
+              padding: "11px 28px", borderRadius: "14px", border: "none",
+              cursor: can ? "pointer" : "not-allowed", fontSize: "13px",
+              display: "inline-flex", alignItems: "center", gap: "7px",
+            }}>
+              {loading
+                ? <><span style={{ width: "12px", height: "12px", borderRadius: "50%", border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", display: "inline-block", animation: "spin 0.7s linear infinite" }} /> Converting {selected.length} language{selected.length > 1 ? "s" : ""}...</>
+                : <>&#9889; Convert to {selected.length} language{selected.length > 1 ? "s" : ""}</>}
+            </button>
           </div>
         </div>
 
-        {/* Main */}
-        <div style={{ maxWidth: "780px", margin: "0 auto", padding: "36px 22px 80px" }} className="main">
-
-          {/* Title */}
-          <div style={{ textAlign: "center", marginBottom: "10px" }}>
-            <h1 className="ruhi-title" style={{ margin: 0, fontWeight: 900, letterSpacing: "-3px", lineHeight: 1, userSelect: "none" }}>RUHI</h1>
+        {/* Error */}
+        {error && (
+          <div className="clay" style={{ padding: "14px 18px", marginBottom: "14px", borderLeft: "4px solid #ef4444", color: "#991b1b", fontSize: "13px", display: "flex", gap: "9px" }}>
+            <span>&#9888;</span><span>{error}</span>
           </div>
-          <div style={{ textAlign: "center", marginBottom: "28px" }}>
-            <p style={{ fontSize: "13px", color: "#475569", margin: 0, lineHeight: 1.6 }}>
-              Kisi bhi bhasha mein likho — Hindi, English, Haryanvi, ya koi bhi.
-              <br />AI detect karega aur aapki chosen bhasha mein convert karega.
-            </p>
-          </div>
+        )}
 
-          {/* Language Cards */}
-          <LanguageCards selected={selected} onSelect={setSelected} />
-
-          {/* Script Input */}
-          <div style={{ ...CARD, border: "1px solid rgba(255,255,255,0.09)" }} className="ta-wrap">
-            <div style={{ padding: "13px 20px", borderBottom: "1px solid rgba(255,255,255,0.05)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}><span>&#9997;&#65039;</span><span style={{ fontSize: "10.5px", fontWeight: 700, letterSpacing: "1.2px", textTransform: "uppercase", color: "#475569" }}>Script Input</span></div>
-              <div style={{ display: "flex", gap: "12px" }}><span style={{ fontSize: "11px", color: "#2d3748" }}>{wc} words</span><span style={{ fontSize: "11px", color: script.length > 2000 ? "#f87171" : "#2d3748" }}>{script.length} chars</span></div>
+        {/* Loading */}
+        {loading && (
+          <div className="clay" style={{ padding: "40px 24px", textAlign: "center", marginBottom: "14px" }}>
+            <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "18px" }}>
+              {[0, 1, 2].map(i => <div key={i} style={{ width: "12px", height: "12px", borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#d97706)", boxShadow: "3px 3px 6px rgba(200,130,20,0.3), -2px -2px 4px rgba(255,220,150,0.4)", animation: `pulse 1.3s ${i * 0.22}s ease-in-out infinite` }} />)}
             </div>
-            <div style={{ padding: "18px 20px" }}>
-              <textarea value={script} onChange={e => setScript(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && e.ctrlKey) convert(); }}
-                placeholder={"Kisi bhi bhasha mein script paste karo...\n\nHindi, English, Bhojpuri, Gujarati, Haryanvi, Rajasthani, ya koi bhi mix.\n\nAI automatically detect karega aur selected bhasha mein convert karega.\n\nExample: \"Yeh kahani hai ek aisi ladki ki, jisne apni zindagi mein sab kuch kho diya — par haar nahi maani.\""}
-                style={{ width: "100%", background: "transparent", border: "none", outline: "none", color: "#e2e8f0", fontSize: "14px", resize: "none", lineHeight: 1.9, fontFamily: "'Inter','Segoe UI',sans-serif", minHeight: "140px", boxSizing: "border-box" }}
-              />
-              {script.length > 0 && <div style={{ marginTop: "8px", height: "2px", borderRadius: "2px", background: "rgba(255,255,255,0.05)", overflow: "hidden" }}><div style={{ height: "100%", width: `${cp}%`, borderRadius: "2px", background: cp > 90 ? "linear-gradient(90deg,#f97316,#ef4444)" : `linear-gradient(90deg,${selectedLang.color},${selectedLang.color}aa)`, transition: "width 0.3s" }} /></div>}
+            <div style={{ fontSize: "14px", color: "#78350f", fontWeight: 700, marginBottom: "6px" }}>
+              Converting to {selected.length} language{selected.length > 1 ? "s" : ""}...
             </div>
-            <div style={{ padding: "12px 20px", borderTop: "1px solid rgba(255,255,255,0.04)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(0,0,0,0.14)", flexWrap: "wrap", gap: "8px" }}>
-              <span style={{ fontSize: "11px", color: "#2d3748" }}>Ctrl + Enter</span>
-              <button onClick={convert} disabled={!can} className={can ? "pb pb-ready" : ""} style={{
-                padding: "10px 26px", borderRadius: "10px", border: "none",
-                cursor: can ? "pointer" : "not-allowed", fontWeight: 700, fontSize: "13px",
-                background: can ? `linear-gradient(135deg,${selectedLang.color},${selectedLang.color}cc)` : "rgba(255,255,255,0.04)",
-                color: can ? "#fff" : "#334155",
-                display: "inline-flex", alignItems: "center", gap: "7px",
-                boxShadow: can ? `0 0 20px ${selectedLang.color}40` : "none"
-              }}>
-                {loading
-                  ? <><span style={{ width: "11px", height: "11px", borderRadius: "50%", border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", display: "inline-block", animation: "spin 0.7s linear infinite" }} /> Converting...</>
-                  : <>&#9889; Convert to {selectedLang.label}</>}
-              </button>
+            <div style={{ fontSize: "11px", color: "#a08060" }}>
+              {selected.map(id => LANGUAGES.find(l => l.id === id)?.label).join(", ")}
             </div>
           </div>
+        )}
 
-          {/* Error */}
-          {error && <div style={{ background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.18)", borderRadius: "13px", padding: "13px 16px", color: "#fca5a5", marginBottom: "12px", fontSize: "13px", display: "flex", gap: "9px" }}><span>&#9888;</span><span>{error}</span></div>}
-
-          {/* Loading */}
-          {loading && (
-            <div style={CARD}>
-              <div style={{ padding: "40px 24px", textAlign: "center" }}>
-                <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "18px" }}>
-                  {[0, 1, 2].map(i => <div key={i} style={{ width: "11px", height: "11px", borderRadius: "50%", background: `linear-gradient(135deg,${selectedLang.color},${selectedLang.color}aa)`, boxShadow: `0 0 14px ${selectedLang.color}55`, animation: `pulse 1.3s ${i * 0.22}s ease-in-out infinite` }} />)}
-                </div>
-                <div style={{ fontSize: "14px", color: "#94a3b8", fontWeight: 700, marginBottom: "6px" }}>
-                  Converting to {selectedLang.label}...
-                </div>
-                <div style={{ fontSize: "11px", color: "#475569" }}>
-                  Auto-detecting input language & converting
+        {/* Results */}
+        {Object.keys(results).length > 0 && (
+          <>
+            <div className="clay" style={{ padding: "14px 20px", marginBottom: "14px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px", borderLeft: "4px solid #22c55e" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <span style={{ fontSize: "18px", color: "#16a34a" }}>&#10004;</span>
+                <div>
+                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#1e1b18" }}>Conversion complete &mdash; {Object.keys(results).length} language{Object.keys(results).length > 1 ? "s" : ""}</div>
+                  <div style={{ fontSize: "10.5px", color: "#78350f" }}>Ready to copy & use</div>
                 </div>
               </div>
+              <button onClick={() => { setResults({}); setScript(""); }} className="clay-btn" style={{ padding: "6px 14px", fontSize: "11px", fontWeight: 700, color: "#6b5e50" }}>New Script</button>
             </div>
-          )}
+            {selected.map(langId => {
+              const lang = LANGUAGES.find(l => l.id === langId);
+              return results[langId] ? <ResultCard key={langId} result={results[langId]} lang={lang} copied={copied} onCopy={copy} /> : null;
+            })}
+          </>
+        )}
+      </div>
 
-          {/* Result */}
-          {result && (
-            <>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", background: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.13)", borderRadius: "13px", padding: "13px 18px", flexWrap: "wrap", gap: "8px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                  <span style={{ fontSize: "18px" }}>&#10004;</span>
-                  <div>
-                    <div style={{ fontSize: "13px", fontWeight: 700, color: "#f1f5f9" }}>Conversion complete — {selectedLang.label}</div>
-                    <div style={{ fontSize: "10.5px", color: "#475569" }}>Ready to copy & use</div>
-                  </div>
-                </div>
-                <button onClick={() => { setResult(null); setScript(""); }} className="gb" style={{ padding: "5px 12px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.08)", cursor: "pointer", fontWeight: 600, fontSize: "11px", background: "transparent", color: "#64748b" }}>New Script</button>
-              </div>
-              <ResultCard result={result} lang={selectedLang} copied={copied} onCopy={copy} />
-            </>
-          )}
+      {/* Footer */}
+      <div style={{ borderTop: "1px solid rgba(166,152,130,0.15)", padding: "16px 28px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "7px", background: "linear-gradient(145deg, #f0ebe3, #e8e0d4)" }}>
+        <div style={{ fontSize: "11.5px", fontWeight: 500, display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
+          <span style={{ color: "#92400e" }}>Powered by</span>
+          <span className="gold-shine">Claude</span>
+          <span style={{ color: "#c4a870" }}>&middot;</span>
+          <span className="gold-shine">Built by</span>
+          <span className="gold-shine">Manik Prajapati</span>
         </div>
-
-        {/* Footer */}
-        <div style={{ borderTop: "1px solid rgba(255,255,255,0.04)", padding: "16px 28px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "7px" }}>
-          <div style={{ fontSize: "11.5px", fontWeight: 500, display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
-            <span style={{ color: "#334155" }}>Powered by</span>
-            <span className="gold-shine">Claude</span>
-            <span style={{ color: "#1e293b" }}>·</span>
-            <span className="gold-shine">Built by</span>
-            <span className="gold-shine">Manik Prajapati</span>
-          </div>
-          <div style={{ fontSize: "10.5px", color: "#1e293b" }}>{LANGUAGES.length} languages · Auto-detect</div>
-        </div>
+        <div style={{ fontSize: "10.5px", color: "#a08060" }}>{LANGUAGES.length} languages &middot; Multi-select &middot; Auto-detect</div>
       </div>
     </div>
   );
