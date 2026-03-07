@@ -857,12 +857,7 @@ export default function App() {
         <div style={{ textAlign: "center", marginBottom: "8px" }}>
           <h1 className="ruhi-title" style={{ margin: 0, fontWeight: 900, letterSpacing: "-3px", lineHeight: 1, userSelect: "none" }}>RUHI</h1>
         </div>
-        <div style={{ textAlign: "center", marginBottom: "28px" }}>
-          <p style={{ fontSize: "13.5px", color: "#78350f", margin: 0, lineHeight: 1.7 }}>
-            Kisi bhi bhasha mein likho &mdash; AI detect karega aur aapki chosen bhasha(on) mein convert karega.
-            <br /><span style={{ fontSize: "11px", color: "#a08060" }}>Multiple languages ek saath select kar sakte ho!</span>
-          </p>
-        </div>
+        <div style={{ marginBottom: "28px" }} />
 
         {/* Language Cards */}
         <LanguageCards selected={selected} onToggle={toggleLang} />
