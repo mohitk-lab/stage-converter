@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import ContentStudio from "./ContentStudio.jsx";
+import DubbingStudio from "./DubbingStudio.jsx";
 
 /* --- Streaming fetch helper --- */
 async function streamConvert({ model, system, messages, onChunk }) {
@@ -1489,10 +1490,20 @@ export default function App() {
         }}>
           {"\uD83C\uDFAC"} Content Studio
         </button>
+        <button onClick={() => setActiveTab("dubbing")} className={activeTab === "dubbing" ? "clay-btn-primary" : "clay-btn"} style={{
+          padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
+          cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
+          ...(activeTab !== "dubbing" ? { color: darkMode ? "#a09080" : "#6b5e50" } : {})
+        }}>
+          {"\uD83C\uDF99\uFE0F"} Dubbing Studio
+        </button>
       </div>
 
       {/* Content Studio Tab */}
       {activeTab === "studio" && <ContentStudio darkMode={darkMode} streamConvert={streamConvert} />}
+
+      {/* Dubbing Studio Tab */}
+      {activeTab === "dubbing" && <DubbingStudio darkMode={darkMode} streamConvert={streamConvert} />}
 
       {/* Script Converter Tab */}
       {activeTab === "converter" && <div className="main-c" style={{ maxWidth: "800px", margin: "0 auto", padding: "36px 22px 80px", position: "relative", zIndex: 1 }}>
