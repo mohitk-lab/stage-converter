@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from "react";
+import ContentStudio from "./ContentStudio.jsx";
 
 /* --- Streaming fetch helper --- */
 async function streamConvert({ model, system, messages, onChunk }) {
@@ -1205,6 +1206,7 @@ export default function App() {
   const [copied, setCopied] = useState("");
   const [historyOpen, setHistoryOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem("ruhi_dark") === "1");
+  const [activeTab, setActiveTab] = useState("converter");
   const [tone, setTone] = useState("auto");
   const [srtMode, setSrtMode] = useState(null); // null or { blocks: [{index, time, text}], fileName }
   const [csvMode, setCsvMode] = useState(null); // null or { rows: string[], fileName, header: string }
@@ -1471,8 +1473,29 @@ export default function App() {
         </div>
       </div>
 
-      {/* Main */}
-      <div className="main-c" style={{ maxWidth: "800px", margin: "0 auto", padding: "36px 22px 80px", position: "relative", zIndex: 1 }}>
+      {/* Tab Bar */}
+      <div style={{ maxWidth: "900px", margin: "0 auto", padding: "18px 22px 0", display: "flex", gap: "8px", position: "relative", zIndex: 1 }}>
+        <button onClick={() => setActiveTab("converter")} className={activeTab === "converter" ? "clay-btn-primary" : "clay-btn"} style={{
+          padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
+          cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
+          ...(activeTab !== "converter" ? { color: darkMode ? "#a09080" : "#6b5e50" } : {})
+        }}>
+          {"\u270D\uFE0F"} Script Converter
+        </button>
+        <button onClick={() => setActiveTab("studio")} className={activeTab === "studio" ? "clay-btn-primary" : "clay-btn"} style={{
+          padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
+          cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
+          ...(activeTab !== "studio" ? { color: darkMode ? "#a09080" : "#6b5e50" } : {})
+        }}>
+          {"\uD83C\uDFAC"} Content Studio
+        </button>
+      </div>
+
+      {/* Content Studio Tab */}
+      {activeTab === "studio" && <ContentStudio darkMode={darkMode} streamConvert={streamConvert} />}
+
+      {/* Script Converter Tab */}
+      {activeTab === "converter" && <div className="main-c" style={{ maxWidth: "800px", margin: "0 auto", padding: "36px 22px 80px", position: "relative", zIndex: 1 }}>
 
         {/* Title */}
         <div style={{ textAlign: "center", marginBottom: "8px" }}>
@@ -1686,7 +1709,7 @@ export default function App() {
             </div>
           </div>
         )}
-      </div>
+      </div>}
 
       {/* Footer */}
       <div style={{ borderTop: `1px solid ${darkMode ? "rgba(60,50,35,0.3)" : "rgba(166,152,130,0.15)"}`, padding: "16px 28px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "7px", background: darkMode ? "linear-gradient(145deg, #1a1510, #151008)" : "linear-gradient(145deg, #f0ebe3, #e8e0d4)", transition: "background 0.3s" }}>
