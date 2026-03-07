@@ -1,7 +1,9 @@
-const OPENROUTER_KEY = process.env.OPENROUTER_KEY || "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";
+const OPENROUTER_KEY = process.env.OPENROUTER_KEY;
 
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
+
+  if (!OPENROUTER_KEY) return res.status(500).json({ error: "OPENROUTER_KEY not configured" });
 
   const { system, messages, model } = req.body;
   if (!messages) return res.status(400).json({ error: "messages required" });
