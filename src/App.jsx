@@ -872,9 +872,26 @@ const CSS = `
   .dark .ta-focus textarea { color: #e8e0d4 !important; }
   .dark .ta-focus textarea::placeholder { color: #6b5e50 !important; }
 
+  /* Logo shine */
+  .ruhi-logo-shine {
+    background: linear-gradient(90deg, #92400e, #d97706, #f59e0b, #fde68a, #f59e0b, #d97706, #92400e);
+    background-size: 200% auto;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: goldShine 3s linear infinite;
+    filter: drop-shadow(0 1px 3px rgba(146,64,14,0.2));
+  }
+  .dark .ruhi-logo-shine {
+    background: linear-gradient(90deg, #d4c8b0, #f59e0b, #fde68a, #fff, #fde68a, #f59e0b, #d4c8b0);
+    background-size: 200% auto;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: goldShine 3s linear infinite;
+    filter: drop-shadow(0 1px 6px rgba(245,158,11,0.3));
+  }
+
   /* --- Dark mode: comprehensive color overrides --- */
   /* Logo */
-  .dark .ruhi-logo-text { color: #d4c8b0 !important; }
   .dark .ruhi-logo-sub { color: #a09080 !important; }
 
   /* Language cards text */
@@ -936,11 +953,20 @@ const CSS = `
 /* --- Logo --- */
 function Logo() {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-      <div className="clay-btn" style={{ width: "36px", height: "36px", borderRadius: "12px", background: "linear-gradient(135deg,#f59e0b,#ef4444)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "17px", fontWeight: 900, color: "#fff", border: "none" }}>R</div>
+    <div style={{ display: "flex", alignItems: "center", gap: "11px" }}>
+      <div style={{ width: "38px", height: "38px", borderRadius: "13px", background: "linear-gradient(135deg, #f59e0b, #ef4444, #d97706)", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", boxShadow: "0 4px 14px rgba(245,158,11,0.35), inset 0 1px 0 rgba(255,255,255,0.3)", border: "none", overflow: "hidden" }}>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style={{ position: "relative", zIndex: 1 }}>
+          <path d="M12 2L15.5 8.5H20L16 13L18 20L12 16.5L6 20L8 13L4 8.5H8.5L12 2Z" fill="white" opacity="0.95"/>
+          <circle cx="12" cy="12" r="4" fill="rgba(245,158,11,0.6)"/>
+          <path d="M10 10.5C10 10.5 11 12 12 12C13 12 14 10.5 14 10.5" stroke="white" strokeWidth="1.2" strokeLinecap="round"/>
+          <circle cx="10.5" cy="9.5" r="0.8" fill="white"/>
+          <circle cx="13.5" cy="9.5" r="0.8" fill="white"/>
+        </svg>
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 50%)", borderRadius: "13px" }} />
+      </div>
       <div>
-        <div className="ruhi-logo-text" style={{ fontSize: "17px", fontWeight: 900, letterSpacing: "-0.5px", lineHeight: 1.1, color: "#78350f" }}>RUHI</div>
-        <div className="ruhi-logo-sub" style={{ fontSize: "8px", color: "#92400e", letterSpacing: "1.8px", fontWeight: 700, textTransform: "uppercase" }}>Multilingual Studio</div>
+        <div className="ruhi-logo-shine" style={{ fontSize: "18px", fontWeight: 900, letterSpacing: "1px", lineHeight: 1.1 }}>RUHI</div>
+        <div className="ruhi-logo-sub" style={{ fontSize: "7.5px", color: "#92400e", letterSpacing: "2px", fontWeight: 700, textTransform: "uppercase", marginTop: "1px" }}>Multilingual Studio</div>
       </div>
     </div>
   );
@@ -1549,7 +1575,7 @@ export default function App() {
       </div>
 
       {/* Tab Bar */}
-      <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "18px 22px 0", display: "flex", gap: "8px", position: "relative", zIndex: 1 }}>
+      <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "20px 28px 0", display: "flex", gap: "10px", position: "relative", zIndex: 1 }}>
         <button onClick={() => setActiveTab("converter")} className={activeTab === "converter" ? "clay-btn-primary" : "clay-btn"} style={{
           padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
           cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",

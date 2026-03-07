@@ -552,20 +552,7 @@ Notes: ${qcData.notes || "Standard review"}`;
   const dm = darkMode;
 
   return (
-    <div style={{ maxWidth: "900px", margin: "0 auto", padding: "24px 22px 60px", position: "relative", zIndex: 1 }}>
-
-      {/* Studio Header */}
-      <div style={{ textAlign: "center", marginBottom: "24px" }}>
-        <h2 style={{
-          fontSize: "28px", fontWeight: 900, letterSpacing: "-1.5px",
-          background: "linear-gradient(135deg, #8b5cf6, #ec4899, #8b5cf6)",
-          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-          backgroundClip: "text", marginBottom: "6px"
-        }}>Dubbing Studio</h2>
-        <p style={{ fontSize: "12px", color: dm ? "#a09080" : "#92400e", fontWeight: 600 }}>
-          AI-Powered Dubbing Workflow for Stage OTT
-        </p>
-      </div>
+    <div style={{ maxWidth: "900px", margin: "0 auto", padding: "16px 22px 60px", position: "relative", zIndex: 1 }}>
 
       {/* Module Tabs */}
       <div className="clay" style={{ padding: 0, marginBottom: "20px", overflow: "hidden" }}>
