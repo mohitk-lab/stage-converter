@@ -956,8 +956,8 @@ const CSS = `
   .tts-toggle-track.active { background: linear-gradient(135deg, #f59e0b, #d97706); }
   .tts-toggle-thumb { width: 18px; height: 18px; border-radius: 50%; background: white; position: absolute; top: 2px; left: 2px; transition: transform 0.25s; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
   .tts-toggle-track.active .tts-toggle-thumb { transform: translateX(18px); }
-  .tts-options { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; }
-  .tts-field { flex: 1 1 180px; min-width: 150px; }
+  .tts-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+  .tts-field { min-width: 0; }
   .tts-field label { display: block; font-size: 10.5px; font-weight: 700; color: #78350f; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
   .tts-field select, .tts-field input[type="range"] { width: 100%; }
   .tts-field select { padding: 8px 12px; border-radius: 10px; border: none; font-size: 12px; font-weight: 600; color: #3d3425; cursor: pointer; }
@@ -968,6 +968,23 @@ const CSS = `
   .tts-audio-row { margin-top: 10px; }
   .tts-audio-row audio { width: 100%; border-radius: 8px; height: 36px; }
   .tts-error { color: #ef4444; font-size: 11px; font-weight: 600; margin-top: 6px; }
+  .tts-advanced-toggle { grid-column: 1 / -1; font-size: 10.5px; font-weight: 700; cursor: pointer; color: #92400e; border: none; background: none; padding: 6px 0; display: flex; align-items: center; gap: 4px; transition: color 0.2s; }
+  .tts-advanced-toggle:hover { color: #d97706; }
+  .tts-advanced { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 10px; border-top: 1px solid rgba(166,152,130,0.15); }
+  .tts-speaker-boost { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; color: #78350f; cursor: pointer; user-select: none; padding-top: 4px; }
+  .tts-speaker-boost input[type="checkbox"] { accent-color: #f59e0b; width: 16px; height: 16px; }
+  .tts-tags-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .tts-tag-btn { padding: 3px 8px; border-radius: 8px; border: 1px solid rgba(166,152,130,0.2); font-size: 10px; font-weight: 700; cursor: pointer; background: rgba(245,158,11,0.08); color: #92400e; transition: all 0.15s; }
+  .tts-tag-btn:hover { background: rgba(245,158,11,0.18); }
+  .tts-edit-area { width: 100%; min-height: 60px; max-height: 120px; resize: vertical; border-radius: 12px; border: none; padding: 10px 12px; font-size: 12px; font-family: 'Courier New', monospace; line-height: 1.6; box-sizing: border-box; }
+  .tts-tags-note { font-size: 9px; color: #a08060; margin-top: 4px; }
+
+  .dark .tts-advanced-toggle { color: #d4c8b0 !important; }
+  .dark .tts-advanced-toggle:hover { color: #f59e0b !important; }
+  .dark .tts-speaker-boost { color: #a09080 !important; }
+  .dark .tts-tag-btn { background: rgba(245,158,11,0.12) !important; color: #d4c8b0 !important; border-color: rgba(60,50,35,0.3) !important; }
+  .dark .tts-edit-area { background: rgba(60,50,35,0.3) !important; color: #e8e0d4 !important; }
+  .dark .tts-tags-note { color: #6b5e50 !important; }
 
   .dark .tts-field label { color: #a09080 !important; }
   .dark .tts-field select { color: #e8e0d4 !important; background: rgba(60,50,35,0.3) !important; }
@@ -976,8 +993,8 @@ const CSS = `
   .dark .tts-audio-row audio { filter: invert(0.85) hue-rotate(180deg); }
 
   @media (max-width: 600px) {
-    .tts-options { flex-direction: column; }
-    .tts-field { flex: 1 1 100%; }
+    .tts-options { grid-template-columns: 1fr; }
+    .tts-advanced { grid-template-columns: 1fr; }
   }
 `;
 
@@ -1351,10 +1368,14 @@ export default function App() {
   const [voices, setVoices] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState("");
   const [ttsModel, setTtsModel] = useState("eleven_multilingual_v2");
-  const [ttsSettings, setTtsSettings] = useState({ stability: 0.5, similarity_boost: 0.75, style: 0, speed: 1.0 });
+  const [ttsSettings, setTtsSettings] = useState({ stability: 0.5, similarity_boost: 0.75, style: 0, speed: 1.0, use_speaker_boost: true });
   const [ttsGenerating, setTtsGenerating] = useState({});
   const [audioUrls, setAudioUrls] = useState({});
   const [ttsError, setTtsError] = useState("");
+  const [ttsAdvanced, setTtsAdvanced] = useState(false);
+  const [ttsTextOverrides, setTtsTextOverrides] = useState({});
+  const [ttsEditingLang, setTtsEditingLang] = useState(null);
+  const ttsTextareaRef = useRef(null);
 
   const fetchVoices = async () => {
     try {
@@ -1373,7 +1394,8 @@ export default function App() {
   };
 
   const generateTTS = async (langId, text) => {
-    if (!selectedVoice || !text) return;
+    const ttsText = ttsTextOverrides[langId] || text;
+    if (!selectedVoice || !ttsText) return;
     setTtsGenerating(p => ({ ...p, [langId]: true }));
     setTtsError("");
     try {
@@ -1381,10 +1403,16 @@ export default function App() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          text: text.substring(0, 5000),
+          text: ttsText.substring(0, 5000),
           voice_id: selectedVoice,
           model_id: ttsModel,
-          voice_settings: ttsSettings,
+          voice_settings: {
+            stability: ttsSettings.stability,
+            similarity_boost: ttsSettings.similarity_boost,
+            style: ttsSettings.style,
+            use_speaker_boost: ttsSettings.use_speaker_boost,
+          },
+          speed: ttsSettings.speed,
           output_format: "mp3_44100_128"
         })
       });
@@ -1394,6 +1422,13 @@ export default function App() {
       setAudioUrls(p => ({ ...p, [langId]: url }));
     } catch (e) { setTtsError(e.message); }
     setTtsGenerating(p => ({ ...p, [langId]: false }));
+  };
+
+  const insertTag = (langId, tag) => {
+    const text = ttsTextOverrides[langId] || results[langId] || "";
+    const pos = ttsTextareaRef.current?.selectionStart ?? text.length;
+    const newText = text.slice(0, pos) + tag + text.slice(pos);
+    setTtsTextOverrides(p => ({ ...p, [langId]: newText }));
   };
 
   const downloadAudio = (langId) => {
@@ -1869,36 +1904,48 @@ export default function App() {
                     <div className="tts-field">
                       <label>Model</label>
                       <select className="clay-inner" value={ttsModel} onChange={e => setTtsModel(e.target.value)}>
-                        <option value="eleven_multilingual_v2">Multilingual v2</option>
-                        <option value="eleven_turbo_v2_5">Turbo v2.5</option>
-                        <option value="eleven_turbo_v2">Turbo v2</option>
-                        <option value="eleven_monolingual_v1">Monolingual v1</option>
+                        <option value="eleven_multilingual_v2">Multilingual v2 (Best Quality)</option>
+                        <option value="eleven_flash_v2_5">Flash v2.5 (Fast)</option>
+                        <option value="eleven_flash_v2">Flash v2 (Fast)</option>
+                        <option value="eleven_monolingual_v1">English v1</option>
                       </select>
                     </div>
-                    <div className="tts-field">
-                      <label>Stability ({ttsSettings.stability.toFixed(2)})</label>
-                      <div className="tts-slider-row">
-                        <input type="range" min="0" max="1" step="0.05" value={ttsSettings.stability} onChange={e => setTtsSettings(p => ({ ...p, stability: +e.target.value }))} />
+                    <button className="tts-advanced-toggle" onClick={() => setTtsAdvanced(p => !p)}>
+                      <span style={{ transition: "transform 0.2s", transform: ttsAdvanced ? "rotate(90deg)" : "rotate(0deg)", display: "inline-block" }}>{"\u25B6"}</span>
+                      Advanced Settings
+                    </button>
+                    {ttsAdvanced && (
+                      <div className="tts-advanced">
+                        <div className="tts-field">
+                          <label>Stability ({ttsSettings.stability.toFixed(2)})</label>
+                          <div className="tts-slider-row">
+                            <input type="range" min="0" max="1" step="0.05" value={ttsSettings.stability} onChange={e => setTtsSettings(p => ({ ...p, stability: +e.target.value }))} />
+                          </div>
+                        </div>
+                        <div className="tts-field">
+                          <label>Similarity ({ttsSettings.similarity_boost.toFixed(2)})</label>
+                          <div className="tts-slider-row">
+                            <input type="range" min="0" max="1" step="0.05" value={ttsSettings.similarity_boost} onChange={e => setTtsSettings(p => ({ ...p, similarity_boost: +e.target.value }))} />
+                          </div>
+                        </div>
+                        <div className="tts-field">
+                          <label>Style ({ttsSettings.style.toFixed(2)})</label>
+                          <div className="tts-slider-row">
+                            <input type="range" min="0" max="1" step="0.05" value={ttsSettings.style} onChange={e => setTtsSettings(p => ({ ...p, style: +e.target.value }))} />
+                          </div>
+                        </div>
+                        <div className="tts-field">
+                          <label>Speed ({ttsSettings.speed.toFixed(1)}x)</label>
+                          <div className="tts-slider-row">
+                            <input type="range" min="0.5" max="2" step="0.1" value={ttsSettings.speed} onChange={e => setTtsSettings(p => ({ ...p, speed: +e.target.value }))} />
+                          </div>
+                        </div>
+                        <label className="tts-speaker-boost">
+                          <input type="checkbox" checked={ttsSettings.use_speaker_boost} onChange={e => setTtsSettings(p => ({ ...p, use_speaker_boost: e.target.checked }))} />
+                          Speaker Boost
+                        </label>
                       </div>
-                    </div>
-                    <div className="tts-field">
-                      <label>Similarity ({ttsSettings.similarity_boost.toFixed(2)})</label>
-                      <div className="tts-slider-row">
-                        <input type="range" min="0" max="1" step="0.05" value={ttsSettings.similarity_boost} onChange={e => setTtsSettings(p => ({ ...p, similarity_boost: +e.target.value }))} />
-                      </div>
-                    </div>
-                    <div className="tts-field">
-                      <label>Style ({ttsSettings.style.toFixed(2)})</label>
-                      <div className="tts-slider-row">
-                        <input type="range" min="0" max="1" step="0.05" value={ttsSettings.style} onChange={e => setTtsSettings(p => ({ ...p, style: +e.target.value }))} />
-                      </div>
-                    </div>
-                    <div className="tts-field">
-                      <label>Speed ({ttsSettings.speed.toFixed(1)}x)</label>
-                      <div className="tts-slider-row">
-                        <input type="range" min="0.5" max="2" step="0.1" value={ttsSettings.speed} onChange={e => setTtsSettings(p => ({ ...p, speed: +e.target.value }))} />
-                      </div>
-                    </div>
+                    )}
                   </div>
                 )}
                 {ttsError && <div className="tts-error">{ttsError}</div>}
@@ -1910,29 +1957,66 @@ export default function App() {
                 <div key={langId}>
                   <ResultCard result={results[langId]} lang={lang} copied={copied} onCopy={copy} isStreaming={!!streaming[langId]} srtMode={srtMode} onDownloadSrt={downloadSrt} />
                   {ttsEnabled && !streaming[langId] && (
-                    <div className="clay" style={{ padding: "12px 18px", marginTop: "-10px", marginBottom: "14px", borderLeft: `4px solid ${lang.color}20`, display: "flex", flexWrap: "wrap", alignItems: "center", gap: "10px" }}>
-                      {!audioUrls[langId] ? (
-                        <button
-                          onClick={() => generateTTS(langId, results[langId])}
-                          disabled={ttsGenerating[langId] || !selectedVoice}
-                          className="clay-btn tts-generate-btn"
-                          style={{ color: ttsGenerating[langId] ? "#92400e" : lang.color, opacity: ttsGenerating[langId] ? 0.7 : 1 }}
-                        >
-                          {ttsGenerating[langId] ? (
-                            <><span style={{ width: "14px", height: "14px", borderRadius: "50%", border: "2px solid rgba(245,158,11,0.3)", borderTopColor: "#f59e0b", display: "inline-block", animation: "spin 0.7s linear infinite" }} /> Generating...</>
-                          ) : (
-                            <>{"\uD83D\uDD0A"} Generate Voice</>
-                          )}
-                        </button>
-                      ) : (
-                        <div className="tts-audio-row" style={{ flex: "1 1 100%", display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-                          <audio controls src={audioUrls[langId]} style={{ flex: "1 1 200px", minWidth: 0 }} />
-                          <button onClick={() => downloadAudio(langId)} className="clay-btn" style={{ padding: "6px 12px", fontSize: "11px", fontWeight: 700, color: "#16a34a", whiteSpace: "nowrap" }}>
-                            {"\u2B07"} Download
-                          </button>
-                          <button onClick={() => { setAudioUrls(p => { const n = { ...p }; delete n[langId]; return n; }); }} className="clay-btn" style={{ padding: "6px 12px", fontSize: "11px", fontWeight: 700, color: "#6b5e50", whiteSpace: "nowrap" }}>
-                            Regenerate
-                          </button>
+                    <div className="clay" style={{ padding: "8px 14px", marginTop: "-10px", marginBottom: "14px", borderLeft: `4px solid ${lang.color}20` }}>
+                      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px" }}>
+                        {!audioUrls[langId] ? (
+                          <>
+                            <button
+                              onClick={() => generateTTS(langId, results[langId])}
+                              disabled={ttsGenerating[langId] || !selectedVoice}
+                              className="clay-btn tts-generate-btn"
+                              style={{ color: ttsGenerating[langId] ? "#92400e" : lang.color, opacity: ttsGenerating[langId] ? 0.7 : 1 }}
+                            >
+                              {ttsGenerating[langId] ? (
+                                <><span style={{ width: "14px", height: "14px", borderRadius: "50%", border: "2px solid rgba(245,158,11,0.3)", borderTopColor: "#f59e0b", display: "inline-block", animation: "spin 0.7s linear infinite" }} /> Generating...</>
+                              ) : (
+                                <>{"\uD83D\uDD0A"} Generate Voice</>
+                              )}
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (ttsEditingLang === langId) {
+                                  setTtsEditingLang(null);
+                                } else {
+                                  if (!ttsTextOverrides[langId]) setTtsTextOverrides(p => ({ ...p, [langId]: results[langId] || "" }));
+                                  setTtsEditingLang(langId);
+                                }
+                              }}
+                              className="clay-btn"
+                              style={{ padding: "6px 12px", fontSize: "11px", fontWeight: 700, color: ttsEditingLang === langId ? "#d97706" : (darkMode ? "#a09080" : "#6b5e50"), whiteSpace: "nowrap" }}
+                            >
+                              {ttsEditingLang === langId ? "\u2716 Close Editor" : "\u270E Edit Text"}
+                            </button>
+                          </>
+                        ) : (
+                          <div className="tts-audio-row" style={{ flex: "1 1 100%", display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                            <audio controls src={audioUrls[langId]} style={{ flex: "1 1 200px", minWidth: 0 }} />
+                            <button onClick={() => downloadAudio(langId)} className="clay-btn" style={{ padding: "6px 12px", fontSize: "11px", fontWeight: 700, color: "#16a34a", whiteSpace: "nowrap" }}>
+                              {"\u2B07"} Download
+                            </button>
+                            <button onClick={() => { setAudioUrls(p => { const n = { ...p }; delete n[langId]; return n; }); }} className="clay-btn" style={{ padding: "6px 12px", fontSize: "11px", fontWeight: 700, color: "#6b5e50", whiteSpace: "nowrap" }}>
+                              Regenerate
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      {ttsEditingLang === langId && (
+                        <div style={{ marginTop: "10px" }}>
+                          <div className="tts-tags-bar">
+                            <span style={{ fontSize: "10px", fontWeight: 700, color: darkMode ? "#a09080" : "#78350f", alignSelf: "center" }}>Tags:</span>
+                            <button className="tts-tag-btn" onClick={() => insertTag(langId, '<break time="0.5s" />')}>Pause 0.5s</button>
+                            <button className="tts-tag-btn" onClick={() => insertTag(langId, '<break time="1.0s" />')}>Pause 1s</button>
+                            <button className="tts-tag-btn" onClick={() => insertTag(langId, '<break time="2.0s" />')}>Pause 2s</button>
+                            <button className="tts-tag-btn" onClick={() => insertTag(langId, '<break time="3.0s" />')}>Pause 3s</button>
+                          </div>
+                          <textarea
+                            ref={ttsTextareaRef}
+                            className="clay-inner tts-edit-area"
+                            value={ttsTextOverrides[langId] || ""}
+                            onChange={e => setTtsTextOverrides(p => ({ ...p, [langId]: e.target.value }))}
+                            style={{ color: darkMode ? "#e8e0d4" : "#3d3425", background: darkMode ? "rgba(60,50,35,0.3)" : "rgba(166,152,130,0.08)" }}
+                          />
+                          <div className="tts-tags-note">Break tags supported on Multilingual v2 & Flash models</div>
                         </div>
                       )}
                     </div>
