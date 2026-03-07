@@ -8,9 +8,7 @@ import { useState, useRef } from "react";
 const MODULES = [
   { id: "promo", icon: "\uD83C\uDFAC", label: "Promo Writer" },
   { id: "campaign", icon: "\uD83D\uDCE2", label: "Campaign" },
-  { id: "translate", icon: "\uD83C\uDF10", label: "Translation" },
   { id: "script", icon: "\uD83D\uDCDC", label: "Script Gen" },
-  { id: "thumbnail", icon: "\uD83D\uDDBC\uFE0F", label: "Thumbnail" },
   { id: "caption", icon: "\uD83D\uDCAC", label: "Captions" },
 ];
 
@@ -442,14 +440,8 @@ export default function ContentStudio({ darkMode, streamConvert }) {
   const [campaignData, setCampaignData] = useState({
     segment: "d0d1", language: "bhojpuri", contentType: "", hook: "fomo"
   });
-  const [transData, setTransData] = useState({
-    sourceText: "", sourceLang: "hindi", targetLang: "bhojpuri", style: "casual"
-  });
   const [scriptData, setScriptData] = useState({
     title: "", genre: "comedy", language: "bhojpuri", scenes: "3", tone: "dramatic", synopsis: ""
-  });
-  const [thumbData, setThumbData] = useState({
-    movieName: "", genre: "comedy", language: "bhojpuri", style: "dramatic"
   });
   const [captionData, setCaptionData] = useState({
     movieName: "", platform: "instagram", language: "bhojpuri", mood: "hype", count: "10"
@@ -485,16 +477,6 @@ Content: ${campaignData.contentType || "General Stage OTT content"}
 Hook Type: ${campaignData.hook}`;
           break;
 
-        case "translate":
-          if (!transData.sourceText.trim()) {
-            setError("Please enter text to translate");
-            setIsGenerating(false);
-            return;
-          }
-          system = buildTranslateSystem(transData);
-          userMessage = transData.sourceText;
-          break;
-
         case "script":
           system = buildScriptSystem(scriptData);
           userMessage = `Title: ${scriptData.title || "Create an original title"}
@@ -503,14 +485,6 @@ Language: ${scriptData.language}
 Scenes: ${scriptData.scenes}
 Tone: ${scriptData.tone}
 Synopsis: ${scriptData.synopsis || "Create an original story"}`;
-          break;
-
-        case "thumbnail":
-          system = buildThumbnailSystem(thumbData);
-          userMessage = `Movie/Show: ${thumbData.movieName || "Untitled"}
-Genre: ${thumbData.genre}
-Language: ${thumbData.language}
-Style: ${thumbData.style}`;
           break;
 
         case "caption":
@@ -548,20 +522,7 @@ Count: ${captionData.count}`;
   const dm = darkMode;
 
   return (
-    <div style={{ maxWidth: "900px", margin: "0 auto", padding: "24px 22px 60px", position: "relative", zIndex: 1 }}>
-
-      {/* Studio Header */}
-      <div style={{ textAlign: "center", marginBottom: "24px" }}>
-        <h2 style={{
-          fontSize: "28px", fontWeight: 900, letterSpacing: "-1.5px",
-          background: "linear-gradient(135deg, #f59e0b, #ef4444, #f59e0b)",
-          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
-          backgroundClip: "text", marginBottom: "6px"
-        }}>Content Studio</h2>
-        <p style={{ fontSize: "12px", color: dm ? "#a09080" : "#92400e", fontWeight: 600 }}>
-          AI-Powered Production Suite for Stage OTT
-        </p>
-      </div>
+    <div style={{ maxWidth: "900px", margin: "0 auto", padding: "16px 22px 60px", position: "relative", zIndex: 1 }}>
 
       {/* Module Tabs */}
       <div className="clay" style={{ padding: 0, marginBottom: "20px", overflow: "hidden" }}>
@@ -597,7 +558,7 @@ Count: ${captionData.count}`;
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             {/* PROMO WRITER */}
             {activeModule === "promo" && (<>
-              <StudioInput label="Movie/Show Name *" value={promoData.movieName} onChange={v => setPromoData({ ...promoData, movieName: v })} placeholder="e.g., \u091D\u094B\u0932\u093E\u091B\u093E\u092A" darkMode={dm} />
+              <StudioInput label="Movie/Show Name *" value={promoData.movieName} onChange={v => setPromoData({ ...promoData, movieName: v })} placeholder="" darkMode={dm} />
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                 <StudioSelect label="Language" value={promoData.language} onChange={v => setPromoData({ ...promoData, language: v })} options={LANGUAGES} darkMode={dm} />
                 <StudioSelect label="Genre" value={promoData.genre} onChange={v => setPromoData({ ...promoData, genre: v })} options={GENRES} darkMode={dm} />
@@ -617,8 +578,8 @@ Count: ${captionData.count}`;
                 { value: "question", label: "Question Hook" }, { value: "social_proof", label: "Social Proof" },
                 { value: "fomo", label: "FOMO" }, { value: "emotional", label: "Emotional" }
               ]} darkMode={dm} />
-              <StudioInput label="Star Cast" value={promoData.starCast} onChange={v => setPromoData({ ...promoData, starCast: v })} placeholder="e.g., \u0928\u093F\u0930\u0939\u0941\u0906, \u0906\u092E\u094D\u0930\u092A\u093E\u0932\u0940" darkMode={dm} />
-              <StudioTextArea label="Plot Points / USP" value={promoData.plotPoints} onChange={v => setPromoData({ ...promoData, plotPoints: v })} placeholder="\u0915\u0939\u093E\u0928\u0940 \u0915\u093E \u092E\u0941\u0916\u094D\u092F \u092D\u093E\u0917..." darkMode={dm} />
+              <StudioInput label="Star Cast" value={promoData.starCast} onChange={v => setPromoData({ ...promoData, starCast: v })} placeholder="" darkMode={dm} />
+              <StudioTextArea label="Plot Points / USP" value={promoData.plotPoints} onChange={v => setPromoData({ ...promoData, plotPoints: v })} placeholder="" darkMode={dm} />
             </>)}
 
             {/* CAMPAIGN */}
@@ -633,29 +594,16 @@ Count: ${captionData.count}`;
                 { value: "churned", label: "Recently Churned" }
               ]} darkMode={dm} />
               <StudioSelect label="Language" value={campaignData.language} onChange={v => setCampaignData({ ...campaignData, language: v })} options={LANGUAGES} darkMode={dm} />
-              <StudioInput label="Content/Movie Name" value={campaignData.contentType} onChange={v => setCampaignData({ ...campaignData, contentType: v })} placeholder="e.g., \u091D\u094B\u0932\u093E\u091B\u093E\u092A, New Release" darkMode={dm} />
+              <StudioInput label="Content/Movie Name" value={campaignData.contentType} onChange={v => setCampaignData({ ...campaignData, contentType: v })} placeholder="" darkMode={dm} />
               <StudioSelect label="Hook Type" value={campaignData.hook} onChange={v => setCampaignData({ ...campaignData, hook: v })} options={[
                 { value: "fomo", label: "FOMO Play" }, { value: "emotional", label: "Emotional" },
                 { value: "social", label: "Social Proof" }, { value: "urgency", label: "Urgency" }
               ]} darkMode={dm} />
             </>)}
 
-            {/* TRANSLATION */}
-            {activeModule === "translate" && (<>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                <StudioSelect label="From" value={transData.sourceLang} onChange={v => setTransData({ ...transData, sourceLang: v })} options={LANGUAGES} darkMode={dm} />
-                <StudioSelect label="To" value={transData.targetLang} onChange={v => setTransData({ ...transData, targetLang: v })} options={LANGUAGES} darkMode={dm} />
-              </div>
-              <StudioSelect label="Style" value={transData.style} onChange={v => setTransData({ ...transData, style: v })} options={[
-                { value: "casual", label: "Casual / \u092C\u094B\u0932\u091A\u093E\u0932" }, { value: "formal", label: "Formal / \u0914\u092A\u091A\u093E\u0930\u093F\u0915" },
-                { value: "dramatic", label: "Dramatic / \u0928\u093E\u091F\u0915\u0940\u092F" }, { value: "funny", label: "Funny / \u092E\u091C\u093C\u0947\u0926\u093E\u0930" }
-              ]} darkMode={dm} />
-              <StudioTextArea label="Source Text" value={transData.sourceText} onChange={v => setTransData({ ...transData, sourceText: v })} placeholder="Hindi text \u092F\u0939\u093E\u0902 \u0932\u093F\u0916\u0947\u0902..." rows={5} darkMode={dm} />
-            </>)}
-
             {/* SCRIPT GEN */}
             {activeModule === "script" && (<>
-              <StudioInput label="Title" value={scriptData.title} onChange={v => setScriptData({ ...scriptData, title: v })} placeholder="Script/Movie Title" darkMode={dm} />
+              <StudioInput label="Title" value={scriptData.title} onChange={v => setScriptData({ ...scriptData, title: v })} placeholder="" darkMode={dm} />
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                 <StudioSelect label="Genre" value={scriptData.genre} onChange={v => setScriptData({ ...scriptData, genre: v })} options={GENRES} darkMode={dm} />
                 <StudioSelect label="Language" value={scriptData.language} onChange={v => setScriptData({ ...scriptData, language: v })} options={LANGUAGES} darkMode={dm} />
@@ -670,25 +618,12 @@ Count: ${captionData.count}`;
                   { value: "suspenseful", label: "Suspenseful" }, { value: "romantic", label: "Romantic" }
                 ]} darkMode={dm} />
               </div>
-              <StudioTextArea label="Synopsis/Outline" value={scriptData.synopsis} onChange={v => setScriptData({ ...scriptData, synopsis: v })} placeholder="Brief story outline..." rows={4} darkMode={dm} />
-            </>)}
-
-            {/* THUMBNAIL */}
-            {activeModule === "thumbnail" && (<>
-              <StudioInput label="Movie/Show Name" value={thumbData.movieName} onChange={v => setThumbData({ ...thumbData, movieName: v })} placeholder="e.g., \u091D\u094B\u0932\u093E\u091B\u093E\u092A" darkMode={dm} />
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                <StudioSelect label="Genre" value={thumbData.genre} onChange={v => setThumbData({ ...thumbData, genre: v })} options={GENRES} darkMode={dm} />
-                <StudioSelect label="Language" value={thumbData.language} onChange={v => setThumbData({ ...thumbData, language: v })} options={LANGUAGES} darkMode={dm} />
-              </div>
-              <StudioSelect label="Style" value={thumbData.style} onChange={v => setThumbData({ ...thumbData, style: v })} options={[
-                { value: "dramatic", label: "Dramatic" }, { value: "colorful", label: "Colorful" },
-                { value: "minimal", label: "Minimal" }, { value: "bold", label: "Bold" }
-              ]} darkMode={dm} />
+              <StudioTextArea label="Synopsis/Outline" value={scriptData.synopsis} onChange={v => setScriptData({ ...scriptData, synopsis: v })} placeholder="" rows={4} darkMode={dm} />
             </>)}
 
             {/* CAPTIONS */}
             {activeModule === "caption" && (<>
-              <StudioInput label="Movie/Show Name" value={captionData.movieName} onChange={v => setCaptionData({ ...captionData, movieName: v })} placeholder="e.g., \u091D\u094B\u0932\u093E\u091B\u093E\u092A" darkMode={dm} />
+              <StudioInput label="Movie/Show Name" value={captionData.movieName} onChange={v => setCaptionData({ ...captionData, movieName: v })} placeholder="" darkMode={dm} />
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                 <StudioSelect label="Platform" value={captionData.platform} onChange={v => setCaptionData({ ...captionData, platform: v })} options={[
                   { value: "instagram", label: "Instagram" }, { value: "facebook", label: "Facebook" },
