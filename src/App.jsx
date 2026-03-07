@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 
 /* --- Streaming fetch helper --- */
-async function streamConvert({ model, system, messages }) {
+async function streamConvert({ model, system, messages, onChunk }) {
   const res = await fetch("/api/convert", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -28,7 +28,10 @@ async function streamConvert({ model, system, messages }) {
       try {
         const chunk = JSON.parse(data);
         const delta = chunk.choices?.[0]?.delta?.content;
-        if (delta) content += delta;
+        if (delta) {
+          content += delta;
+          if (onChunk) onChunk(content);
+        }
       } catch {}
     }
   }
@@ -66,6 +69,31 @@ const LANGUAGES = [
     id: "gujarati", label: "\u0A97\u0AC1\u0A9C\u0AB0\u0ABE\u0AA4\u0AC0", sub: "Gujarati", region: "Gujarat", color: "#a855f7",
     bg: { grad1: "rgba(168,85,247,0.12)", grad2: "rgba(124,58,237,0.08)", grad3: "rgba(192,132,252,0.06)",
           glyphs: ["\u0A97\u0AC1","\u0A9C","\u0AB0","\u0AA4","\u0AC0","\u0A9B\u0AC7","\u0AAD\u0ABE","\u0A88","\u0AB8\u0ABE","\u0AB0\u0AC1\u0A82","\u0AB9\u0AC1\u0A82","\u0AAA\u0ABE","\u0AA3\u0AC0","\u0AA8\u0AC7","\u0A95\u0AC7","\u0AAE","\u0A86","\u0AB5\u0ACB"], accent: "#a855f7" }
+  },
+  {
+    id: "marathi", label: "\u092E\u0930\u093E\u0920\u0940", sub: "Marathi", region: "Maharashtra", color: "#e11d48",
+    bg: { grad1: "rgba(225,29,72,0.12)", grad2: "rgba(190,18,60,0.08)", grad3: "rgba(251,113,133,0.06)",
+          glyphs: ["\u092E","\u0930\u093E","\u0920\u0940","\u092C\u094B","\u0932","\u0906","\u0939\u0947","\u0915\u093E","\u092F","\u0928\u093E","\u0939\u0940","\u0924\u0942","\u092E\u0940","\u0924\u094B","\u0906\u092E\u094D\u0939\u0940","\u0924\u0941\u092E\u094D\u0939\u0940","\u0939\u094B","\u092F"], accent: "#e11d48" }
+  },
+  {
+    id: "bengali", label: "\u09AC\u09BE\u0982\u09B2\u09BE", sub: "Bengali", region: "West Bengal", color: "#0891b2",
+    bg: { grad1: "rgba(8,145,178,0.12)", grad2: "rgba(6,182,212,0.08)", grad3: "rgba(34,211,238,0.06)",
+          glyphs: ["\u09AC\u09BE\u0982","\u09B2\u09BE","\u0986","\u09AE\u09BF","\u09A4\u09C1","\u09AE\u09BF","\u0995\u09C7","\u098F","\u0993","\u09A8\u09BE","\u09B9\u09CD\u09AF\u09BE\u09BE","\u0986\u099B\u09C7","\u0995\u09B0","\u09AC","\u09B2","\u09AE","\u09A8","\u0995\u09BF"], accent: "#0891b2" }
+  },
+  {
+    id: "punjabi", label: "\u0A2A\u0A70\u0A1C\u0A3E\u0A2C\u0A40", sub: "Punjabi", region: "Punjab", color: "#ea580c",
+    bg: { grad1: "rgba(234,88,12,0.12)", grad2: "rgba(194,65,12,0.08)", grad3: "rgba(251,146,60,0.06)",
+          glyphs: ["\u0A2A\u0A70","\u0A1C\u0A3E","\u0A2C\u0A40","\u0A39\u0A48","\u0A28\u0A3E","\u0A24\u0A42\u0A70","\u0A2E\u0A48\u0A02","\u0A15\u0A40","\u0A26\u0A3E","\u0A35\u0A47","\u0A39\u0A48","\u0A28\u0A39\u0A40\u0A02","\u0A2E\u0A48\u0A02","\u0A09\u0A39","\u0A07\u0A39","\u0A16\u0A41\u0A36","\u0A2A\u0A3F","\u0A06\u0A30"], accent: "#ea580c" }
+  },
+  {
+    id: "tamil", label: "\u0BA4\u0BAE\u0BBF\u0BB4\u0BCD", sub: "Tamil", region: "Tamil Nadu", color: "#7c3aed",
+    bg: { grad1: "rgba(124,58,237,0.12)", grad2: "rgba(109,40,217,0.08)", grad3: "rgba(167,139,250,0.06)",
+          glyphs: ["\u0BA4","\u0BAE\u0BBF","\u0BB4\u0BCD","\u0BA8\u0BBE","\u0BA9\u0BCD","\u0BA8\u0BC0","\u0B85","\u0BB5","\u0BA9\u0BCD","\u0B87","\u0BA4\u0BC1","\u0B8E","\u0BA9\u0BCD","\u0BA9","\u0B95","\u0BB2\u0BCD","\u0BAE","\u0BB0"], accent: "#7c3aed" }
+  },
+  {
+    id: "telugu", label: "\u0C24\u0C46\u0C32\u0C41\u0C17\u0C41", sub: "Telugu", region: "Andhra / Telangana", color: "#059669",
+    bg: { grad1: "rgba(5,150,105,0.12)", grad2: "rgba(4,120,87,0.08)", grad3: "rgba(52,211,153,0.06)",
+          glyphs: ["\u0C24\u0C46","\u0C32\u0C41","\u0C17\u0C41","\u0C28\u0C47","\u0C28\u0C41","\u0C2E\u0C40","\u0C30\u0C41","\u0C05","\u0C26\u0C3F","\u0C07","\u0C26\u0C3F","\u0C0E\u0C02","\u0C26\u0C41","\u0C15\u0C41","\u0C1A\u0C47","\u0C2E\u0C3E","\u0C30\u0C41","\u0C35"], accent: "#059669" }
   },
 ];
 
@@ -345,6 +373,139 @@ FLAVOR WORDS (scatter naturally): \u0AAD\u0ABE\u0A88, \u0AAD\u0ABE\u0AAD\u0AC0, 
 CRITICAL \u2014 NEVER write:
 - Devanagari in output \u2014 write ENTIRE output in Gujarati script
 - Hindi words mixed in`,
+
+  marathi: `MARATHI (Devanagari) — authentic Marathi:
+
+OUTPUT IN: Devanagari script. Natural, authentic Marathi.
+
+PRONOUNS: मी (I), माझा/माझी/माझे (my), तू (you informal), तुम्ही (you formal), तो (he), ती (she), ते (they/it), आम्ही (we exclusive), आपण (we inclusive)
+
+VERBS — Key conjugations:
+- आहे = is (singular), आहेत = are (plural), होता/होती = was
+- करतो/करते = does, केला/केली = did, करेल = will do
+- जातो/जाते = goes, गेला/गेली = went, जाईल = will go
+- येतो/येते = comes, आला/आली = came, येईल = will come
+- बोलतो/बोलते = speaks, बोलला/बोलली = spoke
+
+NEGATION: नाही (not), नको (don't want), नये (should not)
+
+QUESTION WORDS: काय (what), का (why), कुठे (where), केव्हा (when), कोण (who), कसे/कसा (how), किती (how much)
+
+COMMON WORDS: चांगले/छान (good), वाईट (bad), खूप (very), घर (house), पाणी (water), जेवण (food), माणूस (person), मुलगा/मुलगी (boy/girl), मित्र (friend), आज (today), उद्या (tomorrow)
+
+FLAVOR (scatter naturally): अरे, बाई, ना, हो ना, काय सांगू, बरं का, च्यायला
+
+CRITICAL:
+- Write ENTIRE output in Marathi (Devanagari script)
+- Do NOT mix Hindi grammar — Marathi has different verb endings
+- Use ला/ला postposition (not को), ने/ने (not ने), चा/ची/चे (not का/की/के)
+- Marathi uses आहे where Hindi uses है`,
+
+  bengali: `BENGALI (Bengali script — write ALL output in Bengali script):
+
+OUTPUT IN: Bengali script (বাংলা লিপি). NOT Devanagari.
+
+PRONOUNS: আমি (I), আমার (my), তুমি (you informal), আপনি (you formal), সে/ও (he/she), তারা/ওরা (they), আমরা (we)
+
+VERBS — Key conjugations:
+- হয় = is, ছিল = was, হবে = will be
+- করি/করো/করে = do, করলাম/করলে/করল = did, করব = will do
+- যাই/যাও/যায় = go, গেলাম/গেলে/গেল = went, যাব = will go
+- আসি/আসো/আসে = come, এলাম/এলে/এল = came, আসব = will come
+- বলি/বলো/বলে = say, বললাম/বললে/বলল = said
+
+NEGATION: না (not), নেই (is not/there isn't), নি (didn't — suffix)
+
+QUESTION WORDS: কী/কি (what), কেন (why), কোথায় (where), কখন (when), কে (who), কেমন/কীভাবে (how), কত (how much)
+
+COMMON WORDS: ভালো (good), খারাপ (bad), খুব (very), বাড়ি (house), জল/পানি (water), খাবার (food), মানুষ (person), ছেলে/মেয়ে (boy/girl), বন্ধু (friend), আজ (today), কাল (tomorrow)
+
+FLAVOR (scatter naturally): আরে, ভাই, তাই না, কি বলো, যাও গে, আচ্ছা, ওরে বাবা, দাদা/দিদি
+
+CRITICAL:
+- Write ENTIRE output in Bengali script — NOT Devanagari
+- Bengali has no gender in verbs (unlike Hindi)
+- Use -টা/-টি for definite articles (বইটা = the book)
+- Different verb endings from Hindi entirely`,
+
+  punjabi: `PUNJABI (Gurmukhi script — write ALL output in Gurmukhi script):
+
+OUTPUT IN: Gurmukhi script (ਗੁਰਮੁਖੀ). NOT Devanagari.
+
+PRONOUNS: ਮੈਂ (I), ਮੇਰਾ/ਮੇਰੀ (my), ਤੂੰ (you informal), ਤੁਸੀਂ (you formal), ਉਹ (he/she/they), ਅਸੀਂ (we), ਇਹ (this), ਉਹ (that)
+
+VERBS — Key conjugations:
+- ਹੈ = is, ਸੀ = was, ਹੋਵੇਗਾ = will be
+- ਕਰਦਾ/ਕਰਦੀ = does, ਕੀਤਾ/ਕੀਤੀ = did, ਕਰੇਗਾ = will do
+- ਜਾਂਦਾ/ਜਾਂਦੀ = goes, ਗਿਆ/ਗਈ = went, ਜਾਵੇਗਾ = will go
+- ਆਉਂਦਾ/ਆਉਂਦੀ = comes, ਆਇਆ/ਆਈ = came, ਆਵੇਗਾ = will come
+- ਬੋਲਦਾ/ਬੋਲਦੀ = speaks, ਬੋਲਿਆ/ਬੋਲੀ = spoke
+
+NEGATION: ਨਹੀਂ (not), ਨਾ (no/don't)
+
+QUESTION WORDS: ਕੀ (what), ਕਿਉਂ (why), ਕਿੱਥੇ (where), ਕਦੋਂ (when), ਕੌਣ (who), ਕਿਵੇਂ (how), ਕਿੰਨਾ (how much)
+
+COMMON WORDS: ਚੰਗਾ (good), ਮਾੜਾ (bad), ਬਹੁਤ (very), ਘਰ (house), ਪਾਣੀ (water), ਖਾਣਾ (food), ਬੰਦਾ (person), ਮੁੰਡਾ/ਕੁੜੀ (boy/girl), ਯਾਰ (friend), ਅੱਜ (today), ਕੱਲ੍ਹ (tomorrow)
+
+FLAVOR (scatter naturally): ਯਾਰ, ਵੀਰੇ, ਪਾਜੀ, ਓਏ, ਕੀ ਹਾਲ, ਬੱਲੇ ਬੱਲੇ, ਸੱਚੀ, ਚੱਲ, ਫਿੱਟੇ ਮੂੰਹ
+
+CRITICAL:
+- Write ENTIRE output in Gurmukhi script — NOT Devanagari
+- Punjabi uses ਦਾ/ਦੀ/ਦੇ (not का/की/के)
+- Use authentic Punjabi expressions and vocabulary`,
+
+  tamil: `TAMIL (Tamil script — write ALL output in Tamil script):
+
+OUTPUT IN: Tamil script (தமிழ் எழுத்து). NOT Devanagari or Latin.
+
+PRONOUNS: நான் (I), என்/என்னுடைய (my), நீ (you informal), நீங்கள் (you formal), அவன் (he), அவள் (she), அவர்கள் (they), நாங்கள்/நாம் (we)
+
+VERBS — Key conjugations:
+- இருக்கிறது = is, இருந்தது = was, இருக்கும் = will be
+- செய்கிறேன்/செய்கிறான் = do/does, செய்தேன்/செய்தான் = did, செய்வேன் = will do
+- போகிறேன் = going, போனேன் = went, போவேன் = will go
+- வருகிறேன் = coming, வந்தேன் = came, வருவேன் = will come
+- சொல்கிறேன் = saying, சொன்னேன் = said, சொல்வேன் = will say
+
+NEGATION: இல்லை (not/no), மாட்டேன் (won't), வேண்டாம் (don't want)
+
+QUESTION WORDS: என்ன (what), ஏன் (why), எங்கே (where), எப்போது (when), யார் (who), எப்படி (how), எவ்வளவு (how much)
+
+COMMON WORDS: நல்ல (good), கெட்ட (bad), மிகவும் (very), வீடு (house), தண்ணீர் (water), சாப்பாடு (food), மனிதன் (person), நண்பன்/நண்பி (friend), இன்று (today), நாளை (tomorrow)
+
+FLAVOR (scatter naturally): டா, டீ, மச்சான், தம்பி, அக்கா, போடா, வாடா, சரி, ஆமா
+
+CRITICAL:
+- Write ENTIRE output in Tamil script — NOT Devanagari
+- Tamil is agglutinative — suffixes attach to verb stems
+- Tamil has no gender distinction in plural
+- Respect the formal/informal pronoun distinction (நீ vs நீங்கள்)`,
+
+  telugu: `TELUGU (Telugu script — write ALL output in Telugu script):
+
+OUTPUT IN: Telugu script (తెలుగు లిపి). NOT Devanagari or Latin.
+
+PRONOUNS: నేను (I), నా/నాకు (my/me), నీవు/నువ్వు (you informal), మీరు (you formal), అతను (he), ఆమె (she), వాళ్ళు (they), మేము/మనం (we)
+
+VERBS — Key conjugations:
+- ఉంది = is, ఉంటుంది = will be, ఉన్నది = was
+- చేస్తాను/చేస్తాడు = do/does, చేశాను/చేశాడు = did, చేస్తాను = will do
+- వెళ్తాను = going, వెళ్ళాను = went, వెళ్తాను = will go
+- వస్తాను = coming, వచ్చాను = came, వస్తాను = will come
+- చెప్తాను = saying, చెప్పాను = said, చెప్తాను = will say
+
+NEGATION: కాదు (is not), లేదు (not/there isn't), వద్దు (don't)
+
+QUESTION WORDS: ఏమిటి/ఏంటి (what), ఎందుకు (why), ఎక్కడ (where), ఎప్పుడు (when), ఎవరు (who), ఎలా (how), ఎంత (how much)
+
+COMMON WORDS: మంచి (good), చెడ్డ (bad), చాలా (very), ఇల్లు (house), నీళ్ళు (water), భోజనం (food), మనిషి (person), స్నేహితుడు (friend), ఈరోజు (today), రేపు (tomorrow)
+
+FLAVOR (scatter naturally): రా, రోయ్, బాబు, అన్నా, అక్కా, ఏంటి, ఒరేయ్, మరి, అవునా
+
+CRITICAL:
+- Write ENTIRE output in Telugu script — NOT Devanagari
+- Telugu is agglutinative — verb endings change based on person/number/gender
+- Use natural Telugu sentence structure (SOV order)`,
 };
 
 /* --- Few-shot examples for each dialect --- */
@@ -380,6 +541,26 @@ const FEW_SHOT_EXAMPLES = {
   english: [
     { role: "user", content: "\u092D\u093E\u0908 \u0906\u091C \u092E\u0947\u0930\u093E \u0926\u094B\u0938\u094D\u0924 \u0906\u092F\u093E \u0939\u0948, \u0939\u092E \u0926\u094B\u0928\u094B\u0902 \u0938\u093E\u0925 \u092E\u0947\u0902 \u0916\u093E\u0928\u093E \u0916\u093E\u090F\u0902\u0917\u0947\u0964 \u092C\u0939\u0941\u0924 \u092E\u091C\u093C\u093E \u0906\u090F\u0917\u093E\u0964" },
     { role: "assistant", content: "Bro, my friend came over today \u2014 we're both gonna eat together. It's gonna be a blast." },
+  ],
+  marathi: [
+    { role: "user", content: "\u092D\u093E\u0908 \u0906\u091C \u092E\u0947\u0930\u093E \u0926\u094B\u0938\u094D\u0924 \u0906\u092F\u093E \u0939\u0948, \u0939\u092E \u0926\u094B\u0928\u094B\u0902 \u0938\u093E\u0925 \u092E\u0947\u0902 \u0916\u093E\u0928\u093E \u0916\u093E\u090F\u0902\u0917\u0947\u0964 \u092C\u0939\u0941\u0924 \u092E\u091C\u093C\u093E \u0906\u090F\u0917\u093E\u0964" },
+    { role: "assistant", content: "\u0905\u0930\u0947 \u092F\u093E\u0930, \u0906\u091C \u092E\u093E\u091D\u093E \u092E\u093F\u0924\u094D\u0930 \u0906\u0932\u093E \u0906\u0939\u0947, \u0906\u092E\u094D\u0939\u0940 \u0926\u094B\u0918\u0947 \u092E\u093F\u0933\u0942\u0928 \u091C\u0947\u0935\u0923\u093E\u0930 \u0906\u0939\u094B\u0924. \u092D\u093E\u0930\u0940 \u092E\u091C\u093E \u092F\u0947\u0923\u093E\u0930!" },
+  ],
+  bengali: [
+    { role: "user", content: "\u092D\u093E\u0908 \u0906\u091C \u092E\u0947\u0930\u093E \u0926\u094B\u0938\u094D\u0924 \u0906\u092F\u093E \u0939\u0948, \u0939\u092E \u0926\u094B\u0928\u094B\u0902 \u0938\u093E\u0925 \u092E\u0947\u0902 \u0916\u093E\u0928\u093E \u0916\u093E\u090F\u0902\u0917\u0947\u0964 \u092C\u0939\u0941\u0924 \u092E\u091C\u093C\u093E \u0906\u090F\u0917\u093E\u0964" },
+    { role: "assistant", content: "\u0986\u09B0\u09C7 \u09AD\u09BE\u0987, \u0986\u099C \u0986\u09AE\u09BE\u09B0 \u09AC\u09A8\u09CD\u09A7\u09C1 \u098F\u09B8\u09C7\u099B\u09C7, \u0986\u09AE\u09B0\u09BE \u09A6\u09C1\u099C\u09A8\u09C7 \u098F\u0995\u09B8\u09BE\u09A5\u09C7 \u0996\u09BE\u09AC\u09CB\u0964 \u0996\u09C1\u09AC \u09AE\u099C\u09BE \u09B9\u09AC\u09C7!" },
+  ],
+  punjabi: [
+    { role: "user", content: "\u092D\u093E\u0908 \u0906\u091C \u092E\u0947\u0930\u093E \u0926\u094B\u0938\u094D\u0924 \u0906\u092F\u093E \u0939\u0948, \u0939\u092E \u0926\u094B\u0928\u094B\u0902 \u0938\u093E\u0925 \u092E\u0947\u0902 \u0916\u093E\u0928\u093E \u0916\u093E\u090F\u0902\u0917\u0947\u0964 \u092C\u0939\u0941\u0924 \u092E\u091C\u093C\u093E \u0906\u090F\u0917\u093E\u0964" },
+    { role: "assistant", content: "\u0A13\u0A2F\u0A47 \u0A2F\u0A3E\u0A30, \u0A05\u0A71\u0A1C \u0A2E\u0A47\u0A30\u0A3E \u0A26\u0A4B\u0A38\u0A24 \u0A06\u0A07\u0A06 \u0A39\u0A48, \u0A05\u0A38\u0A40\u0A02 \u0A26\u0A4B\u0A35\u0A47\u0A02 \u0A07\u0A15\u0A71\u0A20\u0A47 \u0A16\u0A3E\u0A23\u0A3E \u0A16\u0A3E\u0A35\u0A3E\u0A02\u0A17\u0A47\u0964 \u0A2C\u0A39\u0A41\u0A24 \u0A2E\u0A1C\u0A3C\u0A3E \u0A06\u0A0A\u0A17\u0A3E!" },
+  ],
+  tamil: [
+    { role: "user", content: "\u092D\u093E\u0908 \u0906\u091C \u092E\u0947\u0930\u093E \u0926\u094B\u0938\u094D\u0924 \u0906\u092F\u093E \u0939\u0948, \u0939\u092E \u0926\u094B\u0928\u094B\u0902 \u0938\u093E\u0925 \u092E\u0947\u0902 \u0916\u093E\u0928\u093E \u0916\u093E\u090F\u0902\u0917\u0947\u0964 \u092C\u0939\u0941\u0924 \u092E\u091C\u093C\u093E \u0906\u090F\u0917\u093E\u0964" },
+    { role: "assistant", content: "\u0BAE\u0B9A\u0BCD\u0B9A\u0BBE\u0BA9\u0BCD, \u0B87\u0BA9\u0BCD\u0BA9\u0BBF\u0B95\u0BCD\u0B95\u0BC1 \u0B8E\u0BA9\u0BCD \u0BA8\u0BA3\u0BCD\u0BAA\u0BA9\u0BCD \u0BB5\u0BA8\u0BCD\u0BA4\u0BBF\u0BB0\u0BC1\u0B95\u0BCD\u0B95\u0BBE\u0BA9\u0BCD, \u0BA8\u0BBE\u0BAE \u0BB0\u0BA3\u0BCD\u0B9F\u0BC1 \u0BAA\u0BC7\u0BB0\u0BC1\u0BAE\u0BCD \u0B92\u0BA3\u0BCD\u0BA3\u0BBE \u0B9A\u0BBE\u0BAA\u0BCD\u0BAA\u0BBF\u0B9F\u0BAA\u0BCD \u0BAA\u0BCB\u0BB1\u0BCB\u0BAE\u0BCD. \u0BB0\u0BCA\u0BAE\u0BCD\u0BAA \u0B8E\u0BA9\u0BCD\u0B9C\u0BBE\u0BAF\u0BCD \u0BAA\u0BA3\u0BCD\u0BA3\u0BB2\u0BBE\u0BAE\u0BCD!" },
+  ],
+  telugu: [
+    { role: "user", content: "\u092D\u093E\u0908 \u0906\u091C \u092E\u0947\u0930\u093E \u0926\u094B\u0938\u094D\u0924 \u0906\u092F\u093E \u0939\u0948, \u0939\u092E \u0926\u094B\u0928\u094B\u0902 \u0938\u093E\u0925 \u092E\u0947\u0902 \u0916\u093E\u0928\u093E \u0916\u093E\u090F\u0902\u0917\u0947\u0964 \u092C\u0939\u0941\u0924 \u092E\u091C\u093C\u093E \u0906\u090F\u0917\u093E\u0964" },
+    { role: "assistant", content: "\u0C2E\u0C3E\u0C1A\u0C3F, \u0C08\u0C30\u0C4B\u0C1C\u0C41 \u0C28\u0C3E \u0C2B\u0C4D\u0C30\u0C46\u0C02\u0C21\u0C4D \u0C35\u0C1A\u0C4D\u0C1A\u0C3E\u0C21\u0C41, \u0C2E\u0C47\u0C2E\u0C41 \u0C07\u0C26\u0C4D\u0C26\u0C30\u0C42 \u0C15\u0C32\u0C3F\u0C38\u0C3F \u0C24\u0C3F\u0C28\u0C26\u0C3E\u0C02. \u0C1A\u0C3E\u0C32\u0C3E \u0C2E\u0C1C\u0C3E \u0C35\u0C38\u0C4D\u0C24\u0C41\u0C02\u0C26\u0C3F!" },
   ],
 };
 
@@ -418,8 +599,27 @@ Haryanvi: \u0924\u0942 \u0915\u0926 \u0906\u0935\u0947\u0917\u093E? \u092E\u094D
 Rajasthani: \u0924\u0942\u0902 \u0915\u0926 \u0906\u0935\u0947\u0932\u094B? \u092E\u094D\u0939\u0948\u0902 \u0907\u0902\u0924\u091C\u093C\u093E\u0930 \u0915\u0930\u0924\u093E \u091B\u0942\u0902\u0964
 `;
 
+/* --- Tone/Register definitions --- */
+const TONES = [
+  { id: "auto", label: "Auto", icon: "\u2728", desc: "Match original tone" },
+  { id: "formal", label: "Formal", icon: "\u{1F454}", desc: "Professional, polished" },
+  { id: "casual", label: "Casual", icon: "\u{1F60E}", desc: "Relaxed, everyday" },
+  { id: "dramatic", label: "Dramatic", icon: "\u{1F3AD}", desc: "Intense, emotional" },
+  { id: "comedy", label: "Comedy", icon: "\u{1F602}", desc: "Funny, light-hearted" },
+  { id: "romantic", label: "Romantic", icon: "\u2764\uFE0F", desc: "Tender, poetic" },
+];
+
+const TONE_INSTRUCTIONS = {
+  auto: "",
+  formal: "\nTONE: Write in a formal, polished, professional register. Use refined vocabulary and proper grammar. Avoid slang and colloquialisms.",
+  casual: "\nTONE: Write in a casual, relaxed, everyday conversational style. Use natural speech patterns, contractions, and informal expressions.",
+  dramatic: "\nTONE: Write in a dramatic, intense, emotionally charged style. Emphasize tension, conflict, and powerful emotions. Use vivid, impactful language.",
+  comedy: "\nTONE: Write in a humorous, witty, light-hearted style. Add playful word choices, funny expressions, and comedic timing. Keep it entertaining.",
+  romantic: "\nTONE: Write in a tender, poetic, emotionally intimate style. Use soft, evocative language with warmth and affection. Emphasize feelings of love and connection.",
+};
+
 /* --- System prompt builder --- */
-const buildSingleConverterSystem = (id) => {
+const buildSingleConverterSystem = (id, selectedTone) => {
   const checklist = id === "haryanvi" ? `
 HARYANVI FINAL CHECKLIST:
 - \u0939\u0942\u0901 \u2192 \u0938\u0942\u0902 (MANDATORY)
@@ -471,7 +671,9 @@ ENGLISH FINAL CHECKLIST:
     ? `You are an expert linguist specializing in North Indian dialects. Your task: rewrite the given input text in authentic ${id} dialect \u2014 which is COMPLETELY DISTINCT from ${contrastiveDialects[id]}. Pay careful attention to the dialect-specific markers below. Mixing up dialects is a CRITICAL FAILURE.`
     : `You are an expert linguist. Your task: rewrite the given input text in authentic ${id === "hindi" ? "standard Hindi" : id === "english" ? "English" : id + " dialect"}.`;
 
-  return `${opening}
+  const toneInstr = TONE_INSTRUCTIONS[selectedTone] || "";
+
+  return `${opening}${toneInstr}
 
 STEP 1 \u2014 AUTO-DETECT INPUT LANGUAGE:
 The input may be in ANY language: Hindi, English, Hinglish, Bhojpuri, Haryanvi, Rajasthani, Gujarati, or any mix.
@@ -629,6 +831,30 @@ const CSS = `
     .lang-grid{grid-template-columns:repeat(2, 1fr) !important;}
   }
   @media(max-width:400px){.ruhi-title{font-size:36px !important;}}
+
+  /* Dark Mode */
+  .dark body, .dark { background: #1a1510; color: #e8e0d4; }
+  .dark .clay {
+    background: linear-gradient(145deg, #2a2218, #1e1a12);
+    box-shadow: 8px 8px 16px rgba(0,0,0,0.5), -6px -6px 14px rgba(60,50,35,0.3), inset 0 2px 0 rgba(60,50,35,0.4), inset 0 -1px 0 rgba(0,0,0,0.2);
+    border: 1px solid rgba(60,50,35,0.3);
+  }
+  .dark .clay-inner {
+    background: linear-gradient(145deg, #231e14, #1c1810);
+    box-shadow: inset 4px 4px 8px rgba(0,0,0,0.4), inset -3px -3px 6px rgba(60,50,35,0.2);
+    border: 1px solid rgba(60,50,35,0.2);
+  }
+  .dark .clay-btn {
+    background: linear-gradient(145deg, #2a2218, #1e1a12);
+    box-shadow: 5px 5px 10px rgba(0,0,0,0.4), -4px -4px 8px rgba(60,50,35,0.2), inset 0 1px 0 rgba(60,50,35,0.3);
+    border: 1px solid rgba(60,50,35,0.3);
+    color: #d4c8b0;
+  }
+  .dark .clay-btn:hover { box-shadow: 3px 3px 6px rgba(0,0,0,0.5), -2px -2px 5px rgba(60,50,35,0.2); }
+  .dark .clay-btn-primary { background: linear-gradient(145deg, #d4880a, #b87308); }
+  .dark .clay-btn-primary:disabled { background: linear-gradient(145deg, #3a3228, #2e281e); color: #6b5e50; }
+  .dark textarea { color: #e8e0d4 !important; }
+  .dark textarea::placeholder { color: #6b5e50 !important; }
 `;
 
 /* --- Logo --- */
@@ -802,7 +1028,7 @@ function LanguageCards({ selected, onToggle, onSelectAll, onDeselectAll }) {
 }
 
 /* --- Result Card --- */
-function ResultCard({ result, lang, copied, onCopy }) {
+function ResultCard({ result, lang, copied, onCopy, isStreaming, srtMode, onDownloadSrt }) {
   if (!result) return null;
   const wc = result.trim() ? result.trim().split(/\s+/).length : 0;
   return (
@@ -814,18 +1040,33 @@ function ResultCard({ result, lang, copied, onCopy }) {
         <div style={{ display: "flex", alignItems: "center", gap: "11px" }}>
           <div style={{ width: "38px", height: "38px", borderRadius: "12px", background: `linear-gradient(135deg, ${lang.color}25, ${lang.color}10)`, border: `1px solid ${lang.color}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", fontWeight: 900, color: lang.color, flexShrink: 0, boxShadow: `inset 2px 2px 4px ${lang.color}10, inset -2px -2px 3px rgba(255,255,255,0.5)` }}>{lang.label.charAt(0)}</div>
           <div>
-            <div style={{ fontSize: "15px", fontWeight: 800, color: "#1e1b18" }}>{lang.label}</div>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span style={{ fontSize: "15px", fontWeight: 800, color: "#1e1b18" }}>{lang.label}</span>
+              {isStreaming && <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: lang.color, display: "inline-block", animation: "pulse 1s ease-in-out infinite" }} />}
+            </div>
             <div style={{ fontSize: "10.5px", color: "#78350f" }}>{lang.sub} &middot; {lang.region}</div>
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <span style={{ fontSize: "10px", color: "#78350f", background: "rgba(245,158,11,0.08)", borderRadius: "8px", padding: "3px 10px", fontWeight: 600 }}>{wc} words</span>
-          <button onClick={() => onCopy(result, lang.id)} className="clay-btn" style={{ padding: "6px 14px", fontSize: "11.5px", fontWeight: 700, color: copied === lang.id ? lang.color : "#6b5e50", background: copied === lang.id ? `linear-gradient(145deg, ${lang.color}15, ${lang.color}08)` : undefined }}>
-            {copied === lang.id ? "Copied!" : "Copy"}
-          </button>
+          {!isStreaming && (
+            <div style={{ display: "flex", gap: "6px" }}>
+              {srtMode && onDownloadSrt && (
+                <button onClick={() => onDownloadSrt(lang.id)} className="clay-btn" style={{ padding: "6px 10px", fontSize: "10px", fontWeight: 700, color: "#16a34a" }}>
+                  .srt
+                </button>
+              )}
+              <button onClick={() => onCopy(result, lang.id)} className="clay-btn" style={{ padding: "6px 14px", fontSize: "11.5px", fontWeight: 700, color: copied === lang.id ? lang.color : "#6b5e50", background: copied === lang.id ? `linear-gradient(145deg, ${lang.color}15, ${lang.color}08)` : undefined }}>
+                {copied === lang.id ? "Copied!" : "Copy"}
+              </button>
+            </div>
+          )}
         </div>
       </div>
-      <div className="clay-inner" style={{ fontSize: "13.5px", lineHeight: 1.9, color: "#3d3425", padding: "14px 16px", whiteSpace: "pre-wrap" }}>{result}</div>
+      <div className="clay-inner" style={{ fontSize: "13.5px", lineHeight: 1.9, color: "#3d3425", padding: "14px 16px", whiteSpace: "pre-wrap" }}>
+        {result}
+        {isStreaming && <span style={{ display: "inline-block", width: "2px", height: "16px", background: lang.color, marginLeft: "2px", verticalAlign: "text-bottom", animation: "pulse 0.8s ease-in-out infinite" }} />}
+      </div>
     </div>
   );
 }
@@ -959,9 +1200,17 @@ export default function App() {
   const [script, setScript] = useState("");
   const [results, setResults] = useState({});
   const [loading, setLoading] = useState(false);
+  const [streaming, setStreaming] = useState({});
   const [error, setError] = useState("");
   const [copied, setCopied] = useState("");
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("ruhi_dark") === "1");
+  const [tone, setTone] = useState("auto");
+  const [srtMode, setSrtMode] = useState(null); // null or { blocks: [{index, time, text}], fileName }
+  const [csvMode, setCsvMode] = useState(null); // null or { rows: string[], fileName, header: string }
+  const [batchResults, setBatchResults] = useState(null); // null or { langId: string[] }
+  const [batchProgress, setBatchProgress] = useState(null); // null or { done: number, total: number }
+  const fileInputRef = useRef(null);
 
   const loadFromHistory = (entry) => {
     setScript(entry.input);
@@ -977,33 +1226,42 @@ export default function App() {
 
   const convert = async () => {
     if (!script.trim() || selected.length === 0) return;
-    setLoading(true); setError(""); setResults({});
+    setLoading(true); setError(""); setResults({}); setStreaming({});
+    const streamingSet = {};
     try {
       const promises = selected.map(async (langId) => {
         try {
+          streamingSet[langId] = true;
+          setStreaming(s => ({ ...s, [langId]: true }));
           const examples = FEW_SHOT_EXAMPLES[langId] || [];
           const raw = await streamConvert({
             model: "anthropic/claude-sonnet-4-5",
-            system: buildSingleConverterSystem(langId),
-            messages: [...examples, { role: "user", content: script }]
+            system: buildSingleConverterSystem(langId, tone),
+            messages: [...examples, { role: "user", content: script }],
+            onChunk: (partial) => {
+              setResults(prev => ({ ...prev, [langId]: partial }));
+            }
           });
+          setResults(prev => ({ ...prev, [langId]: raw.trim() }));
+          setStreaming(s => { const n = { ...s }; delete n[langId]; return n; });
           return { langId, text: raw.trim(), ok: true };
         } catch (err) {
+          setStreaming(s => { const n = { ...s }; delete n[langId]; return n; });
           return { langId, text: "", ok: false, err: err.message };
         }
       });
       const all = await Promise.all(promises);
-      const map = {};
+      const finalMap = {};
       const errors = [];
       all.forEach(r => {
-        if (r.ok) map[r.langId] = r.text;
+        if (r.ok) finalMap[r.langId] = r.text;
         else errors.push(`${r.langId}: ${r.err}`);
       });
-      setResults(map);
-      if (errors.length > 0 && Object.keys(map).length === 0) setError(errors.join("; "));
+      setResults(finalMap);
+      if (errors.length > 0 && Object.keys(finalMap).length === 0) setError(errors.join("; "));
       // Save to history
-      if (Object.keys(map).length > 0) {
-        const entry = { id: Date.now(), input: script, results: map, langs: selected, date: new Date().toISOString() };
+      if (Object.keys(finalMap).length > 0) {
+        const entry = { id: Date.now(), input: script, results: finalMap, langs: selected, date: new Date().toISOString() };
         const hist = JSON.parse(localStorage.getItem("ruhi_history") || "[]");
         hist.unshift(entry);
         const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
@@ -1013,25 +1271,197 @@ export default function App() {
     } catch (e) {
       setError(e.message);
     }
-    setLoading(false);
+    setLoading(false); setStreaming({});
   };
 
   const copy = (text, id) => { navigator.clipboard.writeText(text); setCopied(id); setTimeout(() => setCopied(""), 2000); };
+
+  /* --- SRT Parser/Formatter --- */
+  const parseSrt = (text) => {
+    const blocks = [];
+    const parts = text.trim().split(/\n\s*\n/);
+    for (const part of parts) {
+      const lines = part.trim().split("\n");
+      if (lines.length < 3) continue;
+      const index = lines[0].trim();
+      const time = lines[1].trim();
+      const content = lines.slice(2).join("\n");
+      blocks.push({ index, time, text: content });
+    }
+    return blocks;
+  };
+
+  const buildSrt = (blocks) => {
+    return blocks.map(b => `${b.index}\n${b.time}\n${b.text}`).join("\n\n") + "\n";
+  };
+
+  const downloadSrt = (langId) => {
+    if (!srtMode || !results[langId]) return;
+    const lines = results[langId].split("\n");
+    const blocks = srtMode.blocks.map((b, i) => ({
+      index: b.index,
+      time: b.time,
+      text: lines[i] || b.text,
+    }));
+    const srtText = buildSrt(blocks);
+    const blob = new Blob([srtText], { type: "text/srt;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const lang = LANGUAGES.find(l => l.id === langId);
+    a.href = url;
+    a.download = `${srtMode.fileName.replace(/\.srt$/i, "")}_${lang?.sub || langId}.srt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  /* --- Simple CSV Parser --- */
+  const parseCsv = (text) => {
+    const lines = text.split("\n").filter(l => l.trim());
+    if (lines.length < 2) return null;
+    const header = lines[0].trim();
+    const rows = lines.slice(1).map(l => l.trim()).filter(Boolean);
+    return { header, rows };
+  };
+
+  const buildCsvOutput = (batchRes) => {
+    if (!csvMode || !batchRes) return "";
+    const langs = Object.keys(batchRes);
+    const headerParts = [csvMode.header, ...langs.map(id => LANGUAGES.find(l => l.id === id)?.sub || id)];
+    const outputLines = [headerParts.join(",")];
+    csvMode.rows.forEach((row, i) => {
+      const values = ['"' + row.replace(/"/g, '""') + '"'];
+      langs.forEach(langId => {
+        const val = batchRes[langId]?.[i] || "";
+        values.push('"' + val.replace(/"/g, '""') + '"');
+      });
+      outputLines.push(values.join(","));
+    });
+    return outputLines.join("\n");
+  };
+
+  const downloadCsv = () => {
+    const csvText = buildCsvOutput(batchResults);
+    if (!csvText) return;
+    const blob = new Blob([csvText], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${csvMode.fileName.replace(/\.csv$/i, "")}_converted.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  /* --- Batch Convert (CSV) --- */
+  const convertBatch = async () => {
+    if (!csvMode || selected.length === 0) return;
+    setLoading(true); setError(""); setBatchResults(null);
+    const total = csvMode.rows.length * selected.length;
+    let done = 0;
+    setBatchProgress({ done: 0, total });
+    const res = {};
+    for (const langId of selected) {
+      res[langId] = [];
+      const examples = FEW_SHOT_EXAMPLES[langId] || [];
+      for (let i = 0; i < csvMode.rows.length; i++) {
+        try {
+          const raw = await streamConvert({
+            model: "anthropic/claude-sonnet-4-5",
+            system: buildSingleConverterSystem(langId, tone),
+            messages: [...examples, { role: "user", content: csvMode.rows[i] }],
+          });
+          res[langId].push(raw.trim());
+        } catch (err) {
+          res[langId].push(`[Error: ${err.message}]`);
+        }
+        done++;
+        setBatchProgress({ done, total });
+      }
+    }
+    setBatchResults(res);
+    setLoading(false);
+    setBatchProgress(null);
+  };
+
+  /* --- File Upload Handler --- */
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const text = ev.target.result;
+      if (file.name.endsWith(".srt")) {
+        const blocks = parseSrt(text);
+        if (blocks.length > 0) {
+          setSrtMode({ blocks, fileName: file.name });
+          setCsvMode(null); setBatchResults(null);
+          setScript(blocks.map(b => b.text).join("\n"));
+        } else {
+          setScript(text);
+          setSrtMode(null); setCsvMode(null);
+        }
+      } else if (file.name.endsWith(".csv")) {
+        const parsed = parseCsv(text);
+        if (parsed && parsed.rows.length > 0) {
+          setCsvMode({ ...parsed, fileName: file.name });
+          setSrtMode(null); setBatchResults(null);
+          setScript(`[CSV: ${parsed.rows.length} rows loaded from ${file.name}]`);
+        } else {
+          setScript(text);
+          setCsvMode(null); setSrtMode(null);
+        }
+      } else {
+        setScript(text);
+        setSrtMode(null); setCsvMode(null);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
+
+  const formatAllResults = () => {
+    return selected
+      .filter(id => results[id])
+      .map(id => {
+        const lang = LANGUAGES.find(l => l.id === id);
+        return `=== ${lang?.label || id} (${lang?.sub || id}) ===\n${results[id]}`;
+      })
+      .join("\n\n");
+  };
+
+  const copyAll = () => {
+    navigator.clipboard.writeText(formatAllResults());
+    setCopied("__all__");
+    setTimeout(() => setCopied(""), 2000);
+  };
+
+  const downloadAll = () => {
+    const text = formatAllResults();
+    const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `ruhi-conversion-${new Date().toISOString().slice(0, 10)}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const wc = script.trim() ? script.trim().split(/\s+/).length : 0;
   const cp = Math.min((script.length / 2000) * 100, 100);
   const can = !loading && !!script.trim() && selected.length > 0;
 
   return (
-    <div style={{ fontFamily: "'Inter','Segoe UI',sans-serif", background: "#f0ebe3", minHeight: "100vh", color: "#1e1b18", position: "relative" }}>
+    <div className={darkMode ? "dark" : ""} style={{ fontFamily: "'Inter','Segoe UI',sans-serif", background: darkMode ? "#1a1510" : "#f0ebe3", minHeight: "100vh", color: darkMode ? "#e8e0d4" : "#1e1b18", position: "relative", transition: "background 0.3s, color 0.3s" }}>
       <style>{CSS}</style>
       <FireflyBackground />
 
       {/* Topbar */}
-      <div className="topbar-c" style={{ padding: "0 28px", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(145deg, #f5f0e8ee, #ece7ddee)", backdropFilter: "blur(20px)", position: "sticky", top: 0, zIndex: 20, borderBottom: "1px solid rgba(166,152,130,0.15)", boxShadow: "0 4px 12px rgba(166,152,130,0.15)" }}>
+      <div className="topbar-c" style={{ padding: "0 28px", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between", background: darkMode ? "linear-gradient(145deg, #231e14ee, #1c1810ee)" : "linear-gradient(145deg, #f5f0e8ee, #ece7ddee)", backdropFilter: "blur(20px)", position: "sticky", top: 0, zIndex: 20, borderBottom: `1px solid ${darkMode ? "rgba(60,50,35,0.3)" : "rgba(166,152,130,0.15)"}`, boxShadow: darkMode ? "0 4px 12px rgba(0,0,0,0.3)" : "0 4px 12px rgba(166,152,130,0.15)", transition: "background 0.3s" }}>
         <Logo />
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <button onClick={() => setHistoryOpen(true)} className="clay-btn" style={{ padding: "6px 14px", fontSize: "11px", fontWeight: 700, color: "#78350f", display: "flex", alignItems: "center", gap: "5px" }}>
+          <button onClick={() => { setDarkMode(d => { localStorage.setItem("ruhi_dark", d ? "0" : "1"); return !d; }); }} className="clay-btn" style={{ padding: "6px 12px", fontSize: "15px", lineHeight: 1 }} title={darkMode ? "Light Mode" : "Dark Mode"}>
+            {darkMode ? "\u2600\uFE0F" : "\u{1F319}"}
+          </button>
+          <button onClick={() => setHistoryOpen(true)} className="clay-btn" style={{ padding: "6px 14px", fontSize: "11px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#78350f", display: "flex", alignItems: "center", gap: "5px" }}>
             <span style={{ fontSize: "13px" }}>&#128218;</span> History
           </button>
           <div className="live-dot" style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11.5px", color: "#16a34a", padding: "5px 12px", borderRadius: "14px", background: "linear-gradient(145deg, #f0ebe3, #e4ddd1)", boxShadow: "3px 3px 6px rgba(166,152,130,0.3), -2px -2px 5px rgba(255,255,255,0.7), inset 0 1px 0 rgba(255,255,255,0.4)", border: "1px solid rgba(34,197,94,0.2)" }}>
@@ -1053,14 +1483,53 @@ export default function App() {
         {/* Language Cards */}
         <LanguageCards selected={selected} onToggle={toggleLang} onSelectAll={() => setSelected(LANGUAGES.map(l => l.id))} onDeselectAll={() => setSelected([LANGUAGES[0].id])} />
 
+        {/* Tone Selector */}
+        <div className="clay" style={{ padding: 0, marginBottom: "16px", overflow: "hidden" }}>
+          <div style={{ padding: "12px 22px", borderBottom: "1px solid rgba(166,152,130,0.12)", display: "flex", alignItems: "center", gap: "8px" }}>
+            <span style={{ fontSize: "14px" }}>{"\u{1F3AD}"}</span>
+            <span style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "1.2px", textTransform: "uppercase", color: darkMode ? "#d4c8b0" : "#78350f" }}>Tone</span>
+          </div>
+          <div style={{ padding: "12px 18px", display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            {TONES.map(t => {
+              const active = tone === t.id;
+              return (
+                <button key={t.id} onClick={() => setTone(t.id)} className="clay-btn" style={{
+                  padding: "8px 14px", fontSize: "11.5px", fontWeight: active ? 800 : 600,
+                  color: active ? "#d97706" : (darkMode ? "#a09080" : "#6b5e50"),
+                  background: active ? (darkMode ? "linear-gradient(145deg, rgba(217,119,6,0.15), rgba(217,119,6,0.05))" : "linear-gradient(145deg, rgba(245,158,11,0.12), rgba(245,158,11,0.05))") : undefined,
+                  border: active ? "1.5px solid rgba(245,158,11,0.3)" : undefined,
+                  display: "flex", alignItems: "center", gap: "5px"
+                }}>
+                  <span style={{ fontSize: "13px" }}>{t.icon}</span>
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Script Input */}
         <div className="clay ta-focus" style={{ marginBottom: "16px", overflow: "hidden" }}>
           <div style={{ padding: "14px 22px", borderBottom: "1px solid rgba(166,152,130,0.12)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <span>&#9997;&#65039;</span>
-              <span style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "1.2px", textTransform: "uppercase", color: "#78350f" }}>Script Input</span>
+              <span style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "1.2px", textTransform: "uppercase", color: darkMode ? "#d4c8b0" : "#78350f" }}>Script Input</span>
+              {srtMode && (
+                <span style={{ fontSize: "9px", fontWeight: 700, color: "#16a34a", background: "rgba(34,197,94,0.1)", padding: "2px 8px", borderRadius: "6px" }}>
+                  SRT &middot; {srtMode.blocks.length} blocks
+                </span>
+              )}
+              {csvMode && (
+                <span style={{ fontSize: "9px", fontWeight: 700, color: "#0891b2", background: "rgba(8,145,178,0.1)", padding: "2px 8px", borderRadius: "6px" }}>
+                  CSV &middot; {csvMode.rows.length} rows
+                </span>
+              )}
             </div>
-            <div style={{ display: "flex", gap: "14px" }}>
+            <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+              <input ref={fileInputRef} type="file" accept=".txt,.srt,.csv,.text" onChange={handleFileUpload} style={{ display: "none" }} />
+              <button onClick={() => fileInputRef.current?.click()} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#78350f" }}>
+                {"\u{1F4C1}"} Upload
+              </button>
               <span style={{ fontSize: "11px", color: "#92400e", fontWeight: 600 }}>{wc} words</span>
               <span style={{ fontSize: "11px", color: script.length > 2000 ? "#dc2626" : "#92400e", fontWeight: 600 }}>{script.length} chars</span>
             </div>
@@ -1078,7 +1547,7 @@ export default function App() {
           </div>
           <div style={{ padding: "14px 22px", borderTop: "1px solid rgba(166,152,130,0.1)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(166,152,130,0.04)", flexWrap: "wrap", gap: "8px" }}>
             <span style={{ fontSize: "11px", color: "#a08060", fontWeight: 500 }}>Ctrl + Enter</span>
-            <button onClick={convert} disabled={!can} className={can ? "clay-btn-primary" : "clay-btn-primary"} style={{
+            <button onClick={csvMode ? convertBatch : convert} disabled={!can} className={can ? "clay-btn-primary" : "clay-btn-primary"} style={{
               padding: "11px 28px", borderRadius: "14px", border: "none",
               cursor: can ? "pointer" : "not-allowed", fontSize: "13px",
               display: "inline-flex", alignItems: "center", gap: "7px",
@@ -1097,8 +1566,8 @@ export default function App() {
           </div>
         )}
 
-        {/* Loading */}
-        {loading && (
+        {/* Loading indicator (only when no streaming results yet) */}
+        {loading && Object.keys(results).length === 0 && (
           <div className="clay" style={{ padding: "40px 24px", textAlign: "center", marginBottom: "14px" }}>
             <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "18px" }}>
               {[0, 1, 2].map(i => <div key={i} style={{ width: "12px", height: "12px", borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#d97706)", boxShadow: "3px 3px 6px rgba(200,130,20,0.3), -2px -2px 4px rgba(255,220,150,0.4)", animation: `pulse 1.3s ${i * 0.22}s ease-in-out infinite` }} />)}
@@ -1112,29 +1581,115 @@ export default function App() {
           </div>
         )}
 
-        {/* Results */}
+        {/* Results (show during streaming and after completion) */}
         {Object.keys(results).length > 0 && (
           <>
-            <div className="clay" style={{ padding: "14px 20px", marginBottom: "14px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px", borderLeft: "4px solid #22c55e" }}>
+            <div className="clay" style={{ padding: "14px 20px", marginBottom: "14px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px", borderLeft: `4px solid ${loading ? "#f59e0b" : "#22c55e"}` }}>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <span style={{ fontSize: "18px", color: "#16a34a" }}>&#10004;</span>
+                {loading
+                  ? <span style={{ width: "18px", height: "18px", borderRadius: "50%", border: "2.5px solid rgba(245,158,11,0.3)", borderTopColor: "#f59e0b", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
+                  : <span style={{ fontSize: "18px", color: "#16a34a" }}>&#10004;</span>
+                }
                 <div>
-                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#1e1b18" }}>Conversion complete &mdash; {Object.keys(results).length} language{Object.keys(results).length > 1 ? "s" : ""}</div>
-                  <div style={{ fontSize: "10.5px", color: "#78350f" }}>Ready to copy & use</div>
+                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#1e1b18" }}>
+                    {loading
+                      ? `Converting... ${Object.keys(results).length}/${selected.length} languages`
+                      : `Conversion complete \u2014 ${Object.keys(results).length} language${Object.keys(results).length > 1 ? "s" : ""}`
+                    }
+                  </div>
+                  <div style={{ fontSize: "10.5px", color: "#78350f" }}>{loading ? "Results appear as they stream in" : "Ready to copy & use"}</div>
                 </div>
               </div>
-              <button onClick={() => { setResults({}); setScript(""); }} className="clay-btn" style={{ padding: "6px 14px", fontSize: "11px", fontWeight: 700, color: "#6b5e50" }}>New Script</button>
+              {!loading && (
+                <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+                  <button onClick={copyAll} className="clay-btn" style={{ padding: "6px 14px", fontSize: "11px", fontWeight: 700, color: copied === "__all__" ? "#16a34a" : "#78350f" }}>
+                    {copied === "__all__" ? "\u2713 Copied All" : "\u{1F4CB} Copy All"}
+                  </button>
+                  <button onClick={downloadAll} className="clay-btn" style={{ padding: "6px 14px", fontSize: "11px", fontWeight: 700, color: "#78350f" }}>
+                    {"\u2B07"} Download
+                  </button>
+                  <button onClick={() => { setResults({}); setScript(""); }} className="clay-btn" style={{ padding: "6px 14px", fontSize: "11px", fontWeight: 700, color: "#6b5e50" }}>New Script</button>
+                </div>
+              )}
             </div>
             {selected.map(langId => {
               const lang = LANGUAGES.find(l => l.id === langId);
-              return results[langId] ? <ResultCard key={langId} result={results[langId]} lang={lang} copied={copied} onCopy={copy} /> : null;
+              return results[langId] ? <ResultCard key={langId} result={results[langId]} lang={lang} copied={copied} onCopy={copy} isStreaming={!!streaming[langId]} srtMode={srtMode} onDownloadSrt={downloadSrt} /> : null;
             })}
           </>
+        )}
+
+        {/* Batch CSV Progress */}
+        {batchProgress && (
+          <div className="clay" style={{ padding: "20px 24px", textAlign: "center", marginBottom: "14px" }}>
+            <div style={{ fontSize: "14px", color: darkMode ? "#d4c8b0" : "#78350f", fontWeight: 700, marginBottom: "10px" }}>
+              Batch converting... {batchProgress.done}/{batchProgress.total}
+            </div>
+            <div style={{ height: "6px", borderRadius: "3px", background: darkMode ? "rgba(60,50,35,0.3)" : "rgba(166,152,130,0.15)", overflow: "hidden" }}>
+              <div style={{ height: "100%", width: `${(batchProgress.done / batchProgress.total) * 100}%`, borderRadius: "3px", background: "linear-gradient(90deg,#f59e0b,#d97706)", transition: "width 0.3s" }} />
+            </div>
+          </div>
+        )}
+
+        {/* Batch CSV Results */}
+        {batchResults && csvMode && (
+          <div className="clay" style={{ padding: "18px", marginBottom: "14px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+              <div>
+                <div style={{ fontSize: "14px", fontWeight: 700, color: darkMode ? "#e8e0d4" : "#1e1b18" }}>
+                  {"\u2705"} Batch complete — {csvMode.rows.length} rows &times; {Object.keys(batchResults).length} languages
+                </div>
+                <div style={{ fontSize: "11px", color: "#92400e", marginTop: "2px" }}>
+                  {Object.keys(batchResults).map(id => LANGUAGES.find(l => l.id === id)?.label).join(", ")}
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button onClick={downloadCsv} className="clay-btn" style={{ padding: "8px 16px", fontSize: "12px", fontWeight: 700, color: "#16a34a" }}>
+                  {"\u2B07"} Download CSV
+                </button>
+                <button onClick={() => { setBatchResults(null); setCsvMode(null); setScript(""); }} className="clay-btn" style={{ padding: "8px 16px", fontSize: "12px", fontWeight: 700, color: "#6b5e50" }}>
+                  New
+                </button>
+              </div>
+            </div>
+            {/* Preview table */}
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "11px" }}>
+                <thead>
+                  <tr>
+                    <th style={{ padding: "8px 10px", textAlign: "left", borderBottom: `1px solid ${darkMode ? "rgba(60,50,35,0.3)" : "rgba(166,152,130,0.2)"}`, color: darkMode ? "#a09080" : "#78350f", fontWeight: 700 }}>Original</th>
+                    {Object.keys(batchResults).map(id => (
+                      <th key={id} style={{ padding: "8px 10px", textAlign: "left", borderBottom: `1px solid ${darkMode ? "rgba(60,50,35,0.3)" : "rgba(166,152,130,0.2)"}`, color: LANGUAGES.find(l => l.id === id)?.color, fontWeight: 700 }}>
+                        {LANGUAGES.find(l => l.id === id)?.label}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {csvMode.rows.slice(0, 10).map((row, i) => (
+                    <tr key={i}>
+                      <td style={{ padding: "6px 10px", borderBottom: `1px solid ${darkMode ? "rgba(60,50,35,0.15)" : "rgba(166,152,130,0.1)"}`, maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row}</td>
+                      {Object.keys(batchResults).map(id => (
+                        <td key={id} style={{ padding: "6px 10px", borderBottom: `1px solid ${darkMode ? "rgba(60,50,35,0.15)" : "rgba(166,152,130,0.1)"}`, maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {batchResults[id]?.[i] || "—"}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {csvMode.rows.length > 10 && (
+                <div style={{ fontSize: "10px", color: "#a08060", textAlign: "center", padding: "8px" }}>
+                  Showing 10 of {csvMode.rows.length} rows. Download CSV for full results.
+                </div>
+              )}
+            </div>
+          </div>
         )}
       </div>
 
       {/* Footer */}
-      <div style={{ borderTop: "1px solid rgba(166,152,130,0.15)", padding: "16px 28px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "7px", background: "linear-gradient(145deg, #f0ebe3, #e8e0d4)" }}>
+      <div style={{ borderTop: `1px solid ${darkMode ? "rgba(60,50,35,0.3)" : "rgba(166,152,130,0.15)"}`, padding: "16px 28px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "7px", background: darkMode ? "linear-gradient(145deg, #1a1510, #151008)" : "linear-gradient(145deg, #f0ebe3, #e8e0d4)", transition: "background 0.3s" }}>
         <div style={{ fontSize: "11.5px", fontWeight: 500, display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
           <span style={{ color: "#92400e" }}>Powered by</span>
           <span className="gold-shine">Claude</span>
