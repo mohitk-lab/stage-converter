@@ -1367,7 +1367,7 @@ export default function App() {
   const [ttsEnabled, setTtsEnabled] = useState(false);
   const [voices, setVoices] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState("");
-  const [ttsModel, setTtsModel] = useState("eleven_multilingual_v2");
+  const [ttsModel, setTtsModel] = useState("eleven_multilingual_v3");
   const [ttsSettings, setTtsSettings] = useState({ stability: 0.5, similarity_boost: 0.75, style: 0, speed: 1.0, use_speaker_boost: true });
   const [ttsGenerating, setTtsGenerating] = useState({});
   const [audioUrls, setAudioUrls] = useState({});
@@ -1904,9 +1904,11 @@ export default function App() {
                     <div className="tts-field">
                       <label>Model</label>
                       <select className="clay-inner" value={ttsModel} onChange={e => setTtsModel(e.target.value)}>
-                        <option value="eleven_multilingual_v2">Multilingual v2 (Best Quality)</option>
-                        <option value="eleven_flash_v2_5">Flash v2.5 (Fast)</option>
-                        <option value="eleven_flash_v2">Flash v2 (Fast)</option>
+                        <option value="eleven_multilingual_v3">Multilingual v3 (Latest)</option>
+                        <option value="eleven_flash_v3">Flash v3 (Fast)</option>
+                        <option value="eleven_multilingual_v2">Multilingual v2</option>
+                        <option value="eleven_flash_v2_5">Flash v2.5</option>
+                        <option value="eleven_flash_v2">Flash v2</option>
                         <option value="eleven_monolingual_v1">English v1</option>
                       </select>
                     </div>
