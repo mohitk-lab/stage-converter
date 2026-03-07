@@ -830,6 +830,127 @@ function ResultCard({ result, lang, copied, onCopy }) {
   );
 }
 
+/* --- History Sidebar --- */
+function HistorySidebar({ open, onClose, onLoad }) {
+  const [history, setHistory] = useState([]);
+  const [expandedId, setExpandedId] = useState(null);
+
+  useState(() => {
+    const raw = localStorage.getItem("ruhi_history");
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
+        setHistory(parsed.filter(h => h.id > cutoff));
+      } catch {}
+    }
+  }, [open]);
+
+  const clearHistory = () => {
+    localStorage.removeItem("ruhi_history");
+    setHistory([]);
+  };
+
+  const deleteEntry = (id) => {
+    const updated = history.filter(h => h.id !== id);
+    setHistory(updated);
+    localStorage.setItem("ruhi_history", JSON.stringify(updated));
+  };
+
+  const formatDate = (iso) => {
+    const d = new Date(iso);
+    const now = new Date();
+    const diff = now - d;
+    if (diff < 60000) return "Just now";
+    if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
+    if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
+    if (diff < 172800000) return "Yesterday";
+    return d.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+  };
+
+  if (!open) return null;
+
+  return (
+    <>
+      <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.2)", zIndex: 50, backdropFilter: "blur(3px)" }} />
+      <div style={{
+        position: "fixed", top: 0, right: 0, bottom: 0, width: "340px", maxWidth: "90vw",
+        background: "linear-gradient(180deg, #f5f0e8, #ece7dd)", zIndex: 51,
+        boxShadow: "-8px 0 24px rgba(166,152,130,0.3), -2px 0 8px rgba(255,255,255,0.5)",
+        display: "flex", flexDirection: "column", animation: "slideIn 0.25s ease",
+        borderLeft: "1px solid rgba(255,255,255,0.5)"
+      }}>
+        <style>{`@keyframes slideIn{from{transform:translateX(100%);}to{transform:translateX(0);}}`}</style>
+        {/* Header */}
+        <div style={{ padding: "18px 20px", borderBottom: "1px solid rgba(166,152,130,0.15)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <span style={{ fontSize: "16px" }}>&#128218;</span>
+            <span style={{ fontSize: "14px", fontWeight: 800, color: "#78350f" }}>History</span>
+            <span style={{ fontSize: "10px", color: "#92400e", background: "rgba(245,158,11,0.1)", padding: "2px 8px", borderRadius: "8px", fontWeight: 600 }}>{history.length}</span>
+          </div>
+          <div style={{ display: "flex", gap: "8px" }}>
+            {history.length > 0 && (
+              <button onClick={clearHistory} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: "#dc2626" }}>Clear All</button>
+            )}
+            <button onClick={onClose} className="clay-btn" style={{ padding: "4px 10px", fontSize: "12px", fontWeight: 700, color: "#6b5e50" }}>&#10005;</button>
+          </div>
+        </div>
+
+        {/* List */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
+          {history.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "40px 20px", color: "#a08060" }}>
+              <div style={{ fontSize: "32px", marginBottom: "12px" }}>&#128196;</div>
+              <div style={{ fontSize: "13px", fontWeight: 600 }}>No history yet</div>
+              <div style={{ fontSize: "11px", marginTop: "4px" }}>Converted scripts will appear here for 30 days</div>
+            </div>
+          ) : (
+            history.map(entry => {
+              const isExpanded = expandedId === entry.id;
+              const preview = entry.input.length > 60 ? entry.input.slice(0, 60) + "..." : entry.input;
+              const langNames = (entry.langs || []).map(id => LANGUAGES.find(l => l.id === id)?.label || id).join(", ");
+              return (
+                <div key={entry.id} className="clay" style={{ marginBottom: "10px", padding: 0, overflow: "hidden", borderRadius: "16px" }}>
+                  <div onClick={() => setExpandedId(isExpanded ? null : entry.id)} style={{ padding: "12px 14px", cursor: "pointer" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "8px" }}>
+                      <div style={{ fontSize: "12px", fontWeight: 700, color: "#3d3425", lineHeight: 1.5, flex: 1 }}>{preview}</div>
+                      <span style={{ fontSize: "10px", color: "#a08060", whiteSpace: "nowrap", flexShrink: 0 }}>{formatDate(entry.date)}</span>
+                    </div>
+                    <div style={{ fontSize: "10px", color: "#92400e", marginTop: "4px" }}>{langNames}</div>
+                  </div>
+                  {isExpanded && (
+                    <div style={{ borderTop: "1px solid rgba(166,152,130,0.12)", padding: "10px 14px", background: "rgba(166,152,130,0.04)" }}>
+                      <div className="clay-inner" style={{ padding: "10px 12px", fontSize: "11px", color: "#3d3425", lineHeight: 1.7, whiteSpace: "pre-wrap", marginBottom: "8px", maxHeight: "120px", overflowY: "auto" }}>{entry.input}</div>
+                      {entry.results && Object.entries(entry.results).map(([langId, text]) => {
+                        const lang = LANGUAGES.find(l => l.id === langId);
+                        return (
+                          <div key={langId} style={{ marginBottom: "6px" }}>
+                            <div style={{ fontSize: "10px", fontWeight: 700, color: lang?.color || "#78350f", marginBottom: "3px" }}>{lang?.label || langId}</div>
+                            <div className="clay-inner" style={{ padding: "8px 10px", fontSize: "11px", color: "#3d3425", lineHeight: 1.6, whiteSpace: "pre-wrap", maxHeight: "80px", overflowY: "auto" }}>{text}</div>
+                          </div>
+                        );
+                      })}
+                      <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
+                        <button onClick={() => { onLoad(entry); onClose(); }} className="clay-btn" style={{ padding: "5px 12px", fontSize: "10px", fontWeight: 700, color: "#78350f", flex: 1 }}>Load Script</button>
+                        <button onClick={() => deleteEntry(entry.id)} className="clay-btn" style={{ padding: "5px 12px", fontSize: "10px", fontWeight: 700, color: "#dc2626" }}>Delete</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Footer */}
+        <div style={{ padding: "12px 16px", borderTop: "1px solid rgba(166,152,130,0.12)", fontSize: "10px", color: "#a08060", textAlign: "center" }}>
+          Scripts auto-delete after 30 days
+        </div>
+      </div>
+    </>
+  );
+}
+
 /* ==============================
    ROOT APP
 ============================== */
@@ -840,6 +961,13 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState("");
+  const [historyOpen, setHistoryOpen] = useState(false);
+
+  const loadFromHistory = (entry) => {
+    setScript(entry.input);
+    setSelected(entry.langs || ["hindi"]);
+    setResults(entry.results || {});
+  };
 
   const toggleLang = (id) => {
     setSelected(prev =>
@@ -852,18 +980,36 @@ export default function App() {
     setLoading(true); setError(""); setResults({});
     try {
       const promises = selected.map(async (langId) => {
-        const examples = FEW_SHOT_EXAMPLES[langId] || [];
-        const raw = await streamConvert({
-          model: "anthropic/claude-sonnet-4-5",
-          system: buildSingleConverterSystem(langId),
-          messages: [...examples, { role: "user", content: script }]
-        });
-        return { langId, text: raw.trim() };
+        try {
+          const examples = FEW_SHOT_EXAMPLES[langId] || [];
+          const raw = await streamConvert({
+            model: "anthropic/claude-sonnet-4-5",
+            system: buildSingleConverterSystem(langId),
+            messages: [...examples, { role: "user", content: script }]
+          });
+          return { langId, text: raw.trim(), ok: true };
+        } catch (err) {
+          return { langId, text: "", ok: false, err: err.message };
+        }
       });
       const all = await Promise.all(promises);
       const map = {};
-      all.forEach(r => { map[r.langId] = r.text; });
+      const errors = [];
+      all.forEach(r => {
+        if (r.ok) map[r.langId] = r.text;
+        else errors.push(`${r.langId}: ${r.err}`);
+      });
       setResults(map);
+      if (errors.length > 0 && Object.keys(map).length === 0) setError(errors.join("; "));
+      // Save to history
+      if (Object.keys(map).length > 0) {
+        const entry = { id: Date.now(), input: script, results: map, langs: selected, date: new Date().toISOString() };
+        const hist = JSON.parse(localStorage.getItem("ruhi_history") || "[]");
+        hist.unshift(entry);
+        const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
+        const filtered = hist.filter(h => h.id > cutoff).slice(0, 100);
+        localStorage.setItem("ruhi_history", JSON.stringify(filtered));
+      }
     } catch (e) {
       setError(e.message);
     }
@@ -884,9 +1030,14 @@ export default function App() {
       {/* Topbar */}
       <div className="topbar-c" style={{ padding: "0 28px", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(145deg, #f5f0e8ee, #ece7ddee)", backdropFilter: "blur(20px)", position: "sticky", top: 0, zIndex: 20, borderBottom: "1px solid rgba(166,152,130,0.15)", boxShadow: "0 4px 12px rgba(166,152,130,0.15)" }}>
         <Logo />
-        <div className="live-dot" style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11.5px", color: "#16a34a", padding: "5px 12px", borderRadius: "14px", background: "linear-gradient(145deg, #f0ebe3, #e4ddd1)", boxShadow: "3px 3px 6px rgba(166,152,130,0.3), -2px -2px 5px rgba(255,255,255,0.7), inset 0 1px 0 rgba(255,255,255,0.4)", border: "1px solid rgba(34,197,94,0.2)" }}>
-          <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
-          Connected
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <button onClick={() => setHistoryOpen(true)} className="clay-btn" style={{ padding: "6px 14px", fontSize: "11px", fontWeight: 700, color: "#78350f", display: "flex", alignItems: "center", gap: "5px" }}>
+            <span style={{ fontSize: "13px" }}>&#128218;</span> History
+          </button>
+          <div className="live-dot" style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11.5px", color: "#16a34a", padding: "5px 12px", borderRadius: "14px", background: "linear-gradient(145deg, #f0ebe3, #e4ddd1)", boxShadow: "3px 3px 6px rgba(166,152,130,0.3), -2px -2px 5px rgba(255,255,255,0.7), inset 0 1px 0 rgba(255,255,255,0.4)", border: "1px solid rgba(34,197,94,0.2)" }}>
+            <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
+            Connected
+          </div>
         </div>
       </div>
 
@@ -993,6 +1144,9 @@ export default function App() {
         </div>
         <div style={{ fontSize: "10.5px", color: "#a08060" }}>{LANGUAGES.length} languages &middot; Multi-select &middot; Auto-detect</div>
       </div>
+
+      {/* History Sidebar */}
+      <HistorySidebar open={historyOpen} onClose={() => setHistoryOpen(false)} onLoad={loadFromHistory} />
     </div>
   );
 }
