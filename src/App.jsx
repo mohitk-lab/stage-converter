@@ -505,6 +505,15 @@ const CSS = `
   @keyframes goldShine {0%{background-position:-200% center;}100%{background-position:200% center;}}
   @keyframes float     {0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
   @keyframes connPulse {0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4);}60%{box-shadow:0 0 0 5px rgba(34,197,94,0);}}
+  @keyframes fireflyDrift {
+    0%   { transform: translate(0,0) scale(1); opacity:0; }
+    10%  { opacity:0.7; }
+    30%  { opacity:0.15; }
+    50%  { opacity:0.8; transform: translate(var(--dx), var(--dy)) scale(1.1); }
+    70%  { opacity:0.1; }
+    90%  { opacity:0.65; }
+    100% { transform: translate(calc(var(--dx)*-0.5), calc(var(--dy)*1.5)) scale(0.9); opacity:0; }
+  }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #f0ebe3; font-family: 'Inter','Segoe UI',sans-serif; }
@@ -629,6 +638,73 @@ function Logo() {
         <div style={{ fontSize: "15px", fontWeight: 900, letterSpacing: "-0.5px", lineHeight: 1.1, color: "#78350f" }}>Ruhi</div>
         <div style={{ fontSize: "8px", color: "#92400e", letterSpacing: "1.8px", fontWeight: 700, textTransform: "uppercase" }}>Script Converter</div>
       </div>
+    </div>
+  );
+}
+
+/* --- Firefly Background --- */
+const FIREFLY_WORDS = [
+  { text: "\u0928\u092E\u0938\u094D\u0924\u0947", color: "#f97316" },
+  { text: "Hello", color: "#3b82f6" },
+  { text: "\u0930\u093E\u092E \u0930\u093E\u092E", color: "#22c55e" },
+  { text: "\u0918\u0923\u094B", color: "#eab308" },
+  { text: "\u092C\u093E", color: "#ef4444" },
+  { text: "\u0A95\u0AC7\u0AAE \u0A9B\u0ACB", color: "#a855f7" },
+  { text: "\u092D\u093E\u0937\u093E", color: "#f97316" },
+  { text: "Script", color: "#3b82f6" },
+  { text: "\u0938\u0948", color: "#22c55e" },
+  { text: "\u091B\u0947", color: "#eab308" },
+  { text: "\u092C\u093E\u0928\u0940", color: "#ef4444" },
+  { text: "\u0AAD\u0ABE\u0A88", color: "#a855f7" },
+  { text: "\u092F\u093E\u0930", color: "#22c55e" },
+  { text: "Convert", color: "#3b82f6" },
+  { text: "\u0936\u092C\u094D\u0926", color: "#f97316" },
+  { text: "\u0915\u094B\u0923\u0940", color: "#eab308" },
+  { text: "\u0928\u093E\u0939\u0940\u0902", color: "#ef4444" },
+  { text: "\u0AB8\u0ABE\u0AB0\u0AC1\u0A82", color: "#a855f7" },
+  { text: "Ruhi", color: "#d97706" },
+  { text: "\u0939\u093F\u0928\u094D\u0926\u0940", color: "#f97316" },
+  { text: "\u0918\u0923\u093E", color: "#22c55e" },
+  { text: "\u0915\u093E\u0939\u0947", color: "#ef4444" },
+  { text: "Language", color: "#3b82f6" },
+  { text: "\u0AAA\u0ABE\u0AA3\u0AC0", color: "#a855f7" },
+];
+
+function FireflyBackground() {
+  const fireflies = FIREFLY_WORDS.map((fw, i) => {
+    const seed = i * 137.508;
+    const left = ((seed * 3.17) % 90 + 5).toFixed(1);
+    const top = ((seed * 2.31) % 85 + 5).toFixed(1);
+    const dur = (12 + (seed * 0.43) % 18).toFixed(1);
+    const delay = (-(seed * 0.67) % 20).toFixed(1);
+    const dx = ((i % 2 === 0 ? 1 : -1) * (30 + (seed % 60))).toFixed(0);
+    const dy = ((i % 3 === 0 ? -1 : 1) * (20 + (seed % 40))).toFixed(0);
+    const size = (11 + (i * 1.3) % 6).toFixed(0);
+    return (
+      <span key={i} style={{
+        position: "absolute",
+        left: `${left}%`,
+        top: `${top}%`,
+        fontSize: `${size}px`,
+        fontWeight: 700,
+        color: fw.color,
+        opacity: 0,
+        pointerEvents: "none",
+        userSelect: "none",
+        textShadow: `0 0 8px ${fw.color}60, 0 0 20px ${fw.color}30`,
+        animation: `fireflyDrift ${dur}s ${delay}s ease-in-out infinite`,
+        "--dx": `${dx}px`,
+        "--dy": `${dy}px`,
+        filter: `drop-shadow(0 0 6px ${fw.color}40)`,
+        fontFamily: "'Inter', serif",
+        letterSpacing: "0.5px",
+      }}>{fw.text}</span>
+    );
+  });
+
+  return (
+    <div style={{ position: "fixed", inset: 0, overflow: "hidden", pointerEvents: "none", zIndex: 0 }}>
+      {fireflies}
     </div>
   );
 }
@@ -761,11 +837,12 @@ export default function App() {
   const can = !loading && !!script.trim() && selected.length > 0;
 
   return (
-    <div style={{ fontFamily: "'Inter','Segoe UI',sans-serif", background: "#f0ebe3", minHeight: "100vh", color: "#1e1b18" }}>
+    <div style={{ fontFamily: "'Inter','Segoe UI',sans-serif", background: "#f0ebe3", minHeight: "100vh", color: "#1e1b18", position: "relative" }}>
       <style>{CSS}</style>
+      <FireflyBackground />
 
       {/* Topbar */}
-      <div className="topbar-c" style={{ padding: "0 28px", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(145deg, #f5f0e8ee, #ece7ddee)", backdropFilter: "blur(20px)", position: "sticky", top: 0, zIndex: 10, borderBottom: "1px solid rgba(166,152,130,0.15)", boxShadow: "0 4px 12px rgba(166,152,130,0.15)" }}>
+      <div className="topbar-c" style={{ padding: "0 28px", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "linear-gradient(145deg, #f5f0e8ee, #ece7ddee)", backdropFilter: "blur(20px)", position: "sticky", top: 0, zIndex: 20, borderBottom: "1px solid rgba(166,152,130,0.15)", boxShadow: "0 4px 12px rgba(166,152,130,0.15)" }}>
         <Logo />
         <div className="live-dot" style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11.5px", color: "#16a34a", padding: "5px 12px", borderRadius: "14px", background: "linear-gradient(145deg, #f0ebe3, #e4ddd1)", boxShadow: "3px 3px 6px rgba(166,152,130,0.3), -2px -2px 5px rgba(255,255,255,0.7), inset 0 1px 0 rgba(255,255,255,0.4)", border: "1px solid rgba(34,197,94,0.2)" }}>
           <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
@@ -774,7 +851,7 @@ export default function App() {
       </div>
 
       {/* Main */}
-      <div className="main-c" style={{ maxWidth: "800px", margin: "0 auto", padding: "36px 22px 80px" }}>
+      <div className="main-c" style={{ maxWidth: "800px", margin: "0 auto", padding: "36px 22px 80px", position: "relative", zIndex: 1 }}>
 
         {/* Title */}
         <div style={{ textAlign: "center", marginBottom: "8px" }}>
