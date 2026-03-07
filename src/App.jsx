@@ -710,16 +710,12 @@ const CSS = `
   @keyframes float     {0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
   @keyframes connPulse {0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4);}60%{box-shadow:0 0 0 5px rgba(34,197,94,0);}}
   @keyframes fireflyDrift {
-    0%   { transform: translate(0,0) scale(1); opacity:0; filter: drop-shadow(0 0 4px var(--glow)) brightness(0.8); }
-    8%   { opacity:0.9; filter: drop-shadow(0 0 18px var(--glow)) brightness(1.3); }
-    20%  { opacity:0.15; filter: drop-shadow(0 0 6px var(--glow)) brightness(0.9); }
-    35%  { opacity:0.95; transform: translate(calc(var(--dx)*0.3), calc(var(--dy)*0.3)) scale(1.06); filter: drop-shadow(0 0 22px var(--glow)) brightness(1.4); }
-    48%  { opacity:0.1; filter: drop-shadow(0 0 4px var(--glow)) brightness(0.8); }
-    60%  { opacity:0.85; transform: translate(calc(var(--dx)*0.7), calc(var(--dy)*0.7)) scale(1.1); filter: drop-shadow(0 0 20px var(--glow)) brightness(1.35); }
-    72%  { opacity:0.12; filter: drop-shadow(0 0 5px var(--glow)) brightness(0.85); }
-    82%  { opacity:0.8; transform: translate(var(--dx), var(--dy)) scale(1.12); filter: drop-shadow(0 0 24px var(--glow)) brightness(1.5); }
-    92%  { opacity:0.2; filter: drop-shadow(0 0 8px var(--glow)) brightness(0.9); }
-    100% { transform: translate(calc(var(--dx)*-0.5), calc(var(--dy)*1.5)) scale(0.95); opacity:0; filter: drop-shadow(0 0 4px var(--glow)) brightness(0.8); }
+    0%   { transform: translate(0,0) scale(1); opacity:0; }
+    15%  { opacity:0.7; }
+    40%  { opacity:0.85; transform: translate(calc(var(--dx)*0.4), calc(var(--dy)*0.4)) scale(1.05); }
+    60%  { opacity:0.7; transform: translate(calc(var(--dx)*0.7), calc(var(--dy)*0.7)) scale(1.08); }
+    80%  { opacity:0.5; transform: translate(var(--dx), var(--dy)) scale(1.03); }
+    100% { transform: translate(calc(var(--dx)*1.2), calc(var(--dy)*1.3)) scale(0.98); opacity:0; }
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -835,44 +831,44 @@ const CSS = `
   }
   @media(max-width:400px){.ruhi-title{font-size:36px !important;}}
 
-  /* Dark Mode */
-  .dark body, .dark { background: #1a1510; color: #e8e0d4; }
+  /* Dark Mode — Pure Black */
+  .dark body, .dark { background: #000000; color: #e8e0d4; }
   .dark .clay {
-    background: linear-gradient(145deg, #2a2218, #1e1a12);
-    box-shadow: 8px 8px 16px rgba(0,0,0,0.5), -6px -6px 14px rgba(60,50,35,0.3), inset 0 2px 0 rgba(60,50,35,0.4), inset 0 -1px 0 rgba(0,0,0,0.2);
-    border: 1px solid rgba(60,50,35,0.3);
+    background: linear-gradient(145deg, #111111, #0a0a0a);
+    box-shadow: 8px 8px 16px rgba(0,0,0,0.7), -6px -6px 14px rgba(255,255,255,0.03), inset 0 2px 0 rgba(255,255,255,0.05), inset 0 -1px 0 rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.08);
   }
   .dark .clay-inner {
-    background: linear-gradient(145deg, #231e14, #1c1810);
-    box-shadow: inset 4px 4px 8px rgba(0,0,0,0.4), inset -3px -3px 6px rgba(60,50,35,0.2);
-    border: 1px solid rgba(60,50,35,0.2);
+    background: linear-gradient(145deg, #0d0d0d, #080808);
+    box-shadow: inset 4px 4px 8px rgba(0,0,0,0.5), inset -3px -3px 6px rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
     color: #e8e0d4 !important;
   }
   .dark .clay-btn {
-    background: linear-gradient(145deg, #2a2218, #1e1a12);
-    box-shadow: 5px 5px 10px rgba(0,0,0,0.4), -4px -4px 8px rgba(60,50,35,0.2), inset 0 1px 0 rgba(60,50,35,0.3);
-    border: 1px solid rgba(60,50,35,0.3);
+    background: linear-gradient(145deg, #111111, #0a0a0a);
+    box-shadow: 5px 5px 10px rgba(0,0,0,0.5), -4px -4px 8px rgba(255,255,255,0.03), inset 0 1px 0 rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
     color: #d4c8b0;
   }
-  .dark .clay-btn:hover { box-shadow: 3px 3px 6px rgba(0,0,0,0.5), -2px -2px 5px rgba(60,50,35,0.2); }
+  .dark .clay-btn:hover { box-shadow: 3px 3px 6px rgba(0,0,0,0.6), -2px -2px 5px rgba(255,255,255,0.03); }
   .dark .clay-btn-primary { background: linear-gradient(145deg, #d4880a, #b87308); }
-  .dark .clay-btn-primary:disabled { background: linear-gradient(145deg, #3a3228, #2e281e); color: #6b5e50; }
+  .dark .clay-btn-primary:disabled { background: linear-gradient(145deg, #1a1a1a, #111111); color: #807060; }
   .dark textarea { color: #e8e0d4 !important; }
-  .dark textarea::placeholder { color: #6b5e50 !important; }
+  .dark textarea::placeholder { color: #807060 !important; }
   .dark input { color: #e8e0d4 !important; }
-  .dark input::placeholder { color: #6b5e50 !important; }
+  .dark input::placeholder { color: #807060 !important; }
   .dark select { color: #e8e0d4 !important; }
-  .dark option { background: #1e1a12; color: #e8e0d4; }
+  .dark option { background: #0a0a0a; color: #e8e0d4; }
   .dark .lang-chip {
-    background: linear-gradient(145deg, #2a2218, #1e1a12) !important;
-    border-color: rgba(60,50,35,0.3) !important;
-    box-shadow: 4px 4px 10px rgba(0,0,0,0.4), -3px -3px 8px rgba(60,50,35,0.2), inset 0 1px 0 rgba(60,50,35,0.3) !important;
+    background: linear-gradient(145deg, #111111, #0a0a0a) !important;
+    border-color: rgba(255,255,255,0.08) !important;
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.5), -3px -3px 8px rgba(255,255,255,0.03), inset 0 1px 0 rgba(255,255,255,0.05) !important;
   }
   .dark .lang-chip[style*="border: 2px"] {
-    box-shadow: 4px 4px 10px rgba(0,0,0,0.4), -3px -3px 8px rgba(60,50,35,0.2), inset 0 1px 0 rgba(60,50,35,0.3) !important;
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.5), -3px -3px 8px rgba(255,255,255,0.03), inset 0 1px 0 rgba(255,255,255,0.05) !important;
   }
   .dark .ta-focus textarea { color: #e8e0d4 !important; }
-  .dark .ta-focus textarea::placeholder { color: #6b5e50 !important; }
+  .dark .ta-focus textarea::placeholder { color: #807060 !important; }
 
   /* Logo shine */
   .ruhi-logo-shine {
@@ -894,59 +890,59 @@ const CSS = `
 
   /* --- Dark mode: comprehensive color overrides --- */
   /* Logo */
-  .dark .ruhi-logo-sub { color: #a09080 !important; }
+  .dark .ruhi-logo-sub { color: #b0a090 !important; }
 
   /* Language cards text */
   .dark .lang-name { color: #e8e0d4 !important; }
-  .dark .lang-name-off { color: #a09080 !important; }
-  .dark .lang-sub { color: #a09080 !important; }
+  .dark .lang-name-off { color: #b0a090 !important; }
+  .dark .lang-sub { color: #b0a090 !important; }
   .dark .lang-header-text { color: #d4c8b0 !important; }
-  .dark .lang-header-count { color: #a09080 !important; }
+  .dark .lang-header-count { color: #b0a090 !important; }
   .dark .lang-header-btn { color: #d4c8b0 !important; }
-  .dark .lang-wc { color: #a09080 !important; background: rgba(245,158,11,0.12) !important; }
-  .dark .lang-icon-off { color: #6b5e50 !important; background: linear-gradient(145deg, #2a2218, #1e1a12) !important; }
+  .dark .lang-wc { color: #b0a090 !important; background: rgba(245,158,11,0.12) !important; }
+  .dark .lang-icon-off { color: #807060 !important; background: linear-gradient(145deg, #111111, #0a0a0a) !important; }
 
   /* Result cards */
   .dark .result-lang-name { color: #e8e0d4 !important; }
-  .dark .result-sub { color: #a09080 !important; }
+  .dark .result-sub { color: #b0a090 !important; }
 
   /* Results header */
   .dark .results-title { color: #e8e0d4 !important; }
-  .dark .results-sub { color: #a09080 !important; }
+  .dark .results-sub { color: #b0a090 !important; }
   .dark .results-btn { color: #d4c8b0 !important; }
 
   /* Loading / progress */
   .dark .loading-text { color: #d4c8b0 !important; }
-  .dark .loading-sub { color: #a09080 !important; }
+  .dark .loading-sub { color: #b0a090 !important; }
 
   /* Script Input area */
-  .dark .word-count-text { color: #a09080 !important; }
-  .dark .char-count-text { color: #a09080 !important; }
-  .dark .ctrl-hint { color: #6b5e50 !important; }
+  .dark .word-count-text { color: #b0a090 !important; }
+  .dark .char-count-text { color: #b0a090 !important; }
+  .dark .ctrl-hint { color: #807060 !important; }
 
   /* History sidebar */
   .dark .history-panel {
-    background: linear-gradient(180deg, #1e1a12, #1a1510) !important;
-    box-shadow: -8px 0 24px rgba(0,0,0,0.5) !important;
-    border-left: 1px solid rgba(60,50,35,0.3) !important;
+    background: linear-gradient(180deg, #0a0a0a, #000000) !important;
+    box-shadow: -8px 0 24px rgba(0,0,0,0.7) !important;
+    border-left: 1px solid rgba(255,255,255,0.08) !important;
   }
   .dark .history-title { color: #d4c8b0 !important; }
-  .dark .history-count { color: #a09080 !important; background: rgba(245,158,11,0.15) !important; }
+  .dark .history-count { color: #b0a090 !important; background: rgba(245,158,11,0.15) !important; }
   .dark .history-preview { color: #d4c8b0 !important; }
-  .dark .history-date { color: #6b5e50 !important; }
-  .dark .history-langs { color: #a09080 !important; }
+  .dark .history-date { color: #807060 !important; }
+  .dark .history-langs { color: #b0a090 !important; }
   .dark .history-load-btn { color: #d4c8b0 !important; }
   .dark .history-entry-text { color: #d4c8b0 !important; }
-  .dark .history-expanded { background: rgba(60,50,35,0.1) !important; }
-  .dark .history-footer { color: #6b5e50 !important; }
-  .dark .history-empty { color: #6b5e50 !important; }
+  .dark .history-expanded { background: rgba(255,255,255,0.03) !important; }
+  .dark .history-footer { color: #807060 !important; }
+  .dark .history-empty { color: #807060 !important; }
 
   /* Footer */
-  .dark .footer-powered { color: #a09080 !important; }
-  .dark .footer-info { color: #6b5e50 !important; }
+  .dark .footer-powered { color: #b0a090 !important; }
+  .dark .footer-info { color: #807060 !important; }
 
   /* Batch CSV */
-  .dark .batch-lang-text { color: #a09080 !important; }
+  .dark .batch-lang-text { color: #b0a090 !important; }
 
   /* Error text dark */
   .dark .error-box { color: #fca5a5 !important; }
@@ -983,15 +979,15 @@ const CSS = `
 
   .dark .tts-advanced-toggle { color: #d4c8b0 !important; }
   .dark .tts-advanced-toggle:hover { color: #f59e0b !important; }
-  .dark .tts-speaker-boost { color: #a09080 !important; }
-  .dark .tts-tag-btn { background: rgba(245,158,11,0.12) !important; color: #d4c8b0 !important; border-color: rgba(60,50,35,0.3) !important; }
-  .dark .tts-edit-area { background: rgba(60,50,35,0.3) !important; color: #e8e0d4 !important; }
-  .dark .tts-tags-note { color: #6b5e50 !important; }
+  .dark .tts-speaker-boost { color: #b0a090 !important; }
+  .dark .tts-tag-btn { background: rgba(245,158,11,0.12) !important; color: #d4c8b0 !important; border-color: rgba(255,255,255,0.08) !important; }
+  .dark .tts-edit-area { background: rgba(255,255,255,0.05) !important; color: #e8e0d4 !important; }
+  .dark .tts-tags-note { color: #807060 !important; }
 
-  .dark .tts-field label { color: #a09080 !important; }
-  .dark .tts-field select { color: #e8e0d4 !important; background: rgba(60,50,35,0.3) !important; }
+  .dark .tts-field label { color: #b0a090 !important; }
+  .dark .tts-field select { color: #e8e0d4 !important; background: rgba(255,255,255,0.05) !important; }
   .dark .tts-slider-val { color: #d4c8b0 !important; }
-  .dark .tts-toggle-track { background: rgba(60,50,35,0.4); }
+  .dark .tts-toggle-track { background: rgba(255,255,255,0.08); }
   .dark .tts-audio-row audio { filter: invert(0.85) hue-rotate(180deg); }
 
   @media (max-width: 600px) {
@@ -1027,99 +1023,53 @@ const FIREFLY_WORDS = [
   // Hindi
   { text: "\u0928\u092E\u0938\u094D\u0924\u0947", color: "#f97316" },
   { text: "\u092D\u093E\u0937\u093E", color: "#f97316" },
-  { text: "\u0936\u092C\u094D\u0926", color: "#f97316" },
-  { text: "\u0939\u093F\u0928\u094D\u0926\u0940", color: "#f97316" },
   { text: "\u0915\u0939\u093E\u0928\u0940", color: "#f97316" },
   { text: "\u092A\u094D\u092F\u093E\u0930", color: "#f97316" },
-  { text: "\u0926\u093F\u0932", color: "#f97316" },
   // English
-  { text: "Hello", color: "#3b82f6" },
   { text: "Script", color: "#3b82f6" },
-  { text: "Convert", color: "#3b82f6" },
   { text: "Language", color: "#3b82f6" },
-  { text: "Words", color: "#3b82f6" },
-  { text: "Speak", color: "#3b82f6" },
   { text: "Story", color: "#3b82f6" },
   // Haryanvi
   { text: "\u0930\u093E\u092E \u0930\u093E\u092E", color: "#22c55e" },
-  { text: "\u0938\u0948", color: "#22c55e" },
   { text: "\u092F\u093E\u0930", color: "#22c55e" },
   { text: "\u0918\u0923\u093E", color: "#22c55e" },
-  { text: "\u091B\u094B\u0930\u093E", color: "#22c55e" },
-  { text: "\u092C\u0922\u093C\u093F\u092F\u093E", color: "#22c55e" },
-  { text: "\u092D\u093E\u0908", color: "#22c55e" },
   // Rajasthani
   { text: "\u0918\u0923\u094B", color: "#eab308" },
-  { text: "\u091B\u0947", color: "#eab308" },
-  { text: "\u0915\u094B\u0923\u0940", color: "#eab308" },
   { text: "\u092A\u093E\u0923\u0940", color: "#eab308" },
-  { text: "\u092E\u093F\u0928\u0916", color: "#eab308" },
   { text: "\u0938\u093E\u0930\u094B", color: "#eab308" },
-  { text: "\u0925\u094B", color: "#eab308" },
   // Bhojpuri
-  { text: "\u092C\u093E", color: "#ef4444" },
-  { text: "\u092C\u093E\u0928\u0940", color: "#ef4444" },
-  { text: "\u0928\u093E\u0939\u0940\u0902", color: "#ef4444" },
-  { text: "\u0915\u093E\u0939\u0947", color: "#ef4444" },
   { text: "\u092D\u0907\u092F\u093E", color: "#ef4444" },
   { text: "\u0928\u0940\u092E\u0928", color: "#ef4444" },
   { text: "\u091C\u093F\u0928\u0917\u0940", color: "#ef4444" },
   // Gujarati
   { text: "\u0A95\u0AC7\u0AAE \u0A9B\u0ACB", color: "#a855f7" },
-  { text: "\u0AAD\u0ABE\u0A88", color: "#a855f7" },
-  { text: "\u0AB8\u0ABE\u0AB0\u0AC1\u0A82", color: "#a855f7" },
-  { text: "\u0AAA\u0ABE\u0AA3\u0AC0", color: "#a855f7" },
-  { text: "\u0A98\u0AB0", color: "#a855f7" },
   { text: "\u0AAA\u0ACD\u0AB0\u0AC7\u0AAE", color: "#a855f7" },
-  { text: "\u0A9A\u0ABE\u0AB2", color: "#a855f7" },
+  { text: "\u0AB8\u0ABE\u0AB0\u0AC1\u0A82", color: "#a855f7" },
   // Marathi
   { text: "\u0928\u092E\u0938\u094D\u0915\u093E\u0930", color: "#e11d48" },
   { text: "\u0915\u0925\u093E", color: "#e11d48" },
-  { text: "\u092E\u093E\u092F\u092C\u094B\u0932\u0940", color: "#e11d48" },
   { text: "\u092A\u094D\u0930\u0947\u092E", color: "#e11d48" },
-  { text: "\u0906\u092D\u093E\u0930", color: "#e11d48" },
-  { text: "\u092E\u093F\u0924\u094D\u0930", color: "#e11d48" },
-  { text: "\u0938\u0941\u0902\u0926\u0930", color: "#e11d48" },
   // Bengali
-  { text: "\u09A8\u09AE\u09B8\u09CD\u0995\u09BE\u09B0", color: "#0891b2" },
   { text: "\u0997\u09B2\u09CD\u09AA", color: "#0891b2" },
   { text: "\u09AD\u09BE\u09B2\u09CB\u09AC\u09BE\u09B8\u09BE", color: "#0891b2" },
   { text: "\u09B8\u09CD\u09AC\u09AA\u09CD\u09A8", color: "#0891b2" },
-  { text: "\u0986\u0995\u09BE\u09B6", color: "#0891b2" },
-  { text: "\u09AC\u09A8\u09CD\u09A7\u09C1", color: "#0891b2" },
-  { text: "\u09AE\u09A8", color: "#0891b2" },
   // Punjabi
-  { text: "\u0A38\u0A24 \u0A38\u0A4D\u0A30\u0A40 \u0A05\u0A15\u0A3E\u0A32", color: "#ea580c" },
   { text: "\u0A2A\u0A3F\u0A06\u0A30", color: "#ea580c" },
   { text: "\u0A2F\u0A3E\u0A30", color: "#ea580c" },
-  { text: "\u0A35\u0A47\u0A16\u0A4B", color: "#ea580c" },
   { text: "\u0A16\u0A41\u0A36\u0A40", color: "#ea580c" },
-  { text: "\u0A26\u0A3F\u0A32", color: "#ea580c" },
-  { text: "\u0A17\u0A40\u0A24", color: "#ea580c" },
   // Tamil
   { text: "\u0BB5\u0BA3\u0B95\u0BCD\u0B95\u0BAE\u0BCD", color: "#7c3aed" },
-  { text: "\u0B95\u0BA4\u0BC8", color: "#7c3aed" },
   { text: "\u0B85\u0BA9\u0BCD\u0BAA\u0BC1", color: "#7c3aed" },
-  { text: "\u0BA8\u0BA9\u0BCD\u0BB1\u0BBF", color: "#7c3aed" },
   { text: "\u0B95\u0BA9\u0BB5\u0BC1", color: "#7c3aed" },
-  { text: "\u0BAE\u0BB2\u0BB0\u0BCD", color: "#7c3aed" },
-  { text: "\u0BAE\u0BA9\u0BAE\u0BCD", color: "#7c3aed" },
   // Telugu
-  { text: "\u0C28\u0C2E\u0C38\u0C4D\u0C15\u0C3E\u0C30\u0C02", color: "#059669" },
-  { text: "\u0C15\u0C25", color: "#059669" },
   { text: "\u0C2A\u0C4D\u0C30\u0C47\u0C2E", color: "#059669" },
   { text: "\u0C2E\u0C28\u0C38\u0C41", color: "#059669" },
-  { text: "\u0C06\u0C15\u0C3E\u0C36\u0C02", color: "#059669" },
   { text: "\u0C38\u0C4D\u0C28\u0C47\u0C39\u0C02", color: "#059669" },
-  { text: "\u0C38\u0C41\u0C02\u0C26\u0C30\u0C02", color: "#059669" },
-  // Extra mixed
+  // Extra
   { text: "Ruhi", color: "#d97706" },
-  { text: "\u0926\u094B\u0938\u094D\u0924", color: "#f97316" },
   { text: "Dream", color: "#3b82f6" },
-  { text: "\u0938\u0941\u0923", color: "#22c55e" },
-  { text: "\u0916\u0941\u0936\u0940", color: "#eab308" },
+  { text: "\u0926\u094B\u0938\u094D\u0924", color: "#f97316" },
   { text: "\u0907\u0936\u094D\u0915", color: "#ef4444" },
-  { text: "\u0AA6\u0ACB\u0AB8\u0ACD\u0AA4", color: "#a855f7" },
 ];
 
 function FireflyBackground() {
@@ -1127,7 +1077,7 @@ function FireflyBackground() {
     const seed = i * 137.508;
     const left = ((seed * 3.17) % 90 + 5).toFixed(1);
     const top = ((seed * 2.31) % 85 + 5).toFixed(1);
-    const dur = (10 + (seed * 0.37) % 14).toFixed(1);
+    const dur = (18 + (seed * 0.37) % 16).toFixed(1);
     const delay = (-(seed * 0.53) % 25).toFixed(1);
     const dx = ((i % 2 === 0 ? 1 : -1) * (40 + (seed % 80))).toFixed(0);
     const dy = ((i % 3 === 0 ? -1 : 1) * (30 + (seed % 60))).toFixed(0);
@@ -1143,11 +1093,10 @@ function FireflyBackground() {
         opacity: 0,
         pointerEvents: "none",
         userSelect: "none",
-        textShadow: `0 0 8px ${fw.color}cc, 0 0 20px ${fw.color}80, 0 0 40px ${fw.color}50, 0 0 60px ${fw.color}30`,
+        textShadow: `0 0 10px ${fw.color}aa, 0 0 25px ${fw.color}60, 0 0 45px ${fw.color}30`,
         animation: `fireflyDrift ${dur}s ${delay}s ease-in-out infinite`,
         "--dx": `${dx}px`,
         "--dy": `${dy}px`,
-        "--glow": `${fw.color}90`,
         fontFamily: "'Inter', serif",
         letterSpacing: "0.5px",
       }}>{fw.text}</span>
@@ -1720,7 +1669,7 @@ export default function App() {
   const can = !loading && !!script.trim() && selected.length > 0;
 
   return (
-    <div className={darkMode ? "dark" : ""} style={{ fontFamily: "'Inter','Segoe UI',sans-serif", background: darkMode ? "#1a1510" : "#f0ebe3", minHeight: "100vh", color: darkMode ? "#e8e0d4" : "#1e1b18", position: "relative", transition: "background 0.3s, color 0.3s" }}>
+    <div className={darkMode ? "dark" : ""} style={{ fontFamily: "'Inter','Segoe UI',sans-serif", background: darkMode ? "#000000" : "#f0ebe3", minHeight: "100vh", color: darkMode ? "#e8e0d4" : "#1e1b18", position: "relative", transition: "background 0.3s, color 0.3s" }}>
       <style>{CSS}</style>
       <FireflyBackground />
 
@@ -1746,21 +1695,21 @@ export default function App() {
         <button onClick={() => setActiveTab("converter")} className={activeTab === "converter" ? "clay-btn-primary" : "clay-btn"} style={{
           padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
           cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
-          ...(activeTab !== "converter" ? { color: darkMode ? "#a09080" : "#6b5e50" } : {})
+          ...(activeTab !== "converter" ? { color: darkMode ? "#b0a090" : "#6b5e50" } : {})
         }}>
           {"\u270D\uFE0F"} Script Converter
         </button>
         <button onClick={() => setActiveTab("studio")} className={activeTab === "studio" ? "clay-btn-primary" : "clay-btn"} style={{
           padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
           cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
-          ...(activeTab !== "studio" ? { color: darkMode ? "#a09080" : "#6b5e50" } : {})
+          ...(activeTab !== "studio" ? { color: darkMode ? "#b0a090" : "#6b5e50" } : {})
         }}>
           {"\uD83C\uDFAC"} Content Studio
         </button>
         <button onClick={() => setActiveTab("dubbing")} className={activeTab === "dubbing" ? "clay-btn-primary" : "clay-btn"} style={{
           padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
           cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
-          ...(activeTab !== "dubbing" ? { color: darkMode ? "#a09080" : "#6b5e50" } : {})
+          ...(activeTab !== "dubbing" ? { color: darkMode ? "#b0a090" : "#6b5e50" } : {})
         }}>
           {"\uD83C\uDFA5"} Video Dub
         </button>
@@ -1794,7 +1743,7 @@ export default function App() {
                 return (
                   <button key={t.id} onClick={() => setTone(t.id)} className="clay-btn" style={{
                     padding: "6px 10px", fontSize: "10.5px", fontWeight: active ? 800 : 600,
-                    color: active ? "#d97706" : (darkMode ? "#a09080" : "#6b5e50"),
+                    color: active ? "#d97706" : (darkMode ? "#b0a090" : "#6b5e50"),
                     background: active ? (darkMode ? "linear-gradient(145deg, rgba(217,119,6,0.15), rgba(217,119,6,0.05))" : "linear-gradient(145deg, rgba(245,158,11,0.12), rgba(245,158,11,0.05))") : undefined,
                     border: active ? "1.5px solid rgba(245,158,11,0.3)" : undefined,
                     display: "flex", alignItems: "center", gap: "4px"
@@ -1928,7 +1877,7 @@ export default function App() {
                     <div className="tts-toggle-thumb" />
                   </div>
                   <span style={{ fontSize: "13px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#3d3425" }}>Voice Over Generation</span>
-                  <span style={{ fontSize: "10px", color: darkMode ? "#6b5e50" : "#92400e", fontWeight: 600 }}>ElevenLabs</span>
+                  <span style={{ fontSize: "10px", color: darkMode ? "#807060" : "#92400e", fontWeight: 600 }}>ElevenLabs</span>
                 </div>
                 {ttsEnabled && (
                   <div className="tts-options">
@@ -2027,7 +1976,7 @@ export default function App() {
                                 }
                               }}
                               className="clay-btn"
-                              style={{ padding: "6px 12px", fontSize: "11px", fontWeight: 700, color: ttsEditingLang === langId ? "#d97706" : (darkMode ? "#a09080" : "#6b5e50"), whiteSpace: "nowrap" }}
+                              style={{ padding: "6px 12px", fontSize: "11px", fontWeight: 700, color: ttsEditingLang === langId ? "#d97706" : (darkMode ? "#b0a090" : "#6b5e50"), whiteSpace: "nowrap" }}
                             >
                               {ttsEditingLang === langId ? "\u2716 Close Editor" : "\u270E Edit Text"}
                             </button>
@@ -2047,7 +1996,7 @@ export default function App() {
                       {ttsEditingLang === langId && (
                         <div style={{ marginTop: "10px" }}>
                           <div className="tts-tags-bar">
-                            <span style={{ fontSize: "10px", fontWeight: 700, color: darkMode ? "#a09080" : "#78350f", alignSelf: "center" }}>Tags:</span>
+                            <span style={{ fontSize: "10px", fontWeight: 700, color: darkMode ? "#b0a090" : "#78350f", alignSelf: "center" }}>Tags:</span>
                             <button className="tts-tag-btn" onClick={() => insertTag(langId, '<break time="0.5s" />')}>Pause 0.5s</button>
                             <button className="tts-tag-btn" onClick={() => insertTag(langId, '<break time="1.0s" />')}>Pause 1s</button>
                             <button className="tts-tag-btn" onClick={() => insertTag(langId, '<break time="2.0s" />')}>Pause 2s</button>
@@ -2109,9 +2058,9 @@ export default function App() {
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "11px" }}>
                 <thead>
                   <tr>
-                    <th style={{ padding: "8px 10px", textAlign: "left", borderBottom: `1px solid ${darkMode ? "rgba(60,50,35,0.3)" : "rgba(166,152,130,0.2)"}`, color: darkMode ? "#a09080" : "#78350f", fontWeight: 700 }}>Original</th>
+                    <th style={{ padding: "8px 10px", textAlign: "left", borderBottom: `1px solid ${darkMode ? "rgba(255,255,255,0.08)" : "rgba(166,152,130,0.2)"}`, color: darkMode ? "#b0a090" : "#78350f", fontWeight: 700 }}>Original</th>
                     {Object.keys(batchResults).map(id => (
-                      <th key={id} style={{ padding: "8px 10px", textAlign: "left", borderBottom: `1px solid ${darkMode ? "rgba(60,50,35,0.3)" : "rgba(166,152,130,0.2)"}`, color: LANGUAGES.find(l => l.id === id)?.color, fontWeight: 700 }}>
+                      <th key={id} style={{ padding: "8px 10px", textAlign: "left", borderBottom: `1px solid ${darkMode ? "rgba(255,255,255,0.08)" : "rgba(166,152,130,0.2)"}`, color: LANGUAGES.find(l => l.id === id)?.color, fontWeight: 700 }}>
                         {LANGUAGES.find(l => l.id === id)?.label}
                       </th>
                     ))}
@@ -2143,7 +2092,7 @@ export default function App() {
       </div>}
 
       {/* Footer */}
-      <div style={{ borderTop: `1px solid ${darkMode ? "rgba(60,50,35,0.3)" : "rgba(166,152,130,0.15)"}`, padding: "16px 28px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "7px", background: darkMode ? "linear-gradient(145deg, #1a1510, #151008)" : "linear-gradient(145deg, #f0ebe3, #e8e0d4)", transition: "background 0.3s" }}>
+      <div style={{ borderTop: `1px solid ${darkMode ? "rgba(255,255,255,0.08)" : "rgba(166,152,130,0.15)"}`, padding: "16px 28px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "7px", background: darkMode ? "linear-gradient(145deg, #0a0a0a, #000000)" : "linear-gradient(145deg, #f0ebe3, #e8e0d4)", transition: "background 0.3s" }}>
         <div style={{ fontSize: "11.5px", fontWeight: 500, display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
           <span className="footer-powered" style={{ color: "#92400e" }}>Powered by</span>
           <span className="gold-shine">Claude</span>

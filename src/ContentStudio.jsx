@@ -407,11 +407,11 @@ function saveActivePersonas(m) {
 function StudioSelect({ label, value, onChange, options, darkMode }) {
   return (
     <div>
-      <label style={{ display: "block", fontSize: "10px", fontWeight: 700, color: darkMode ? "#a09080" : "#92400e", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.8px" }}>{label}</label>
+      <label style={{ display: "block", fontSize: "10px", fontWeight: 700, color: darkMode ? "#b0a090" : "#92400e", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.8px" }}>{label}</label>
       <select value={value} onChange={e => onChange(e.target.value)} className="clay-inner" style={{
         width: "100%", padding: "10px 12px", fontSize: "13px", fontWeight: 600,
         color: darkMode ? "#e8e0d4" : "#3d3425",
-        background: darkMode ? "linear-gradient(145deg, #231e14, #1c1810)" : "linear-gradient(145deg, #e8e0d4, #ddd5c9)",
+        background: darkMode ? "linear-gradient(145deg, #0d0d0d, #080808)" : "linear-gradient(145deg, #e8e0d4, #ddd5c9)",
         border: "none", outline: "none", cursor: "pointer", fontFamily: "'Inter','Segoe UI',sans-serif",
         borderRadius: "12px", appearance: "none", WebkitAppearance: "none",
         backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2378350f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
@@ -426,7 +426,7 @@ function StudioSelect({ label, value, onChange, options, darkMode }) {
 function StudioInput({ label, value, onChange, placeholder, darkMode }) {
   return (
     <div>
-      <label style={{ display: "block", fontSize: "10px", fontWeight: 700, color: darkMode ? "#a09080" : "#92400e", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.8px" }}>{label}</label>
+      <label style={{ display: "block", fontSize: "10px", fontWeight: 700, color: darkMode ? "#b0a090" : "#92400e", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.8px" }}>{label}</label>
       <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} className="clay-inner" style={{
         width: "100%", padding: "10px 12px", fontSize: "13px", fontWeight: 600,
         color: darkMode ? "#e8e0d4" : "#3d3425",
@@ -440,7 +440,7 @@ function StudioInput({ label, value, onChange, placeholder, darkMode }) {
 function StudioTextArea({ label, value, onChange, placeholder, rows = 3, darkMode }) {
   return (
     <div>
-      <label style={{ display: "block", fontSize: "10px", fontWeight: 700, color: darkMode ? "#a09080" : "#92400e", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.8px" }}>{label}</label>
+      <label style={{ display: "block", fontSize: "10px", fontWeight: 700, color: darkMode ? "#b0a090" : "#92400e", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.8px" }}>{label}</label>
       <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder} rows={rows} className="clay-inner" style={{
         width: "100%", padding: "10px 12px", fontSize: "13px", fontWeight: 600,
         color: darkMode ? "#e8e0d4" : "#3d3425",
@@ -712,7 +712,7 @@ ${system}`;
             return (
               <button key={m.id} onClick={() => { setActiveModule(m.id); setOutput(""); setError(""); }} className="clay-btn" style={{
                 padding: "10px 16px", fontSize: "12px", fontWeight: active ? 800 : 600,
-                color: active ? "#d97706" : (dm ? "#a09080" : "#6b5e50"),
+                color: active ? "#d97706" : (dm ? "#b0a090" : "#6b5e50"),
                 background: active ? (dm ? "linear-gradient(145deg, rgba(217,119,6,0.15), rgba(217,119,6,0.05))" : "linear-gradient(145deg, rgba(245,158,11,0.12), rgba(245,158,11,0.05))") : undefined,
                 border: active ? "1.5px solid rgba(245,158,11,0.3)" : undefined,
                 display: "flex", alignItems: "center", gap: "6px", whiteSpace: "nowrap"
@@ -830,15 +830,9 @@ ${system}`;
             {/* LEARNING */}
             {activeModule === "learning" && (<>
               <StudioInput label="Persona Name *" value={learningData.personaName} onChange={v => setLearningData({ ...learningData, personaName: v })} placeholder="" darkMode={dm} />
-              <StudioInput label="Style Description" value={learningData.styleDescription} onChange={v => setLearningData({ ...learningData, styleDescription: v })} placeholder="" darkMode={dm} />
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                <StudioInput label="Vocabulary Preferences" value={learningData.vocabularyPrefs} onChange={v => setLearningData({ ...learningData, vocabularyPrefs: v })} placeholder="" darkMode={dm} />
-                <StudioInput label="Tone Patterns" value={learningData.tonePatterns} onChange={v => setLearningData({ ...learningData, tonePatterns: v })} placeholder="" darkMode={dm} />
-              </div>
-              <StudioTextArea label="Paste Promo Scripts *" value={learningData.scriptInput} onChange={v => setLearningData({ ...learningData, scriptInput: v })} placeholder="" rows={8} darkMode={dm} />
               <div>
-                <label style={{ display: "block", fontSize: "10px", fontWeight: 700, color: dm ? "#a09080" : "#92400e", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.8px" }}>Or Upload Text Files</label>
-                <input type="file" accept=".txt,.csv" multiple onChange={handleFileUpload} style={{ fontSize: "11px", color: dm ? "#a09080" : "#6b5e50" }} />
+                <label style={{ display: "block", fontSize: "10px", fontWeight: 700, color: dm ? "#b0a090" : "#92400e", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.8px" }}>Or Upload Text Files</label>
+                <input type="file" accept=".txt,.csv" multiple onChange={handleFileUpload} style={{ fontSize: "11px", color: dm ? "#b0a090" : "#6b5e50" }} />
               </div>
               <div style={{ display: "flex", gap: "8px", alignItems: "flex-end" }}>
                 <div style={{ flex: 1 }}>
@@ -851,18 +845,18 @@ ${system}`;
                 )}
               </div>
               {learningData.googleLink && (
-                <div className="clay-inner" style={{ padding: "8px 12px", fontSize: "10px", color: dm ? "#a09080" : "#6b5e50", lineHeight: 1.6 }}>
+                <div className="clay-inner" style={{ padding: "8px 12px", fontSize: "10px", color: dm ? "#b0a090" : "#6b5e50", lineHeight: 1.6 }}>
                   Tip: Google Sheet public hona chahiye. Ya fir File &rarr; Download &rarr; CSV karke upload karo.
                 </div>
               )}
               {personas.length > 0 && (
                 <div>
-                  <label style={{ display: "block", fontSize: "10px", fontWeight: 700, color: dm ? "#a09080" : "#92400e", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.8px" }}>Saved Personas ({personas.length})</label>
+                  <label style={{ display: "block", fontSize: "10px", fontWeight: 700, color: dm ? "#b0a090" : "#92400e", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.8px" }}>Saved Personas ({personas.length})</label>
                   {personas.map(p => (
                     <div key={p.id} className="clay-inner" style={{ padding: "8px 12px", marginBottom: "6px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <div>
                         <span style={{ fontSize: "12px", fontWeight: 700, color: dm ? "#e8e0d4" : "#3d3425" }}>{p.name}</span>
-                        <span style={{ fontSize: "10px", color: dm ? "#6b5e50" : "#a08060", marginLeft: "8px" }}>{p.sourceScriptCount} scripts</span>
+                        <span style={{ fontSize: "10px", color: dm ? "#807060" : "#a08060", marginLeft: "8px" }}>{p.sourceScriptCount} scripts</span>
                       </div>
                       <button onClick={() => deletePersona(p.id)} className="clay-btn" style={{ padding: "3px 8px", fontSize: "10px", fontWeight: 700, color: "#dc2626" }}>
                         Delete
@@ -922,7 +916,7 @@ ${system}`;
                 {isGenerating && <span style={{ display: "inline-block", width: "2px", height: "16px", background: "#f59e0b", marginLeft: "2px", verticalAlign: "text-bottom", animation: "pulse 0.8s ease-in-out infinite" }} />}
               </>
             ) : (
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: dm ? "#6b5e50" : "#a08060", fontSize: "13px", fontWeight: 600, textAlign: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", color: dm ? "#807060" : "#a08060", fontSize: "13px", fontWeight: 600, textAlign: "center" }}>
                 {isGenerating ? (
                   <div>
                     <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "14px" }}>
