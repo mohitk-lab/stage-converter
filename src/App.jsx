@@ -507,12 +507,14 @@ const CSS = `
   @keyframes connPulse {0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4);}60%{box-shadow:0 0 0 5px rgba(34,197,94,0);}}
   @keyframes fireflyDrift {
     0%   { transform: translate(0,0) scale(1); opacity:0; }
-    10%  { opacity:0.7; }
-    30%  { opacity:0.15; }
-    50%  { opacity:0.8; transform: translate(var(--dx), var(--dy)) scale(1.1); }
-    70%  { opacity:0.1; }
-    90%  { opacity:0.65; }
-    100% { transform: translate(calc(var(--dx)*-0.5), calc(var(--dy)*1.5)) scale(0.9); opacity:0; }
+    8%   { opacity:0.85; }
+    25%  { opacity:0.2; }
+    40%  { opacity:0.9; transform: translate(calc(var(--dx)*0.4), calc(var(--dy)*0.4)) scale(1.08); }
+    55%  { opacity:0.15; }
+    70%  { opacity:0.8; transform: translate(var(--dx), var(--dy)) scale(1.12); }
+    85%  { opacity:0.25; }
+    95%  { opacity:0.7; }
+    100% { transform: translate(calc(var(--dx)*-0.5), calc(var(--dy)*1.5)) scale(0.95); opacity:0; }
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -644,30 +646,62 @@ function Logo() {
 
 /* --- Firefly Background --- */
 const FIREFLY_WORDS = [
+  // Hindi
   { text: "\u0928\u092E\u0938\u094D\u0924\u0947", color: "#f97316" },
-  { text: "Hello", color: "#3b82f6" },
-  { text: "\u0930\u093E\u092E \u0930\u093E\u092E", color: "#22c55e" },
-  { text: "\u0918\u0923\u094B", color: "#eab308" },
-  { text: "\u092C\u093E", color: "#ef4444" },
-  { text: "\u0A95\u0AC7\u0AAE \u0A9B\u0ACB", color: "#a855f7" },
   { text: "\u092D\u093E\u0937\u093E", color: "#f97316" },
-  { text: "Script", color: "#3b82f6" },
-  { text: "\u0938\u0948", color: "#22c55e" },
-  { text: "\u091B\u0947", color: "#eab308" },
-  { text: "\u092C\u093E\u0928\u0940", color: "#ef4444" },
-  { text: "\u0AAD\u0ABE\u0A88", color: "#a855f7" },
-  { text: "\u092F\u093E\u0930", color: "#22c55e" },
-  { text: "Convert", color: "#3b82f6" },
   { text: "\u0936\u092C\u094D\u0926", color: "#f97316" },
-  { text: "\u0915\u094B\u0923\u0940", color: "#eab308" },
-  { text: "\u0928\u093E\u0939\u0940\u0902", color: "#ef4444" },
-  { text: "\u0AB8\u0ABE\u0AB0\u0AC1\u0A82", color: "#a855f7" },
-  { text: "Ruhi", color: "#d97706" },
   { text: "\u0939\u093F\u0928\u094D\u0926\u0940", color: "#f97316" },
-  { text: "\u0918\u0923\u093E", color: "#22c55e" },
-  { text: "\u0915\u093E\u0939\u0947", color: "#ef4444" },
+  { text: "\u0915\u0939\u093E\u0928\u0940", color: "#f97316" },
+  { text: "\u092A\u094D\u092F\u093E\u0930", color: "#f97316" },
+  { text: "\u0926\u093F\u0932", color: "#f97316" },
+  // English
+  { text: "Hello", color: "#3b82f6" },
+  { text: "Script", color: "#3b82f6" },
+  { text: "Convert", color: "#3b82f6" },
   { text: "Language", color: "#3b82f6" },
+  { text: "Words", color: "#3b82f6" },
+  { text: "Speak", color: "#3b82f6" },
+  { text: "Story", color: "#3b82f6" },
+  // Haryanvi
+  { text: "\u0930\u093E\u092E \u0930\u093E\u092E", color: "#22c55e" },
+  { text: "\u0938\u0948", color: "#22c55e" },
+  { text: "\u092F\u093E\u0930", color: "#22c55e" },
+  { text: "\u0918\u0923\u093E", color: "#22c55e" },
+  { text: "\u091B\u094B\u0930\u093E", color: "#22c55e" },
+  { text: "\u092C\u0922\u093C\u093F\u092F\u093E", color: "#22c55e" },
+  { text: "\u092D\u093E\u0908", color: "#22c55e" },
+  // Rajasthani
+  { text: "\u0918\u0923\u094B", color: "#eab308" },
+  { text: "\u091B\u0947", color: "#eab308" },
+  { text: "\u0915\u094B\u0923\u0940", color: "#eab308" },
+  { text: "\u092A\u093E\u0923\u0940", color: "#eab308" },
+  { text: "\u092E\u093F\u0928\u0916", color: "#eab308" },
+  { text: "\u0938\u093E\u0930\u094B", color: "#eab308" },
+  { text: "\u0925\u094B", color: "#eab308" },
+  // Bhojpuri
+  { text: "\u092C\u093E", color: "#ef4444" },
+  { text: "\u092C\u093E\u0928\u0940", color: "#ef4444" },
+  { text: "\u0928\u093E\u0939\u0940\u0902", color: "#ef4444" },
+  { text: "\u0915\u093E\u0939\u0947", color: "#ef4444" },
+  { text: "\u092D\u0907\u092F\u093E", color: "#ef4444" },
+  { text: "\u0928\u0940\u092E\u0928", color: "#ef4444" },
+  { text: "\u091C\u093F\u0928\u0917\u0940", color: "#ef4444" },
+  // Gujarati
+  { text: "\u0A95\u0AC7\u0AAE \u0A9B\u0ACB", color: "#a855f7" },
+  { text: "\u0AAD\u0ABE\u0A88", color: "#a855f7" },
+  { text: "\u0AB8\u0ABE\u0AB0\u0AC1\u0A82", color: "#a855f7" },
   { text: "\u0AAA\u0ABE\u0AA3\u0AC0", color: "#a855f7" },
+  { text: "\u0A98\u0AB0", color: "#a855f7" },
+  { text: "\u0AAA\u0ACD\u0AB0\u0AC7\u0AAE", color: "#a855f7" },
+  { text: "\u0A9A\u0ABE\u0AB2", color: "#a855f7" },
+  // Extra mixed
+  { text: "Ruhi", color: "#d97706" },
+  { text: "\u0926\u094B\u0938\u094D\u0924", color: "#f97316" },
+  { text: "Dream", color: "#3b82f6" },
+  { text: "\u0938\u0941\u0923", color: "#22c55e" },
+  { text: "\u0916\u0941\u0936\u0940", color: "#eab308" },
+  { text: "\u0907\u0936\u094D\u0915", color: "#ef4444" },
+  { text: "\u0AA6\u0ACB\u0AB8\u0ACD\u0AA4", color: "#a855f7" },
 ];
 
 function FireflyBackground() {
@@ -675,11 +709,11 @@ function FireflyBackground() {
     const seed = i * 137.508;
     const left = ((seed * 3.17) % 90 + 5).toFixed(1);
     const top = ((seed * 2.31) % 85 + 5).toFixed(1);
-    const dur = (12 + (seed * 0.43) % 18).toFixed(1);
-    const delay = (-(seed * 0.67) % 20).toFixed(1);
-    const dx = ((i % 2 === 0 ? 1 : -1) * (30 + (seed % 60))).toFixed(0);
-    const dy = ((i % 3 === 0 ? -1 : 1) * (20 + (seed % 40))).toFixed(0);
-    const size = (11 + (i * 1.3) % 6).toFixed(0);
+    const dur = (10 + (seed * 0.37) % 14).toFixed(1);
+    const delay = (-(seed * 0.53) % 25).toFixed(1);
+    const dx = ((i % 2 === 0 ? 1 : -1) * (40 + (seed % 80))).toFixed(0);
+    const dy = ((i % 3 === 0 ? -1 : 1) * (30 + (seed % 60))).toFixed(0);
+    const size = (14 + (i * 1.7) % 10).toFixed(0);
     return (
       <span key={i} style={{
         position: "absolute",
@@ -691,11 +725,11 @@ function FireflyBackground() {
         opacity: 0,
         pointerEvents: "none",
         userSelect: "none",
-        textShadow: `0 0 8px ${fw.color}60, 0 0 20px ${fw.color}30`,
+        textShadow: `0 0 12px ${fw.color}90, 0 0 30px ${fw.color}50, 0 0 50px ${fw.color}25`,
         animation: `fireflyDrift ${dur}s ${delay}s ease-in-out infinite`,
         "--dx": `${dx}px`,
         "--dy": `${dy}px`,
-        filter: `drop-shadow(0 0 6px ${fw.color}40)`,
+        filter: `drop-shadow(0 0 10px ${fw.color}60)`,
         fontFamily: "'Inter', serif",
         letterSpacing: "0.5px",
       }}>{fw.text}</span>
@@ -794,7 +828,7 @@ function ResultCard({ result, lang, copied, onCopy }) {
    ROOT APP
 ============================== */
 export default function App() {
-  const [selected, setSelected] = useState(["hindi"]);
+  const [selected, setSelected] = useState(LANGUAGES.map(l => l.id));
   const [script, setScript] = useState("");
   const [results, setResults] = useState({});
   const [loading, setLoading] = useState(false);
