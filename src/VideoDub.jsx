@@ -30,11 +30,11 @@ const STEPS = [
 function StudioSelect({ label, value, onChange, options, darkMode }) {
   return (
     <div>
-      <label style={{ display: "block", fontSize: "10px", fontWeight: 700, color: darkMode ? "#a09080" : "#92400e", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.8px" }}>{label}</label>
+      <label style={{ display: "block", fontSize: "10px", fontWeight: 700, color: darkMode ? "#b0a090" : "#92400e", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.8px" }}>{label}</label>
       <select value={value} onChange={e => onChange(e.target.value)} className="clay-inner" style={{
         width: "100%", padding: "10px 12px", fontSize: "13px", fontWeight: 600,
         color: darkMode ? "#e8e0d4" : "#3d3425",
-        background: darkMode ? "linear-gradient(145deg, #231e14, #1c1810)" : "linear-gradient(145deg, #e8e0d4, #ddd5c9)",
+        background: darkMode ? "linear-gradient(145deg, #0d0d0d, #080808)" : "linear-gradient(145deg, #e8e0d4, #ddd5c9)",
         border: "none", outline: "none", cursor: "pointer", fontFamily: "'Inter','Segoe UI',sans-serif",
         borderRadius: "12px", appearance: "none", WebkitAppearance: "none",
         backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2378350f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
@@ -86,18 +86,19 @@ function StepCard({ step, currentStep, label, icon, darkMode, error, children })
 
   return (
     <div className="clay" style={{
-      padding: "16px 18px", marginBottom: "12px",
+      padding: "18px 20px",
       opacity: isActive ? 1 : 0.45,
       border: isCurrent ? "1.5px solid rgba(245,158,11,0.35)" : "1.5px solid transparent",
       transition: "all 0.3s ease",
       pointerEvents: isActive ? "auto" : "none",
+      gridColumn: isCurrent ? "1 / -1" : undefined,
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: isActive ? "12px" : "0" }}>
         <span style={{
           display: "inline-flex", alignItems: "center", justifyContent: "center",
           width: "26px", height: "26px", borderRadius: "50%", fontSize: "11px", fontWeight: 800,
-          background: isCurrent ? "linear-gradient(135deg, #f59e0b, #d97706)" : (dm ? "#2a241a" : "#e8e0d4"),
-          color: isCurrent ? "#fff" : (dm ? "#a09080" : "#78350f"),
+          background: isCurrent ? "linear-gradient(135deg, #f59e0b, #d97706)" : (dm ? "#111111" : "#e8e0d4"),
+          color: isCurrent ? "#fff" : (dm ? "#b0a090" : "#78350f"),
         }}>{step}</span>
         <span style={{ fontSize: "14px" }}>{icon}</span>
         <span style={{ fontSize: "13px", fontWeight: 700, color: dm ? "#e8e0d4" : "#3d3425" }}>{label}</span>
@@ -140,7 +141,7 @@ function MediaPreview({ url, type, blob, filename, darkMode }) {
 function ProgressBar({ progress, label, darkMode }) {
   return (
     <div style={{ marginTop: "8px" }}>
-      {label && <div style={{ fontSize: "10px", fontWeight: 700, color: darkMode ? "#a09080" : "#92400e", marginBottom: "4px" }}>{label}</div>}
+      {label && <div style={{ fontSize: "10px", fontWeight: 700, color: darkMode ? "#b0a090" : "#92400e", marginBottom: "4px" }}>{label}</div>}
       <div className="clay-inner" style={{ height: "8px", borderRadius: "4px", overflow: "hidden" }}>
         <div style={{
           height: "100%", borderRadius: "4px", width: `${progress}%`,
@@ -573,10 +574,10 @@ ${(transcription.segments || []).map(s => `[${s.start.toFixed(1)}s - ${s.end.toF
   };
 
   return (
-    <div style={{ maxWidth: "900px", margin: "0 auto", padding: "16px 22px 60px", position: "relative", zIndex: 1 }}>
+    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "16px 22px 60px", position: "relative", zIndex: 1 }}>
 
       {/* Header */}
-      <div className="clay" style={{ padding: "14px 18px", marginBottom: "16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div className="clay" style={{ padding: "14px 18px", marginBottom: "20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <span style={{ fontSize: "18px" }}>{"\uD83C\uDFA5"}</span>
           <span style={{ fontSize: "14px", fontWeight: 800, color: dm ? "#e8e0d4" : "#3d3425" }}>Video Dub</span>
@@ -586,7 +587,7 @@ ${(transcription.segments || []).map(s => `[${s.start.toFixed(1)}s - ${s.end.toF
           {STEPS.map(s => (
             <span key={s.id} style={{
               width: "8px", height: "8px", borderRadius: "50%",
-              background: currentStep > s.id ? "#16a34a" : (currentStep === s.id ? "#f59e0b" : (dm ? "#3d3425" : "#d5cdc1")),
+              background: currentStep > s.id ? "#16a34a" : (currentStep === s.id ? "#f59e0b" : (dm ? "#333333" : "#d5cdc1")),
               transition: "background 0.3s"
             }} title={s.label} />
           ))}
@@ -597,6 +598,9 @@ ${(transcription.segments || []).map(s => `[${s.start.toFixed(1)}s - ${s.end.toF
           )}
         </div>
       </div>
+
+      {/* Steps Grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
 
       {/* Step 1: Upload Video */}
       <StepCard step={1} currentStep={currentStep} label="Upload Video" icon={"\uD83C\uDFA5"} darkMode={dm} error={errors[1]}>
@@ -610,7 +614,7 @@ ${(transcription.segments || []).map(s => `[${s.start.toFixed(1)}s - ${s.end.toF
             <span style={{ fontSize: "12px", fontWeight: 700, color: dm ? "#d4c8b0" : "#78350f" }}>
               Video select karo (500MB tak)
             </span>
-            <span style={{ fontSize: "10px", color: dm ? "#6b5e50" : "#a08060", marginTop: "4px" }}>
+            <span style={{ fontSize: "10px", color: dm ? "#807060" : "#a08060", marginTop: "4px" }}>
               MP4, WebM, MOV, AVI, MKV
             </span>
             <input type="file" accept="video/*" onChange={handleVideoSelect} style={{ display: "none" }} />
@@ -619,7 +623,7 @@ ${(transcription.segments || []).map(s => `[${s.start.toFixed(1)}s - ${s.end.toF
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "8px" }}>
               <span style={{ fontSize: "11px", fontWeight: 700, color: dm ? "#e8e0d4" : "#3d3425" }}>{videoFile.name}</span>
-              <span style={{ fontSize: "10px", color: dm ? "#6b5e50" : "#a08060" }}>
+              <span style={{ fontSize: "10px", color: dm ? "#807060" : "#a08060" }}>
                 ({(videoFile.size / (1024 * 1024)).toFixed(1)} MB)
               </span>
             </div>
@@ -644,7 +648,7 @@ ${(transcription.segments || []).map(s => `[${s.start.toFixed(1)}s - ${s.end.toF
           <>
             <ActionBtn onClick={separateStems} loading={separating} label="Separate Vocals & Music" loadingLabel={separateStatus || "Processing..."} darkMode={dm} />
             {separating && separateStatus && (
-              <div style={{ marginTop: "8px", fontSize: "10px", fontWeight: 600, color: dm ? "#a09080" : "#6b5e50", textAlign: "center" }}>
+              <div style={{ marginTop: "8px", fontSize: "10px", fontWeight: 600, color: dm ? "#b0a090" : "#6b5e50", textAlign: "center" }}>
                 {separateStatus}
               </div>
             )}
@@ -652,15 +656,15 @@ ${(transcription.segments || []).map(s => `[${s.start.toFixed(1)}s - ${s.end.toF
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
             <div>
-              <div style={{ fontSize: "10px", fontWeight: 700, color: dm ? "#a09080" : "#92400e", marginBottom: "4px", textTransform: "uppercase" }}>Vocals</div>
+              <div style={{ fontSize: "10px", fontWeight: 700, color: dm ? "#b0a090" : "#92400e", marginBottom: "4px", textTransform: "uppercase" }}>Vocals</div>
               <MediaPreview url={vocalsUrl} type="audio" blob={vocalsBlob} filename="vocals.wav" darkMode={dm} />
             </div>
             <div>
-              <div style={{ fontSize: "10px", fontWeight: 700, color: dm ? "#a09080" : "#92400e", marginBottom: "4px", textTransform: "uppercase" }}>Music</div>
+              <div style={{ fontSize: "10px", fontWeight: 700, color: dm ? "#b0a090" : "#92400e", marginBottom: "4px", textTransform: "uppercase" }}>Music</div>
               {musicBlob ? (
                 <MediaPreview url={musicUrl} type="audio" blob={musicBlob} filename="music.wav" darkMode={dm} />
               ) : (
-                <div style={{ fontSize: "10px", color: dm ? "#6b5e50" : "#a08060", padding: "8px" }}>No music stem found</div>
+                <div style={{ fontSize: "10px", color: dm ? "#807060" : "#a08060", padding: "8px" }}>No music stem found</div>
               )}
             </div>
           </div>
@@ -674,12 +678,12 @@ ${(transcription.segments || []).map(s => `[${s.start.toFixed(1)}s - ${s.end.toF
         ) : (
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-              <span style={{ fontSize: "10px", fontWeight: 700, color: dm ? "#a09080" : "#92400e", textTransform: "uppercase" }}>Detected Language:</span>
+              <span style={{ fontSize: "10px", fontWeight: 700, color: dm ? "#b0a090" : "#92400e", textTransform: "uppercase" }}>Detected Language:</span>
               <span className="clay-inner" style={{ padding: "3px 10px", fontSize: "11px", fontWeight: 700, color: "#f59e0b", borderRadius: "8px" }}>
                 {detectedLanguage || "Unknown"}
               </span>
               {transcription.duration && (
-                <span style={{ fontSize: "10px", color: dm ? "#6b5e50" : "#a08060" }}>
+                <span style={{ fontSize: "10px", color: dm ? "#807060" : "#a08060" }}>
                   ({Math.round(transcription.duration)}s)
                 </span>
               )}
@@ -753,7 +757,7 @@ ${(transcription.segments || []).map(s => `[${s.start.toFixed(1)}s - ${s.end.toF
           <>
             <ActionBtn onClick={generateDubbedAudio} loading={generating} label="Clone Voice & Generate Dub" loadingLabel={ttsProgress || "Processing..."} darkMode={dm} />
             {generating && ttsProgress && (
-              <div style={{ marginTop: "6px", fontSize: "10px", fontWeight: 600, color: dm ? "#a09080" : "#6b5e50", textAlign: "center" }}>
+              <div style={{ marginTop: "6px", fontSize: "10px", fontWeight: 600, color: dm ? "#b0a090" : "#6b5e50", textAlign: "center" }}>
                 {ttsProgress}
               </div>
             )}
@@ -776,6 +780,8 @@ ${(transcription.segments || []).map(s => `[${s.start.toFixed(1)}s - ${s.end.toF
           </div>
         )}
       </StepCard>
+
+      </div>{/* end Steps Grid */}
 
       {/* Blink animation for streaming cursor */}
       <style>{`@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }`}</style>
