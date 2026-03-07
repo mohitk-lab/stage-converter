@@ -710,16 +710,12 @@ const CSS = `
   @keyframes float     {0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
   @keyframes connPulse {0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4);}60%{box-shadow:0 0 0 5px rgba(34,197,94,0);}}
   @keyframes fireflyDrift {
-    0%   { transform: translate(0,0) scale(1); opacity:0; filter: drop-shadow(0 0 4px var(--glow)) brightness(0.8); }
-    8%   { opacity:0.9; filter: drop-shadow(0 0 18px var(--glow)) brightness(1.3); }
-    20%  { opacity:0.15; filter: drop-shadow(0 0 6px var(--glow)) brightness(0.9); }
-    35%  { opacity:0.95; transform: translate(calc(var(--dx)*0.3), calc(var(--dy)*0.3)) scale(1.06); filter: drop-shadow(0 0 22px var(--glow)) brightness(1.4); }
-    48%  { opacity:0.1; filter: drop-shadow(0 0 4px var(--glow)) brightness(0.8); }
-    60%  { opacity:0.85; transform: translate(calc(var(--dx)*0.7), calc(var(--dy)*0.7)) scale(1.1); filter: drop-shadow(0 0 20px var(--glow)) brightness(1.35); }
-    72%  { opacity:0.12; filter: drop-shadow(0 0 5px var(--glow)) brightness(0.85); }
-    82%  { opacity:0.8; transform: translate(var(--dx), var(--dy)) scale(1.12); filter: drop-shadow(0 0 24px var(--glow)) brightness(1.5); }
-    92%  { opacity:0.2; filter: drop-shadow(0 0 8px var(--glow)) brightness(0.9); }
-    100% { transform: translate(calc(var(--dx)*-0.5), calc(var(--dy)*1.5)) scale(0.95); opacity:0; filter: drop-shadow(0 0 4px var(--glow)) brightness(0.8); }
+    0%   { transform: translate(0,0) scale(1); opacity:0; }
+    15%  { opacity:0.7; }
+    40%  { opacity:0.85; transform: translate(calc(var(--dx)*0.4), calc(var(--dy)*0.4)) scale(1.05); }
+    60%  { opacity:0.7; transform: translate(calc(var(--dx)*0.7), calc(var(--dy)*0.7)) scale(1.08); }
+    80%  { opacity:0.5; transform: translate(var(--dx), var(--dy)) scale(1.03); }
+    100% { transform: translate(calc(var(--dx)*1.2), calc(var(--dy)*1.3)) scale(0.98); opacity:0; }
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1027,99 +1023,53 @@ const FIREFLY_WORDS = [
   // Hindi
   { text: "\u0928\u092E\u0938\u094D\u0924\u0947", color: "#f97316" },
   { text: "\u092D\u093E\u0937\u093E", color: "#f97316" },
-  { text: "\u0936\u092C\u094D\u0926", color: "#f97316" },
-  { text: "\u0939\u093F\u0928\u094D\u0926\u0940", color: "#f97316" },
   { text: "\u0915\u0939\u093E\u0928\u0940", color: "#f97316" },
   { text: "\u092A\u094D\u092F\u093E\u0930", color: "#f97316" },
-  { text: "\u0926\u093F\u0932", color: "#f97316" },
   // English
-  { text: "Hello", color: "#3b82f6" },
   { text: "Script", color: "#3b82f6" },
-  { text: "Convert", color: "#3b82f6" },
   { text: "Language", color: "#3b82f6" },
-  { text: "Words", color: "#3b82f6" },
-  { text: "Speak", color: "#3b82f6" },
   { text: "Story", color: "#3b82f6" },
   // Haryanvi
   { text: "\u0930\u093E\u092E \u0930\u093E\u092E", color: "#22c55e" },
-  { text: "\u0938\u0948", color: "#22c55e" },
   { text: "\u092F\u093E\u0930", color: "#22c55e" },
   { text: "\u0918\u0923\u093E", color: "#22c55e" },
-  { text: "\u091B\u094B\u0930\u093E", color: "#22c55e" },
-  { text: "\u092C\u0922\u093C\u093F\u092F\u093E", color: "#22c55e" },
-  { text: "\u092D\u093E\u0908", color: "#22c55e" },
   // Rajasthani
   { text: "\u0918\u0923\u094B", color: "#eab308" },
-  { text: "\u091B\u0947", color: "#eab308" },
-  { text: "\u0915\u094B\u0923\u0940", color: "#eab308" },
   { text: "\u092A\u093E\u0923\u0940", color: "#eab308" },
-  { text: "\u092E\u093F\u0928\u0916", color: "#eab308" },
   { text: "\u0938\u093E\u0930\u094B", color: "#eab308" },
-  { text: "\u0925\u094B", color: "#eab308" },
   // Bhojpuri
-  { text: "\u092C\u093E", color: "#ef4444" },
-  { text: "\u092C\u093E\u0928\u0940", color: "#ef4444" },
-  { text: "\u0928\u093E\u0939\u0940\u0902", color: "#ef4444" },
-  { text: "\u0915\u093E\u0939\u0947", color: "#ef4444" },
   { text: "\u092D\u0907\u092F\u093E", color: "#ef4444" },
   { text: "\u0928\u0940\u092E\u0928", color: "#ef4444" },
   { text: "\u091C\u093F\u0928\u0917\u0940", color: "#ef4444" },
   // Gujarati
   { text: "\u0A95\u0AC7\u0AAE \u0A9B\u0ACB", color: "#a855f7" },
-  { text: "\u0AAD\u0ABE\u0A88", color: "#a855f7" },
-  { text: "\u0AB8\u0ABE\u0AB0\u0AC1\u0A82", color: "#a855f7" },
-  { text: "\u0AAA\u0ABE\u0AA3\u0AC0", color: "#a855f7" },
-  { text: "\u0A98\u0AB0", color: "#a855f7" },
   { text: "\u0AAA\u0ACD\u0AB0\u0AC7\u0AAE", color: "#a855f7" },
-  { text: "\u0A9A\u0ABE\u0AB2", color: "#a855f7" },
+  { text: "\u0AB8\u0ABE\u0AB0\u0AC1\u0A82", color: "#a855f7" },
   // Marathi
   { text: "\u0928\u092E\u0938\u094D\u0915\u093E\u0930", color: "#e11d48" },
   { text: "\u0915\u0925\u093E", color: "#e11d48" },
-  { text: "\u092E\u093E\u092F\u092C\u094B\u0932\u0940", color: "#e11d48" },
   { text: "\u092A\u094D\u0930\u0947\u092E", color: "#e11d48" },
-  { text: "\u0906\u092D\u093E\u0930", color: "#e11d48" },
-  { text: "\u092E\u093F\u0924\u094D\u0930", color: "#e11d48" },
-  { text: "\u0938\u0941\u0902\u0926\u0930", color: "#e11d48" },
   // Bengali
-  { text: "\u09A8\u09AE\u09B8\u09CD\u0995\u09BE\u09B0", color: "#0891b2" },
   { text: "\u0997\u09B2\u09CD\u09AA", color: "#0891b2" },
   { text: "\u09AD\u09BE\u09B2\u09CB\u09AC\u09BE\u09B8\u09BE", color: "#0891b2" },
   { text: "\u09B8\u09CD\u09AC\u09AA\u09CD\u09A8", color: "#0891b2" },
-  { text: "\u0986\u0995\u09BE\u09B6", color: "#0891b2" },
-  { text: "\u09AC\u09A8\u09CD\u09A7\u09C1", color: "#0891b2" },
-  { text: "\u09AE\u09A8", color: "#0891b2" },
   // Punjabi
-  { text: "\u0A38\u0A24 \u0A38\u0A4D\u0A30\u0A40 \u0A05\u0A15\u0A3E\u0A32", color: "#ea580c" },
   { text: "\u0A2A\u0A3F\u0A06\u0A30", color: "#ea580c" },
   { text: "\u0A2F\u0A3E\u0A30", color: "#ea580c" },
-  { text: "\u0A35\u0A47\u0A16\u0A4B", color: "#ea580c" },
   { text: "\u0A16\u0A41\u0A36\u0A40", color: "#ea580c" },
-  { text: "\u0A26\u0A3F\u0A32", color: "#ea580c" },
-  { text: "\u0A17\u0A40\u0A24", color: "#ea580c" },
   // Tamil
   { text: "\u0BB5\u0BA3\u0B95\u0BCD\u0B95\u0BAE\u0BCD", color: "#7c3aed" },
-  { text: "\u0B95\u0BA4\u0BC8", color: "#7c3aed" },
   { text: "\u0B85\u0BA9\u0BCD\u0BAA\u0BC1", color: "#7c3aed" },
-  { text: "\u0BA8\u0BA9\u0BCD\u0BB1\u0BBF", color: "#7c3aed" },
   { text: "\u0B95\u0BA9\u0BB5\u0BC1", color: "#7c3aed" },
-  { text: "\u0BAE\u0BB2\u0BB0\u0BCD", color: "#7c3aed" },
-  { text: "\u0BAE\u0BA9\u0BAE\u0BCD", color: "#7c3aed" },
   // Telugu
-  { text: "\u0C28\u0C2E\u0C38\u0C4D\u0C15\u0C3E\u0C30\u0C02", color: "#059669" },
-  { text: "\u0C15\u0C25", color: "#059669" },
   { text: "\u0C2A\u0C4D\u0C30\u0C47\u0C2E", color: "#059669" },
   { text: "\u0C2E\u0C28\u0C38\u0C41", color: "#059669" },
-  { text: "\u0C06\u0C15\u0C3E\u0C36\u0C02", color: "#059669" },
   { text: "\u0C38\u0C4D\u0C28\u0C47\u0C39\u0C02", color: "#059669" },
-  { text: "\u0C38\u0C41\u0C02\u0C26\u0C30\u0C02", color: "#059669" },
-  // Extra mixed
+  // Extra
   { text: "Ruhi", color: "#d97706" },
-  { text: "\u0926\u094B\u0938\u094D\u0924", color: "#f97316" },
   { text: "Dream", color: "#3b82f6" },
-  { text: "\u0938\u0941\u0923", color: "#22c55e" },
-  { text: "\u0916\u0941\u0936\u0940", color: "#eab308" },
+  { text: "\u0926\u094B\u0938\u094D\u0924", color: "#f97316" },
   { text: "\u0907\u0936\u094D\u0915", color: "#ef4444" },
-  { text: "\u0AA6\u0ACB\u0AB8\u0ACD\u0AA4", color: "#a855f7" },
 ];
 
 function FireflyBackground() {
@@ -1127,7 +1077,7 @@ function FireflyBackground() {
     const seed = i * 137.508;
     const left = ((seed * 3.17) % 90 + 5).toFixed(1);
     const top = ((seed * 2.31) % 85 + 5).toFixed(1);
-    const dur = (10 + (seed * 0.37) % 14).toFixed(1);
+    const dur = (18 + (seed * 0.37) % 16).toFixed(1);
     const delay = (-(seed * 0.53) % 25).toFixed(1);
     const dx = ((i % 2 === 0 ? 1 : -1) * (40 + (seed % 80))).toFixed(0);
     const dy = ((i % 3 === 0 ? -1 : 1) * (30 + (seed % 60))).toFixed(0);
@@ -1143,11 +1093,10 @@ function FireflyBackground() {
         opacity: 0,
         pointerEvents: "none",
         userSelect: "none",
-        textShadow: `0 0 8px ${fw.color}cc, 0 0 20px ${fw.color}80, 0 0 40px ${fw.color}50, 0 0 60px ${fw.color}30`,
+        textShadow: `0 0 10px ${fw.color}aa, 0 0 25px ${fw.color}60, 0 0 45px ${fw.color}30`,
         animation: `fireflyDrift ${dur}s ${delay}s ease-in-out infinite`,
         "--dx": `${dx}px`,
         "--dy": `${dy}px`,
-        "--glow": `${fw.color}90`,
         fontFamily: "'Inter', serif",
         letterSpacing: "0.5px",
       }}>{fw.text}</span>
