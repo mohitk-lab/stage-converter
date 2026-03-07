@@ -865,8 +865,8 @@ function Logo() {
     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
       <div className="clay-btn" style={{ width: "36px", height: "36px", borderRadius: "12px", background: "linear-gradient(135deg,#f59e0b,#ef4444)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "17px", fontWeight: 900, color: "#fff", border: "none" }}>R</div>
       <div>
-        <div style={{ fontSize: "15px", fontWeight: 900, letterSpacing: "-0.5px", lineHeight: 1.1, color: "#78350f" }}>Ruhi</div>
-        <div style={{ fontSize: "8px", color: "#92400e", letterSpacing: "1.8px", fontWeight: 700, textTransform: "uppercase" }}>Script Converter</div>
+        <div style={{ fontSize: "17px", fontWeight: 900, letterSpacing: "-0.5px", lineHeight: 1.1, color: "#78350f" }}>RUHI</div>
+        <div style={{ fontSize: "8px", color: "#92400e", letterSpacing: "1.8px", fontWeight: 700, textTransform: "uppercase" }}>Multilingual Studio</div>
       </div>
     </div>
   );
@@ -975,7 +975,7 @@ function FireflyBackground() {
 function LanguageCards({ selected, onToggle, onSelectAll, onDeselectAll }) {
   const allSelected = selected.length === LANGUAGES.length;
   return (
-    <div className="clay" style={{ padding: 0, marginBottom: "16px", overflow: "hidden" }}>
+    <div className="clay" style={{ padding: 0, overflow: "hidden", height: "100%" }}>
       <div style={{ padding: "14px 22px", borderBottom: "1px solid rgba(166,152,130,0.15)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <span style={{ fontSize: "14px" }}>&#127760;</span>
@@ -1475,7 +1475,7 @@ export default function App() {
       </div>
 
       {/* Tab Bar */}
-      <div style={{ maxWidth: "900px", margin: "0 auto", padding: "18px 22px 0", display: "flex", gap: "8px", position: "relative", zIndex: 1 }}>
+      <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "18px 22px 0", display: "flex", gap: "8px", position: "relative", zIndex: 1 }}>
         <button onClick={() => setActiveTab("converter")} className={activeTab === "converter" ? "clay-btn-primary" : "clay-btn"} style={{
           padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
           cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
@@ -1506,43 +1506,46 @@ export default function App() {
       {activeTab === "dubbing" && <DubbingStudio darkMode={darkMode} streamConvert={streamConvert} />}
 
       {/* Script Converter Tab */}
-      {activeTab === "converter" && <div className="main-c" style={{ maxWidth: "800px", margin: "0 auto", padding: "36px 22px 80px", position: "relative", zIndex: 1 }}>
+      {activeTab === "converter" && <div className="main-c" style={{ maxWidth: "1400px", margin: "0 auto", padding: "28px 22px 80px", position: "relative", zIndex: 1 }}>
 
-        {/* Title */}
-        <div style={{ textAlign: "center", marginBottom: "8px" }}>
-          <h1 className="ruhi-title" style={{ margin: 0, fontWeight: 900, letterSpacing: "-3px", lineHeight: 1, userSelect: "none" }}>RUHI</h1>
-        </div>
-        <div style={{ marginBottom: "28px" }} />
-
-        {/* Language Cards */}
-        <LanguageCards selected={selected} onToggle={toggleLang} onSelectAll={() => setSelected(LANGUAGES.map(l => l.id))} onDeselectAll={() => setSelected([LANGUAGES[0].id])} />
-
-        {/* Tone Selector */}
-        <div className="clay" style={{ padding: 0, marginBottom: "16px", overflow: "hidden" }}>
-          <div style={{ padding: "12px 22px", borderBottom: "1px solid rgba(166,152,130,0.12)", display: "flex", alignItems: "center", gap: "8px" }}>
-            <span style={{ fontSize: "14px" }}>{"\u{1F3AD}"}</span>
-            <span style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "1.2px", textTransform: "uppercase", color: darkMode ? "#d4c8b0" : "#78350f" }}>Tone</span>
+        {/* Top Controls: Language Cards + Tone side by side */}
+        <div className="top-controls-row" style={{ display: "flex", gap: "16px", marginBottom: "20px", alignItems: "stretch" }}>
+          {/* Language Cards */}
+          <div style={{ flex: "1 1 0", minWidth: 0 }}>
+            <LanguageCards selected={selected} onToggle={toggleLang} onSelectAll={() => setSelected(LANGUAGES.map(l => l.id))} onDeselectAll={() => setSelected([LANGUAGES[0].id])} />
           </div>
-          <div style={{ padding: "12px 18px", display: "flex", gap: "8px", flexWrap: "wrap" }}>
-            {TONES.map(t => {
-              const active = tone === t.id;
-              return (
-                <button key={t.id} onClick={() => setTone(t.id)} className="clay-btn" style={{
-                  padding: "8px 14px", fontSize: "11.5px", fontWeight: active ? 800 : 600,
-                  color: active ? "#d97706" : (darkMode ? "#a09080" : "#6b5e50"),
-                  background: active ? (darkMode ? "linear-gradient(145deg, rgba(217,119,6,0.15), rgba(217,119,6,0.05))" : "linear-gradient(145deg, rgba(245,158,11,0.12), rgba(245,158,11,0.05))") : undefined,
-                  border: active ? "1.5px solid rgba(245,158,11,0.3)" : undefined,
-                  display: "flex", alignItems: "center", gap: "5px"
-                }}>
-                  <span style={{ fontSize: "13px" }}>{t.icon}</span>
-                  {t.label}
-                </button>
-              );
-            })}
+
+          {/* Tone Selector */}
+          <div className="clay tone-sidebar" style={{ padding: 0, overflow: "hidden", flexShrink: 0, width: "220px", alignSelf: "stretch" }}>
+            <div style={{ padding: "12px 18px", borderBottom: "1px solid rgba(166,152,130,0.12)", display: "flex", alignItems: "center", gap: "8px" }}>
+              <span style={{ fontSize: "14px" }}>{"\u{1F3AD}"}</span>
+              <span style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "1.2px", textTransform: "uppercase", color: darkMode ? "#d4c8b0" : "#78350f" }}>Tone</span>
+            </div>
+            <div style={{ padding: "12px 14px", display: "flex", gap: "6px", flexWrap: "wrap" }}>
+              {TONES.map(t => {
+                const active = tone === t.id;
+                return (
+                  <button key={t.id} onClick={() => setTone(t.id)} className="clay-btn" style={{
+                    padding: "6px 10px", fontSize: "10.5px", fontWeight: active ? 800 : 600,
+                    color: active ? "#d97706" : (darkMode ? "#a09080" : "#6b5e50"),
+                    background: active ? (darkMode ? "linear-gradient(145deg, rgba(217,119,6,0.15), rgba(217,119,6,0.05))" : "linear-gradient(145deg, rgba(245,158,11,0.12), rgba(245,158,11,0.05))") : undefined,
+                    border: active ? "1.5px solid rgba(245,158,11,0.3)" : undefined,
+                    display: "flex", alignItems: "center", gap: "4px"
+                  }}>
+                    <span style={{ fontSize: "12px" }}>{t.icon}</span>
+                    {t.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        {/* Script Input */}
+        {/* Two-column layout: Input (left) | Output (right) */}
+        <div className="converter-cols" style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
+
+        {/* Left Column — Script Input */}
+        <div style={{ flex: "1 1 0", minWidth: 0 }}>
         <div className="clay ta-focus" style={{ marginBottom: "16px", overflow: "hidden" }}>
           <div style={{ padding: "14px 22px", borderBottom: "1px solid rgba(166,152,130,0.12)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -1592,6 +1595,10 @@ export default function App() {
             </button>
           </div>
         </div>
+        </div>{/* end left column */}
+
+        {/* Right Column — Output */}
+        <div style={{ flex: "1 1 0", minWidth: 0 }}>
 
         {/* Error */}
         {error && (
@@ -1720,6 +1727,8 @@ export default function App() {
             </div>
           </div>
         )}
+        </div>{/* end right column */}
+        </div>{/* end two-column flex row */}
       </div>}
 
       {/* Footer */}
