@@ -845,6 +845,7 @@ const CSS = `
     background: linear-gradient(145deg, #231e14, #1c1810);
     box-shadow: inset 4px 4px 8px rgba(0,0,0,0.4), inset -3px -3px 6px rgba(60,50,35,0.2);
     border: 1px solid rgba(60,50,35,0.2);
+    color: #e8e0d4 !important;
   }
   .dark .clay-btn {
     background: linear-gradient(145deg, #2a2218, #1e1a12);
