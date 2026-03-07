@@ -10,6 +10,7 @@ const MODULES = [
   { id: "campaign", icon: "\uD83D\uDCE2", label: "Campaign" },
   { id: "script", icon: "\uD83D\uDCDC", label: "Script Gen" },
   { id: "caption", icon: "\uD83D\uDCAC", label: "Captions" },
+  { id: "learning", icon: "\uD83E\uDDE0", label: "Learning" },
 ];
 
 const LANGUAGES = [
@@ -345,6 +346,63 @@ RULES:
 - Reference Stage OTT brand naturally`;
 }
 
+/* --- Learning System Prompt --- */
+function buildLearningSystem(personaName, description) {
+  return `You are an expert writing analyst specializing in promotional content for entertainment/OTT platforms.
+
+TASK: Deeply analyze the following promo scripts to build a "writing fingerprint" for the writer named "${personaName}".
+${description ? `Writer description: ${description}` : ""}
+
+Analyze the scripts for:
+1. Overall writing style and voice
+2. Tone patterns (energetic, subtle, dramatic, humorous, etc.)
+3. Vocabulary preferences and distinctive word choices
+4. Sentence structure patterns (length, complexity, rhythm)
+5. How they write hooks/openings
+6. How they write CTAs/closings
+7. Emotional register and manipulation techniques
+8. Cultural references and markers
+9. Language mixing patterns (pure Hindi, Hinglish, dialect-heavy etc.)
+10. Any signature phrases or constructions
+
+OUTPUT FORMAT (use EXACTLY this structure):
+
+PERSONA: ${personaName}
+---
+WRITING_STYLE_SUMMARY: [2-3 sentence overview of this writer's style]
+TONE: [comma-separated tone descriptors]
+VOCABULARY_PATTERNS: [distinctive words, phrases, idioms used frequently]
+SENTENCE_STRUCTURE: [short/long, simple/complex, rhythm patterns]
+HOOK_STYLE: [how they open promos - patterns and examples]
+CTA_PATTERNS: [how they close/call-to-action - patterns]
+EMOTIONAL_REGISTER: [primary emotions evoked and techniques]
+CULTURAL_MARKERS: [regional/cultural references typical to this writer]
+LANGUAGE_MIX: [e.g., pure Hindi, Hinglish, dialect-heavy Bhojpuri]
+SIGNATURE_PHRASES: [any recurring phrases or constructions]
+---
+RAW_STYLE_INSTRUCTION: [Write a single comprehensive paragraph that, when injected into a system prompt, would make an AI write exactly like this persona. Be specific and actionable. This is the most important part.]
+
+RULES:
+- Be specific with examples from the provided scripts
+- This fingerprint will be used to mimic this writing style, so be precise
+- Keep total output under 800 words for token efficiency
+- Focus on actionable, reproducible style traits`;
+}
+
+/* --- localStorage helpers --- */
+function loadPersonas() {
+  try { return JSON.parse(localStorage.getItem("stage_personas") || "[]"); } catch { return []; }
+}
+function savePersonas(p) {
+  localStorage.setItem("stage_personas", JSON.stringify(p));
+}
+function loadActivePersonas() {
+  try { return JSON.parse(localStorage.getItem("stage_active_persona") || "{}"); } catch { return {}; }
+}
+function saveActivePersonas(m) {
+  localStorage.setItem("stage_active_persona", JSON.stringify(m));
+}
+
 /* --- Shared UI components --- */
 function StudioSelect({ label, value, onChange, options, darkMode }) {
   return (
@@ -410,6 +468,23 @@ function CopyBtn({ text, darkMode }) {
   );
 }
 
+function PersonaSelector({ moduleId, personas, activePersonaMap, onSelect, darkMode }) {
+  if (!personas || personas.length === 0) return null;
+  const currentId = activePersonaMap[moduleId] || "";
+  return (
+    <StudioSelect
+      label="Writing Persona"
+      value={currentId}
+      onChange={(v) => onSelect(moduleId, v || null)}
+      options={[
+        { value: "", label: "Default (No Persona)" },
+        ...personas.map(p => ({ value: p.id, label: p.name }))
+      ]}
+      darkMode={darkMode}
+    />
+  );
+}
+
 /* --- Download helper --- */
 function downloadContent(content, filename) {
   const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
@@ -446,6 +521,56 @@ export default function ContentStudio({ darkMode, streamConvert }) {
   const [captionData, setCaptionData] = useState({
     movieName: "", platform: "instagram", language: "bhojpuri", mood: "hype", count: "10"
   });
+
+  // Persona & Learning state
+  const [personas, setPersonas] = useState(() => loadPersonas());
+  const [activePersonaMap, setActivePersonaMap] = useState(() => loadActivePersonas());
+  const [learningData, setLearningData] = useState({
+    personaName: "", styleDescription: "", vocabularyPrefs: "", tonePatterns: "",
+    scriptInput: "", googleLink: ""
+  });
+
+  const handlePersonaSelect = (moduleId, personaId) => {
+    const updated = { ...activePersonaMap, [moduleId]: personaId };
+    setActivePersonaMap(updated);
+    saveActivePersonas(updated);
+  };
+
+  const deletePersona = (id) => {
+    const updated = personas.filter(p => p.id !== id);
+    setPersonas(updated);
+    savePersonas(updated);
+    const updatedMap = { ...activePersonaMap };
+    for (const key of Object.keys(updatedMap)) {
+      if (updatedMap[key] === id) updatedMap[key] = null;
+    }
+    setActivePersonaMap(updatedMap);
+    saveActivePersonas(updatedMap);
+  };
+
+  const handleFileUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    let combined = learningData.scriptInput;
+    for (const file of files) {
+      const text = await file.text();
+      combined += (combined ? "\n\n---\n\n" : "") + text;
+    }
+    setLearningData({ ...learningData, scriptInput: combined });
+  };
+
+  const fetchGoogleSheet = async () => {
+    try {
+      const match = learningData.googleLink.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (!match) { setError("Invalid Google Sheets URL"); return; }
+      const csvUrl = `https://docs.google.com/spreadsheets/d/${match[1]}/export?format=csv`;
+      const res = await fetch(csvUrl);
+      if (!res.ok) throw new Error("Could not fetch sheet. Make sure it is publicly accessible.");
+      const text = await res.text();
+      setLearningData({ ...learningData, scriptInput: learningData.scriptInput + (learningData.scriptInput ? "\n\n---\n\n" : "") + text });
+    } catch (err) {
+      setError(err.message || "Failed to fetch Google Sheet");
+    }
+  };
 
   const generate = async () => {
     setIsGenerating(true);
@@ -496,16 +621,71 @@ Mood: ${captionData.mood}
 Count: ${captionData.count}`;
           break;
 
+        case "learning": {
+          if (!learningData.personaName || !learningData.scriptInput) {
+            setError("Persona name aur scripts dono zaroori hain.");
+            setIsGenerating(false);
+            return;
+          }
+          system = buildLearningSystem(learningData.personaName, learningData.styleDescription);
+          userMessage = `PERSONA: ${learningData.personaName}
+USER-DESCRIBED STYLE: ${learningData.styleDescription || "Not specified"}
+USER-DESCRIBED VOCABULARY: ${learningData.vocabularyPrefs || "Not specified"}
+USER-DESCRIBED TONE: ${learningData.tonePatterns || "Not specified"}
+
+=== SCRIPTS TO ANALYZE ===
+${learningData.scriptInput}`;
+          break;
+        }
+
         default:
           break;
       }
 
-      await streamConvert({
+      // Inject persona if selected (not for learning module)
+      const activePersonaId = activePersonaMap[activeModule];
+      if (activePersonaId && activeModule !== "learning") {
+        const persona = personas.find(p => p.id === activePersonaId);
+        if (persona?.styleFingerprint) {
+          system = `=== WRITING PERSONA: ${persona.name} ===
+You MUST mimic this writer's style exactly. This is your primary directive for tone, vocabulary, and structure.
+
+${persona.styleFingerprint}
+${persona.styleDescription ? `\nStyle notes: ${persona.styleDescription}` : ""}
+${persona.vocabularyPrefs ? `Vocabulary preferences: ${persona.vocabularyPrefs}` : ""}
+${persona.tonePatterns ? `Tone patterns: ${persona.tonePatterns}` : ""}
+
+=== END PERSONA ===
+
+${system}`;
+        }
+      }
+
+      const result = await streamConvert({
         model: "anthropic/claude-sonnet-4-5",
         system,
         messages: [{ role: "user", content: userMessage }],
         onChunk: (partial) => setOutput(partial),
       });
+
+      // Save persona after learning analysis completes
+      if (activeModule === "learning" && result) {
+        const newPersona = {
+          id: crypto.randomUUID(),
+          name: learningData.personaName,
+          createdAt: new Date().toISOString(),
+          styleDescription: learningData.styleDescription,
+          vocabularyPrefs: learningData.vocabularyPrefs,
+          tonePatterns: learningData.tonePatterns,
+          styleFingerprint: result,
+          sourceScriptCount: learningData.scriptInput.split("---").length,
+          sourceSamplePreview: learningData.scriptInput.slice(0, 200),
+        };
+        const updated = [...personas, newPersona];
+        setPersonas(updated);
+        savePersonas(updated);
+        setLearningData({ personaName: "", styleDescription: "", vocabularyPrefs: "", tonePatterns: "", scriptInput: "", googleLink: "" });
+      }
     } catch (err) {
       setError(err.message || "Generation failed");
     }
@@ -558,6 +738,7 @@ Count: ${captionData.count}`;
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             {/* PROMO WRITER */}
             {activeModule === "promo" && (<>
+              <PersonaSelector moduleId="promo" personas={personas} activePersonaMap={activePersonaMap} onSelect={handlePersonaSelect} darkMode={dm} />
               <StudioInput label="Movie/Show Name *" value={promoData.movieName} onChange={v => setPromoData({ ...promoData, movieName: v })} placeholder="" darkMode={dm} />
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                 <StudioSelect label="Language" value={promoData.language} onChange={v => setPromoData({ ...promoData, language: v })} options={LANGUAGES} darkMode={dm} />
@@ -584,6 +765,7 @@ Count: ${captionData.count}`;
 
             {/* CAMPAIGN */}
             {activeModule === "campaign" && (<>
+              <PersonaSelector moduleId="campaign" personas={personas} activePersonaMap={activePersonaMap} onSelect={handlePersonaSelect} darkMode={dm} />
               <StudioSelect label="User Segment" value={campaignData.segment} onChange={v => setCampaignData({ ...campaignData, segment: v })} options={[
                 { value: "d0d1", label: "D0-D1 (Trial, <20min)" },
                 { value: "d2d7", label: "D2-D7 (Active 20+ min)" },
@@ -603,6 +785,7 @@ Count: ${captionData.count}`;
 
             {/* SCRIPT GEN */}
             {activeModule === "script" && (<>
+              <PersonaSelector moduleId="script" personas={personas} activePersonaMap={activePersonaMap} onSelect={handlePersonaSelect} darkMode={dm} />
               <StudioInput label="Title" value={scriptData.title} onChange={v => setScriptData({ ...scriptData, title: v })} placeholder="" darkMode={dm} />
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                 <StudioSelect label="Genre" value={scriptData.genre} onChange={v => setScriptData({ ...scriptData, genre: v })} options={GENRES} darkMode={dm} />
@@ -623,6 +806,7 @@ Count: ${captionData.count}`;
 
             {/* CAPTIONS */}
             {activeModule === "caption" && (<>
+              <PersonaSelector moduleId="caption" personas={personas} activePersonaMap={activePersonaMap} onSelect={handlePersonaSelect} darkMode={dm} />
               <StudioInput label="Movie/Show Name" value={captionData.movieName} onChange={v => setCaptionData({ ...captionData, movieName: v })} placeholder="" darkMode={dm} />
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                 <StudioSelect label="Platform" value={captionData.platform} onChange={v => setCaptionData({ ...captionData, platform: v })} options={[
@@ -643,6 +827,52 @@ Count: ${captionData.count}`;
               </div>
             </>)}
 
+            {/* LEARNING */}
+            {activeModule === "learning" && (<>
+              <StudioInput label="Persona Name *" value={learningData.personaName} onChange={v => setLearningData({ ...learningData, personaName: v })} placeholder="" darkMode={dm} />
+              <StudioInput label="Style Description" value={learningData.styleDescription} onChange={v => setLearningData({ ...learningData, styleDescription: v })} placeholder="" darkMode={dm} />
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                <StudioInput label="Vocabulary Preferences" value={learningData.vocabularyPrefs} onChange={v => setLearningData({ ...learningData, vocabularyPrefs: v })} placeholder="" darkMode={dm} />
+                <StudioInput label="Tone Patterns" value={learningData.tonePatterns} onChange={v => setLearningData({ ...learningData, tonePatterns: v })} placeholder="" darkMode={dm} />
+              </div>
+              <StudioTextArea label="Paste Promo Scripts *" value={learningData.scriptInput} onChange={v => setLearningData({ ...learningData, scriptInput: v })} placeholder="" rows={8} darkMode={dm} />
+              <div>
+                <label style={{ display: "block", fontSize: "10px", fontWeight: 700, color: dm ? "#a09080" : "#92400e", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.8px" }}>Or Upload Text Files</label>
+                <input type="file" accept=".txt,.csv" multiple onChange={handleFileUpload} style={{ fontSize: "11px", color: dm ? "#a09080" : "#6b5e50" }} />
+              </div>
+              <div style={{ display: "flex", gap: "8px", alignItems: "flex-end" }}>
+                <div style={{ flex: 1 }}>
+                  <StudioInput label="Google Sheet Link (Optional)" value={learningData.googleLink} onChange={v => setLearningData({ ...learningData, googleLink: v })} placeholder="" darkMode={dm} />
+                </div>
+                {learningData.googleLink && (
+                  <button onClick={fetchGoogleSheet} className="clay-btn" style={{ padding: "8px 14px", fontSize: "11px", fontWeight: 700, color: dm ? "#d4c8b0" : "#78350f", whiteSpace: "nowrap" }}>
+                    Fetch
+                  </button>
+                )}
+              </div>
+              {learningData.googleLink && (
+                <div className="clay-inner" style={{ padding: "8px 12px", fontSize: "10px", color: dm ? "#a09080" : "#6b5e50", lineHeight: 1.6 }}>
+                  Tip: Google Sheet public hona chahiye. Ya fir File &rarr; Download &rarr; CSV karke upload karo.
+                </div>
+              )}
+              {personas.length > 0 && (
+                <div>
+                  <label style={{ display: "block", fontSize: "10px", fontWeight: 700, color: dm ? "#a09080" : "#92400e", marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.8px" }}>Saved Personas ({personas.length})</label>
+                  {personas.map(p => (
+                    <div key={p.id} className="clay-inner" style={{ padding: "8px 12px", marginBottom: "6px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div>
+                        <span style={{ fontSize: "12px", fontWeight: 700, color: dm ? "#e8e0d4" : "#3d3425" }}>{p.name}</span>
+                        <span style={{ fontSize: "10px", color: dm ? "#6b5e50" : "#a08060", marginLeft: "8px" }}>{p.sourceScriptCount} scripts</span>
+                      </div>
+                      <button onClick={() => deletePersona(p.id)} className="clay-btn" style={{ padding: "3px 8px", fontSize: "10px", fontWeight: 700, color: "#dc2626" }}>
+                        Delete
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>)}
+
             {/* Generate Button */}
             <button onClick={generate} disabled={isGenerating} className="clay-btn-primary" style={{
               width: "100%", padding: "13px", borderRadius: "14px", border: "none",
@@ -650,9 +880,9 @@ Count: ${captionData.count}`;
               display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginTop: "4px"
             }}>
               {isGenerating ? (
-                <><span style={{ width: "14px", height: "14px", borderRadius: "50%", border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", display: "inline-block", animation: "spin 0.7s linear infinite" }} /> Generating...</>
+                <><span style={{ width: "14px", height: "14px", borderRadius: "50%", border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", display: "inline-block", animation: "spin 0.7s linear infinite" }} /> {activeModule === "learning" ? "Analyzing..." : "Generating..."}</>
               ) : (
-                <>\u26A1 Generate {MODULES.find(m => m.id === activeModule)?.label}</>
+                <>{activeModule === "learning" ? "Analyze & Learn" : `Generate ${MODULES.find(m => m.id === activeModule)?.label}`}</>
               )}
             </button>
           </div>

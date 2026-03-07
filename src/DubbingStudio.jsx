@@ -688,7 +688,7 @@ Notes: ${qcData.notes || "Standard review"}`;
               {isGenerating ? (
                 <><span style={{ width: "14px", height: "14px", borderRadius: "50%", border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", display: "inline-block", animation: "spin 0.7s linear infinite" }} /> Generating...</>
               ) : (
-                <>{"\u26A1"} Generate {MODULES.find(m => m.id === activeModule)?.label}</>
+                <>Generate {MODULES.find(m => m.id === activeModule)?.label}</>
               )}
             </button>
           </div>
