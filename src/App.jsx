@@ -744,7 +744,8 @@ function FireflyBackground() {
 }
 
 /* --- Language Cards (multi-select) --- */
-function LanguageCards({ selected, onToggle }) {
+function LanguageCards({ selected, onToggle, onSelectAll, onDeselectAll }) {
+  const allSelected = selected.length === LANGUAGES.length;
   return (
     <div className="clay" style={{ padding: 0, marginBottom: "16px", overflow: "hidden" }}>
       <div style={{ padding: "14px 22px", borderBottom: "1px solid rgba(166,152,130,0.15)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -752,7 +753,12 @@ function LanguageCards({ selected, onToggle }) {
           <span style={{ fontSize: "14px" }}>&#127760;</span>
           <span style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "1.2px", textTransform: "uppercase", color: "#78350f" }}>Convert To</span>
         </div>
-        <span style={{ fontSize: "10px", color: "#92400e", fontWeight: 600 }}>{selected.length} selected</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <span style={{ fontSize: "10px", color: "#92400e", fontWeight: 600 }}>{selected.length}/{LANGUAGES.length}</span>
+          <button onClick={allSelected ? onDeselectAll : onSelectAll} className="clay-btn" style={{ padding: "4px 12px", fontSize: "10px", fontWeight: 700, color: "#78350f" }}>
+            {allSelected ? "Deselect All" : "Select All"}
+          </button>
+        </div>
       </div>
       <div className="lang-grid" style={{ padding: "16px 18px", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(155px, 1fr))", gap: "12px" }}>
         {LANGUAGES.map(d => {
@@ -894,7 +900,7 @@ export default function App() {
         <div style={{ marginBottom: "28px" }} />
 
         {/* Language Cards */}
-        <LanguageCards selected={selected} onToggle={toggleLang} />
+        <LanguageCards selected={selected} onToggle={toggleLang} onSelectAll={() => setSelected(LANGUAGES.map(l => l.id))} onDeselectAll={() => setSelected([LANGUAGES[0].id])} />
 
         {/* Script Input */}
         <div className="clay ta-focus" style={{ marginBottom: "16px", overflow: "hidden" }}>
