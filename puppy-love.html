@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For You</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 30%, #f48fb1 60%, #fce4ec 100%);
+      font-family: 'Poppins', sans-serif;
+      overflow-x: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    ::selection { background: rgba(233,30,99,0.2); color: #880e4f; }
+
+    @keyframes floatHeart {
+      0% { transform: translateY(0) scale(1); opacity: 0.7; }
+      100% { transform: translateY(-100vh) scale(0.3); opacity: 0; }
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+    @keyframes bigPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
+    .floating-hearts {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    }
+    .heart {
+      position: absolute; bottom: -40px;
+    }
+
+    .container {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; min-height: 100vh; padding: 20px;
+      position: relative; z-index: 1;
+    }
+
+    .title {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      color: #880e4f;
+      margin-bottom: 10px;
+      text-align: center;
+      animation: fadeInUp 0.8s ease;
+    }
+    .subtitle {
+      color: #ad1457; font-size: 0.95rem;
+      margin-bottom: 40px; font-weight: 300;
+      opacity: 0.8; animation: fadeInUp 1s ease;
+    }
+
+    .puppy {
+      font-size: clamp(80px, 20vw, 140px);
+      margin-bottom: 50px;
+      animation: pulse 3s ease infinite;
+      filter: drop-shadow(0 10px 30px rgba(136,14,79,0.2));
+      line-height: 1;
+      transition: all 0.3s ease;
+    }
+    .puppy.shaking {
+      animation: shake 0.5s ease;
+    }
+
+    .tabs {
+      display: flex; gap: 20px; align-items: center;
+      animation: fadeInUp 1.2s ease;
+    }
+
+    .btn-maaf {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(0.9rem, 2.5vw, 1.15rem);
+      font-weight: 500;
+      padding: 14px 32px;
+      border: none; border-radius: 50px;
+      background: linear-gradient(135deg, #e91e63, #c2185b);
+      color: #fff; cursor: pointer;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      letter-spacing: 0.5px;
+      outline: none;
+    }
+    .btn-maaf:hover {
+      box-shadow: 0 6px 25px rgba(233,30,99,0.5);
+    }
+
+    .btn-maar {
+      font-family: 'Poppins', sans-serif;
+      font-size: clamp(0.9rem, 2.5vw, 1.15rem);
+      font-weight: 500;
+      padding: 14px 32px;
+      border: 2px solid rgba(136,14,79,0.3);
+      border-radius: 50px;
+      background: rgba(255,255,255,0.6);
+      color: #880e4f; cursor: pointer;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+      letter-spacing: 0.5px;
+      outline: none;
+    }
+    .btn-maar:hover {
+      background: rgba(255,255,255,0.8);
+    }
+
+    .hint {
+      color: #ad1457; font-size: 0.8rem;
+      margin-top: 20px; opacity: 0.6;
+      font-weight: 300; min-height: 1.2em;
+    }
+    .final-hint {
+      font-family: 'Dancing Script', cursive;
+      color: #880e4f;
+      font-size: clamp(1rem, 3vw, 1.4rem);
+      margin-top: 24px; font-weight: 600;
+      animation: fadeInUp 0.6s ease;
+    }
+
+    /* Proposal Overlay */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(136,14,79,0.88);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100; animation: fadeInUp 0.6s ease;
+      cursor: pointer;
+    }
+    .overlay-content {
+      text-align: center; color: #fff;
+      animation: bigPulse 2s ease infinite;
+    }
+    .overlay-heart { font-size: 80px; margin-bottom: 20px; }
+    .overlay h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(2rem, 6vw, 4rem);
+      font-weight: 700; margin-bottom: 16px;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    }
+    .overlay p {
+      font-size: 1.1rem; opacity: 0.8; font-weight: 300;
+    }
+    .overlay-hearts {
+      margin-top: 30px; font-size: 40px; letter-spacing: 10px;
+    }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Hearts Background -->
+  <div class="floating-hearts" id="hearts"></div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <h1 class="title">Hey Cutie...</h1>
+    <p class="subtitle">I have something to say...</p>
+
+    <div class="puppy" id="puppy">&#x1F436;</div>
+
+    <div class="tabs">
+      <button class="btn-maaf" id="btnMaaf" onclick="handleMaaf()">Maaf Kiya</button>
+      <button class="btn-maar" id="btnMaar" onclick="handleMaar()">Maar Dalugi</button>
+    </div>
+
+    <p class="hint" id="hint"></p>
+  </div>
+
+  <!-- Proposal Overlay -->
+  <div class="overlay hidden" id="overlay" onclick="closeOverlay()">
+    <div class="overlay-content">
+      <div class="overlay-heart">&#x2764;&#xFE0F;</div>
+      <h1>Will you be my life partner?</h1>
+      <p>I promise to love you forever...</p>
+      <div class="overlay-hearts">&#x2764; &#x2764; &#x2764;</div>
+    </div>
+  </div>
+
+  <script>
+    // Create floating hearts
+    const heartsContainer = document.getElementById('hearts');
+    for (let i = 0; i < 15; i++) {
+      const span = document.createElement('span');
+      span.className = 'heart';
+      span.textContent = i % 2 === 0 ? '\u2764' : '\u2765';
+      span.style.left = Math.random() * 100 + '%';
+      span.style.fontSize = (14 + Math.random() * 20) + 'px';
+      span.style.animation = `floatHeart ${4 + Math.random() * 4}s ease-in ${Math.random() * 5}s infinite`;
+      span.style.opacity = '0.6';
+      heartsContainer.appendChild(span);
+    }
+
+    let clickCount = 0;
+    const maxClicks = 5;
+    const btnMaaf = document.getElementById('btnMaaf');
+    const btnMaar = document.getElementById('btnMaar');
+    const puppy = document.getElementById('puppy');
+    const hint = document.getElementById('hint');
+    const overlay = document.getElementById('overlay');
+
+    function handleMaar() {
+      if (clickCount >= maxClicks) return;
+      clickCount++;
+
+      // Shake puppy
+      puppy.classList.add('shaking');
+      setTimeout(() => puppy.classList.remove('shaking'), 500);
+
+      // Grow Tab 1, Shrink Tab 2
+      const tab1Scale = 1 + clickCount * 0.12;
+      const tab2Scale = 1 - clickCount * 0.16;
+
+      btnMaaf.style.transform = `scale(${tab1Scale})`;
+      btnMaaf.style.boxShadow = `0 4px ${10 + clickCount * 4}px rgba(233,30,99,${0.3 + clickCount * 0.08})`;
+
+      btnMaar.style.transform = `scale(${tab2Scale})`;
+      btnMaar.style.opacity = tab2Scale;
+
+      // Update hint
+      if (clickCount < 3) {
+        hint.textContent = 'Sochlo phir se...';
+        hint.className = 'hint';
+      } else if (clickCount < 5) {
+        hint.textContent = 'Ab toh maaf kr do na...';
+        hint.className = 'hint';
+      }
+
+      // After 5 clicks - remove Tab 2
+      if (clickCount >= maxClicks) {
+        setTimeout(() => {
+          btnMaar.style.display = 'none';
+          btnMaaf.textContent = 'Maaf Kiya \u2764\uFE0F';
+          hint.textContent = 'Ab click kro... please';
+          hint.className = 'final-hint';
+        }, 400);
+      }
+    }
+
+    function handleMaaf() {
+      overlay.classList.remove('hidden');
+    }
+
+    function closeOverlay() {
+      overlay.classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
