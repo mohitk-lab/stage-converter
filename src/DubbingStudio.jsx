@@ -617,18 +617,18 @@ Notes: ${qcData.notes || "Standard review"}`;
                   { value: "animation", label: "Animation" }
                 ]} darkMode={dm} />
               </div>
-              <StudioTextArea label="Source Script *" value={adaptData.sourceScript} onChange={v => setAdaptData({ ...adaptData, sourceScript: v })} placeholder="Paste original dialogue here... (one line per dialogue, optionally with timecodes like [00:01:23])" rows={6} darkMode={dm} />
+              <StudioTextArea label="Source Script *" value={adaptData.sourceScript} onChange={v => setAdaptData({ ...adaptData, sourceScript: v })} placeholder="" rows={6} darkMode={dm} />
             </>)}
 
             {/* VOICE DIRECTION */}
             {activeModule === "voice" && (<>
-              <StudioInput label="Character Name" value={voiceData.characterName} onChange={v => setVoiceData({ ...voiceData, characterName: v })} placeholder="e.g., Raju, Meena Devi" darkMode={dm} />
+              <StudioInput label="Character Name" value={voiceData.characterName} onChange={v => setVoiceData({ ...voiceData, characterName: v })} placeholder="" darkMode={dm} />
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                 <StudioSelect label="Language" value={voiceData.language} onChange={v => setVoiceData({ ...voiceData, language: v })} options={LANGUAGES} darkMode={dm} />
                 <StudioSelect label="Genre" value={voiceData.genre} onChange={v => setVoiceData({ ...voiceData, genre: v })} options={GENRES} darkMode={dm} />
               </div>
-              <StudioTextArea label="Character Description" value={voiceData.characterDesc} onChange={v => setVoiceData({ ...voiceData, characterDesc: v })} placeholder="Age, personality, role in story, emotional state..." rows={3} darkMode={dm} />
-              <StudioTextArea label="Scene Context" value={voiceData.sceneContext} onChange={v => setVoiceData({ ...voiceData, sceneContext: v })} placeholder="What's happening in the scene? What emotion should come through?" rows={3} darkMode={dm} />
+              <StudioTextArea label="Character Description" value={voiceData.characterDesc} onChange={v => setVoiceData({ ...voiceData, characterDesc: v })} placeholder="" rows={3} darkMode={dm} />
+              <StudioTextArea label="Scene Context" value={voiceData.sceneContext} onChange={v => setVoiceData({ ...voiceData, sceneContext: v })} placeholder="" rows={3} darkMode={dm} />
             </>)}
 
             {/* TIMING SHEET */}
@@ -638,24 +638,24 @@ Notes: ${qcData.notes || "Standard review"}`;
                 <StudioSelect label="Target Language" value={timingData.targetLang} onChange={v => setTimingData({ ...timingData, targetLang: v })} options={LANGUAGES} darkMode={dm} />
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                <StudioInput label="Episode/Scene Info" value={timingData.episodeInfo} onChange={v => setTimingData({ ...timingData, episodeInfo: v })} placeholder="e.g., S01E03, Scene 7" darkMode={dm} />
+                <StudioInput label="Episode/Scene Info" value={timingData.episodeInfo} onChange={v => setTimingData({ ...timingData, episodeInfo: v })} placeholder="" darkMode={dm} />
                 <StudioSelect label="Sheet Format" value={timingData.format} onChange={v => setTimingData({ ...timingData, format: v })} options={[
                   { value: "standard", label: "Standard Cue Sheet" }, { value: "adr", label: "ADR Sheet" },
                   { value: "loop", label: "Loop Sheet" }
                 ]} darkMode={dm} />
               </div>
-              <StudioTextArea label="Dialogue Lines *" value={timingData.dialogueText} onChange={v => setTimingData({ ...timingData, dialogueText: v })} placeholder="One dialogue per line. Optionally include timecodes and character names:&#10;[00:01:23] RAJU: Yeh kya ho raha hai?&#10;[00:01:26] MEENA: Mujhe nahi pata..." rows={6} darkMode={dm} />
+              <StudioTextArea label="Dialogue Lines *" value={timingData.dialogueText} onChange={v => setTimingData({ ...timingData, dialogueText: v })} placeholder="" rows={6} darkMode={dm} />
             </>)}
 
             {/* VOICE BIBLE */}
             {activeModule === "bible" && (<>
-              <StudioInput label="Show/Movie Title" value={bibleData.showTitle} onChange={v => setBibleData({ ...bibleData, showTitle: v })} placeholder="e.g., Jhola Chhap Season 2" darkMode={dm} />
+              <StudioInput label="Show/Movie Title" value={bibleData.showTitle} onChange={v => setBibleData({ ...bibleData, showTitle: v })} placeholder="" darkMode={dm} />
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
                 <StudioSelect label="Language" value={bibleData.language} onChange={v => setBibleData({ ...bibleData, language: v })} options={LANGUAGES} darkMode={dm} />
                 <StudioSelect label="Genre" value={bibleData.genre} onChange={v => setBibleData({ ...bibleData, genre: v })} options={GENRES} darkMode={dm} />
               </div>
-              <StudioInput label="Episodes" value={bibleData.episodes} onChange={v => setBibleData({ ...bibleData, episodes: v })} placeholder="e.g., 12 episodes, Season 1" darkMode={dm} />
-              <StudioTextArea label="Characters" value={bibleData.characters} onChange={v => setBibleData({ ...bibleData, characters: v })} placeholder="One character per line:&#10;Raju - 25 year old village boy, funny, innocent&#10;Meena - 50 year old strict mother, loving inside" rows={4} darkMode={dm} />
+              <StudioInput label="Episodes" value={bibleData.episodes} onChange={v => setBibleData({ ...bibleData, episodes: v })} placeholder="" darkMode={dm} />
+              <StudioTextArea label="Characters" value={bibleData.characters} onChange={v => setBibleData({ ...bibleData, characters: v })} placeholder="" rows={4} darkMode={dm} />
             </>)}
 
             {/* LIP-SYNC ADAPTER */}
@@ -674,14 +674,14 @@ Notes: ${qcData.notes || "Standard review"}`;
                   { value: "nasal", label: "Nasal Sounds" }, { value: "mixed", label: "Mixed" }
                 ]} darkMode={dm} />
               </div>
-              <StudioTextArea label="Original Dialogue Lines *" value={lipsyncData.originalLines} onChange={v => setLipsyncData({ ...lipsyncData, originalLines: v })} placeholder="One dialogue line per row:&#10;Yeh kya ho raha hai bhai?&#10;Mujhe is sheher se bahut pyaar hai" rows={4} darkMode={dm} />
+              <StudioTextArea label="Original Dialogue Lines *" value={lipsyncData.originalLines} onChange={v => setLipsyncData({ ...lipsyncData, originalLines: v })} placeholder="" rows={4} darkMode={dm} />
             </>)}
 
             {/* QC REVIEW */}
             {activeModule === "qc" && (<>
-              <StudioInput label="Show/Movie Title" value={qcData.showTitle} onChange={v => setQCData({ ...qcData, showTitle: v })} placeholder="e.g., Jhola Chhap" darkMode={dm} />
+              <StudioInput label="Show/Movie Title" value={qcData.showTitle} onChange={v => setQCData({ ...qcData, showTitle: v })} placeholder="" darkMode={dm} />
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                <StudioInput label="Episode/Scene" value={qcData.episodeInfo} onChange={v => setQCData({ ...qcData, episodeInfo: v })} placeholder="e.g., S01E05" darkMode={dm} />
+                <StudioInput label="Episode/Scene" value={qcData.episodeInfo} onChange={v => setQCData({ ...qcData, episodeInfo: v })} placeholder="" darkMode={dm} />
                 <StudioSelect label="Language" value={qcData.language} onChange={v => setQCData({ ...qcData, language: v })} options={LANGUAGES} darkMode={dm} />
               </div>
               <StudioSelect label="QC Type" value={qcData.qcType} onChange={v => setQCData({ ...qcData, qcType: v })} options={[
@@ -689,7 +689,7 @@ Notes: ${qcData.notes || "Standard review"}`;
                 { value: "cultural", label: "Cultural Review" }, { value: "technical", label: "Technical Audio" },
                 { value: "final_delivery", label: "Final Delivery Check" }
               ]} darkMode={dm} />
-              <StudioTextArea label="Specific Concerns" value={qcData.notes} onChange={v => setQCData({ ...qcData, notes: v })} placeholder="Any specific areas to focus on? Known issues?" rows={3} darkMode={dm} />
+              <StudioTextArea label="Specific Concerns" value={qcData.notes} onChange={v => setQCData({ ...qcData, notes: v })} placeholder="" rows={3} darkMode={dm} />
             </>)}
 
             {/* Generate Button */}

@@ -857,6 +857,80 @@ const CSS = `
   .dark .clay-btn-primary:disabled { background: linear-gradient(145deg, #3a3228, #2e281e); color: #6b5e50; }
   .dark textarea { color: #e8e0d4 !important; }
   .dark textarea::placeholder { color: #6b5e50 !important; }
+  .dark input { color: #e8e0d4 !important; }
+  .dark input::placeholder { color: #6b5e50 !important; }
+  .dark select { color: #e8e0d4 !important; }
+  .dark option { background: #1e1a12; color: #e8e0d4; }
+  .dark .lang-chip {
+    background: linear-gradient(145deg, #2a2218, #1e1a12) !important;
+    border-color: rgba(60,50,35,0.3) !important;
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.4), -3px -3px 8px rgba(60,50,35,0.2), inset 0 1px 0 rgba(60,50,35,0.3) !important;
+  }
+  .dark .lang-chip[style*="border: 2px"] {
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.4), -3px -3px 8px rgba(60,50,35,0.2), inset 0 1px 0 rgba(60,50,35,0.3) !important;
+  }
+  .dark .ta-focus textarea { color: #e8e0d4 !important; }
+  .dark .ta-focus textarea::placeholder { color: #6b5e50 !important; }
+
+  /* --- Dark mode: comprehensive color overrides --- */
+  /* Logo */
+  .dark .ruhi-logo-text { color: #d4c8b0 !important; }
+  .dark .ruhi-logo-sub { color: #a09080 !important; }
+
+  /* Language cards text */
+  .dark .lang-name { color: #e8e0d4 !important; }
+  .dark .lang-name-off { color: #a09080 !important; }
+  .dark .lang-sub { color: #a09080 !important; }
+  .dark .lang-header-text { color: #d4c8b0 !important; }
+  .dark .lang-header-count { color: #a09080 !important; }
+  .dark .lang-header-btn { color: #d4c8b0 !important; }
+  .dark .lang-wc { color: #a09080 !important; background: rgba(245,158,11,0.12) !important; }
+  .dark .lang-icon-off { color: #6b5e50 !important; background: linear-gradient(145deg, #2a2218, #1e1a12) !important; }
+
+  /* Result cards */
+  .dark .result-lang-name { color: #e8e0d4 !important; }
+  .dark .result-sub { color: #a09080 !important; }
+
+  /* Results header */
+  .dark .results-title { color: #e8e0d4 !important; }
+  .dark .results-sub { color: #a09080 !important; }
+  .dark .results-btn { color: #d4c8b0 !important; }
+
+  /* Loading / progress */
+  .dark .loading-text { color: #d4c8b0 !important; }
+  .dark .loading-sub { color: #a09080 !important; }
+
+  /* Script Input area */
+  .dark .word-count-text { color: #a09080 !important; }
+  .dark .char-count-text { color: #a09080 !important; }
+  .dark .ctrl-hint { color: #6b5e50 !important; }
+
+  /* History sidebar */
+  .dark .history-panel {
+    background: linear-gradient(180deg, #1e1a12, #1a1510) !important;
+    box-shadow: -8px 0 24px rgba(0,0,0,0.5) !important;
+    border-left: 1px solid rgba(60,50,35,0.3) !important;
+  }
+  .dark .history-title { color: #d4c8b0 !important; }
+  .dark .history-count { color: #a09080 !important; background: rgba(245,158,11,0.15) !important; }
+  .dark .history-preview { color: #d4c8b0 !important; }
+  .dark .history-date { color: #6b5e50 !important; }
+  .dark .history-langs { color: #a09080 !important; }
+  .dark .history-load-btn { color: #d4c8b0 !important; }
+  .dark .history-entry-text { color: #d4c8b0 !important; }
+  .dark .history-expanded { background: rgba(60,50,35,0.1) !important; }
+  .dark .history-footer { color: #6b5e50 !important; }
+  .dark .history-empty { color: #6b5e50 !important; }
+
+  /* Footer */
+  .dark .footer-powered { color: #a09080 !important; }
+  .dark .footer-info { color: #6b5e50 !important; }
+
+  /* Batch CSV */
+  .dark .batch-lang-text { color: #a09080 !important; }
+
+  /* Error text dark */
+  .dark .error-box { color: #fca5a5 !important; }
 `;
 
 /* --- Logo --- */
@@ -865,8 +939,8 @@ function Logo() {
     <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
       <div className="clay-btn" style={{ width: "36px", height: "36px", borderRadius: "12px", background: "linear-gradient(135deg,#f59e0b,#ef4444)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "17px", fontWeight: 900, color: "#fff", border: "none" }}>R</div>
       <div>
-        <div style={{ fontSize: "17px", fontWeight: 900, letterSpacing: "-0.5px", lineHeight: 1.1, color: "#78350f" }}>RUHI</div>
-        <div style={{ fontSize: "8px", color: "#92400e", letterSpacing: "1.8px", fontWeight: 700, textTransform: "uppercase" }}>Multilingual Studio</div>
+        <div className="ruhi-logo-text" style={{ fontSize: "17px", fontWeight: 900, letterSpacing: "-0.5px", lineHeight: 1.1, color: "#78350f" }}>RUHI</div>
+        <div className="ruhi-logo-sub" style={{ fontSize: "8px", color: "#92400e", letterSpacing: "1.8px", fontWeight: 700, textTransform: "uppercase" }}>Multilingual Studio</div>
       </div>
     </div>
   );
@@ -979,11 +1053,11 @@ function LanguageCards({ selected, onToggle, onSelectAll, onDeselectAll }) {
       <div style={{ padding: "14px 22px", borderBottom: "1px solid rgba(166,152,130,0.15)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <span style={{ fontSize: "14px" }}>&#127760;</span>
-          <span style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "1.2px", textTransform: "uppercase", color: "#78350f" }}>Convert To</span>
+          <span className="lang-header-text" style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "1.2px", textTransform: "uppercase", color: "#78350f" }}>Convert To</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span style={{ fontSize: "10px", color: "#92400e", fontWeight: 600 }}>{selected.length}/{LANGUAGES.length}</span>
-          <button onClick={allSelected ? onDeselectAll : onSelectAll} className="clay-btn" style={{ padding: "4px 12px", fontSize: "10px", fontWeight: 700, color: "#78350f" }}>
+          <span className="lang-header-count" style={{ fontSize: "10px", color: "#92400e", fontWeight: 600 }}>{selected.length}/{LANGUAGES.length}</span>
+          <button onClick={allSelected ? onDeselectAll : onSelectAll} className="clay-btn lang-header-btn" style={{ padding: "4px 12px", fontSize: "10px", fontWeight: 700, color: "#78350f" }}>
             {allSelected ? "Deselect All" : "Select All"}
           </button>
         </div>
@@ -1016,8 +1090,8 @@ function LanguageCards({ selected, onToggle, onSelectAll, onDeselectAll }) {
                   transition: "all 0.2s"
                 }}>{d.label.charAt(0)}</div>
                 <div>
-                  <div style={{ fontSize: "13.5px", fontWeight: 800, color: on ? "#1e1b18" : "#6b5e50", lineHeight: 1.2, transition: "color 0.2s" }}>{d.label}</div>
-                  <div style={{ fontSize: "10px", color: on ? "#78350f" : "#a09080", marginTop: "2px" }}>{d.sub} &middot; {d.region}</div>
+                  <div className={on ? "lang-name" : "lang-name-off"} style={{ fontSize: "13.5px", fontWeight: 800, color: on ? "#1e1b18" : "#6b5e50", lineHeight: 1.2, transition: "color 0.2s" }}>{d.label}</div>
+                  <div className="lang-sub" style={{ fontSize: "10px", color: on ? "#78350f" : "#a09080", marginTop: "2px" }}>{d.sub} &middot; {d.region}</div>
                 </div>
               </div>
               {on && <div style={{ position: "absolute", bottom: "8px", right: "10px", width: "20px", height: "20px", borderRadius: "50%", background: `linear-gradient(135deg, ${d.color}, ${d.color}cc)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", color: "#fff", fontWeight: 900, boxShadow: `2px 2px 4px ${d.color}40, -1px -1px 3px rgba(255,255,255,0.3)` }}>&#10003;</div>}
@@ -1043,14 +1117,14 @@ function ResultCard({ result, lang, copied, onCopy, isStreaming, srtMode, onDown
           <div style={{ width: "38px", height: "38px", borderRadius: "12px", background: `linear-gradient(135deg, ${lang.color}25, ${lang.color}10)`, border: `1px solid ${lang.color}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", fontWeight: 900, color: lang.color, flexShrink: 0, boxShadow: `inset 2px 2px 4px ${lang.color}10, inset -2px -2px 3px rgba(255,255,255,0.5)` }}>{lang.label.charAt(0)}</div>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <span style={{ fontSize: "15px", fontWeight: 800, color: "#1e1b18" }}>{lang.label}</span>
+              <span className="result-lang-name" style={{ fontSize: "15px", fontWeight: 800, color: "#1e1b18" }}>{lang.label}</span>
               {isStreaming && <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: lang.color, display: "inline-block", animation: "pulse 1s ease-in-out infinite" }} />}
             </div>
-            <div style={{ fontSize: "10.5px", color: "#78350f" }}>{lang.sub} &middot; {lang.region}</div>
+            <div className="result-sub" style={{ fontSize: "10.5px", color: "#78350f" }}>{lang.sub} &middot; {lang.region}</div>
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span style={{ fontSize: "10px", color: "#78350f", background: "rgba(245,158,11,0.08)", borderRadius: "8px", padding: "3px 10px", fontWeight: 600 }}>{wc} words</span>
+          <span className="lang-wc" style={{ fontSize: "10px", color: "#78350f", background: "rgba(245,158,11,0.08)", borderRadius: "8px", padding: "3px 10px", fontWeight: 600 }}>{wc} words</span>
           {!isStreaming && (
             <div style={{ display: "flex", gap: "6px" }}>
               {srtMode && onDownloadSrt && (
@@ -1116,7 +1190,7 @@ function HistorySidebar({ open, onClose, onLoad }) {
   return (
     <>
       <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.2)", zIndex: 50, backdropFilter: "blur(3px)" }} />
-      <div style={{
+      <div className="history-panel" style={{
         position: "fixed", top: 0, right: 0, bottom: 0, width: "340px", maxWidth: "90vw",
         background: "linear-gradient(180deg, #f5f0e8, #ece7dd)", zIndex: 51,
         boxShadow: "-8px 0 24px rgba(166,152,130,0.3), -2px 0 8px rgba(255,255,255,0.5)",
@@ -1128,8 +1202,8 @@ function HistorySidebar({ open, onClose, onLoad }) {
         <div style={{ padding: "18px 20px", borderBottom: "1px solid rgba(166,152,130,0.15)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <span style={{ fontSize: "16px" }}>&#128218;</span>
-            <span style={{ fontSize: "14px", fontWeight: 800, color: "#78350f" }}>History</span>
-            <span style={{ fontSize: "10px", color: "#92400e", background: "rgba(245,158,11,0.1)", padding: "2px 8px", borderRadius: "8px", fontWeight: 600 }}>{history.length}</span>
+            <span className="history-title" style={{ fontSize: "14px", fontWeight: 800, color: "#78350f" }}>History</span>
+            <span className="history-count" style={{ fontSize: "10px", color: "#92400e", background: "rgba(245,158,11,0.1)", padding: "2px 8px", borderRadius: "8px", fontWeight: 600 }}>{history.length}</span>
           </div>
           <div style={{ display: "flex", gap: "8px" }}>
             {history.length > 0 && (
@@ -1142,7 +1216,7 @@ function HistorySidebar({ open, onClose, onLoad }) {
         {/* List */}
         <div style={{ flex: 1, overflowY: "auto", padding: "12px" }}>
           {history.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "40px 20px", color: "#a08060" }}>
+            <div className="history-empty" style={{ textAlign: "center", padding: "40px 20px", color: "#a08060" }}>
               <div style={{ fontSize: "32px", marginBottom: "12px" }}>&#128196;</div>
               <div style={{ fontSize: "13px", fontWeight: 600 }}>No history yet</div>
               <div style={{ fontSize: "11px", marginTop: "4px" }}>Converted scripts will appear here for 30 days</div>
@@ -1156,25 +1230,25 @@ function HistorySidebar({ open, onClose, onLoad }) {
                 <div key={entry.id} className="clay" style={{ marginBottom: "10px", padding: 0, overflow: "hidden", borderRadius: "16px" }}>
                   <div onClick={() => setExpandedId(isExpanded ? null : entry.id)} style={{ padding: "12px 14px", cursor: "pointer" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "8px" }}>
-                      <div style={{ fontSize: "12px", fontWeight: 700, color: "#3d3425", lineHeight: 1.5, flex: 1 }}>{preview}</div>
-                      <span style={{ fontSize: "10px", color: "#a08060", whiteSpace: "nowrap", flexShrink: 0 }}>{formatDate(entry.date)}</span>
+                      <div className="history-preview" style={{ fontSize: "12px", fontWeight: 700, color: "#3d3425", lineHeight: 1.5, flex: 1 }}>{preview}</div>
+                      <span className="history-date" style={{ fontSize: "10px", color: "#a08060", whiteSpace: "nowrap", flexShrink: 0 }}>{formatDate(entry.date)}</span>
                     </div>
-                    <div style={{ fontSize: "10px", color: "#92400e", marginTop: "4px" }}>{langNames}</div>
+                    <div className="history-langs" style={{ fontSize: "10px", color: "#92400e", marginTop: "4px" }}>{langNames}</div>
                   </div>
                   {isExpanded && (
-                    <div style={{ borderTop: "1px solid rgba(166,152,130,0.12)", padding: "10px 14px", background: "rgba(166,152,130,0.04)" }}>
-                      <div className="clay-inner" style={{ padding: "10px 12px", fontSize: "11px", color: "#3d3425", lineHeight: 1.7, whiteSpace: "pre-wrap", marginBottom: "8px", maxHeight: "120px", overflowY: "auto" }}>{entry.input}</div>
+                    <div className="history-expanded" style={{ borderTop: "1px solid rgba(166,152,130,0.12)", padding: "10px 14px", background: "rgba(166,152,130,0.04)" }}>
+                      <div className="clay-inner history-entry-text" style={{ padding: "10px 12px", fontSize: "11px", color: "#3d3425", lineHeight: 1.7, whiteSpace: "pre-wrap", marginBottom: "8px", maxHeight: "120px", overflowY: "auto" }}>{entry.input}</div>
                       {entry.results && Object.entries(entry.results).map(([langId, text]) => {
                         const lang = LANGUAGES.find(l => l.id === langId);
                         return (
                           <div key={langId} style={{ marginBottom: "6px" }}>
                             <div style={{ fontSize: "10px", fontWeight: 700, color: lang?.color || "#78350f", marginBottom: "3px" }}>{lang?.label || langId}</div>
-                            <div className="clay-inner" style={{ padding: "8px 10px", fontSize: "11px", color: "#3d3425", lineHeight: 1.6, whiteSpace: "pre-wrap", maxHeight: "80px", overflowY: "auto" }}>{text}</div>
+                            <div className="clay-inner history-entry-text" style={{ padding: "8px 10px", fontSize: "11px", color: "#3d3425", lineHeight: 1.6, whiteSpace: "pre-wrap", maxHeight: "80px", overflowY: "auto" }}>{text}</div>
                           </div>
                         );
                       })}
                       <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
-                        <button onClick={() => { onLoad(entry); onClose(); }} className="clay-btn" style={{ padding: "5px 12px", fontSize: "10px", fontWeight: 700, color: "#78350f", flex: 1 }}>Load Script</button>
+                        <button onClick={() => { onLoad(entry); onClose(); }} className="clay-btn history-load-btn" style={{ padding: "5px 12px", fontSize: "10px", fontWeight: 700, color: "#78350f", flex: 1 }}>Load Script</button>
                         <button onClick={() => deleteEntry(entry.id)} className="clay-btn" style={{ padding: "5px 12px", fontSize: "10px", fontWeight: 700, color: "#dc2626" }}>Delete</button>
                       </div>
                     </div>
@@ -1186,7 +1260,7 @@ function HistorySidebar({ open, onClose, onLoad }) {
         </div>
 
         {/* Footer */}
-        <div style={{ padding: "12px 16px", borderTop: "1px solid rgba(166,152,130,0.12)", fontSize: "10px", color: "#a08060", textAlign: "center" }}>
+        <div className="history-footer" style={{ padding: "12px 16px", borderTop: "1px solid rgba(166,152,130,0.12)", fontSize: "10px", color: "#a08060", textAlign: "center" }}>
           Scripts auto-delete after 30 days
         </div>
       </div>
@@ -1567,14 +1641,14 @@ export default function App() {
               <button onClick={() => fileInputRef.current?.click()} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#78350f" }}>
                 {"\u{1F4C1}"} Upload
               </button>
-              <span style={{ fontSize: "11px", color: "#92400e", fontWeight: 600 }}>{wc} words</span>
-              <span style={{ fontSize: "11px", color: script.length > 2000 ? "#dc2626" : "#92400e", fontWeight: 600 }}>{script.length} chars</span>
+              <span className="word-count-text" style={{ fontSize: "11px", color: "#92400e", fontWeight: 600 }}>{wc} words</span>
+              <span className="char-count-text" style={{ fontSize: "11px", color: script.length > 2000 ? "#dc2626" : "#92400e", fontWeight: 600 }}>{script.length} chars</span>
             </div>
           </div>
           <div style={{ padding: "18px 22px" }}>
             <textarea value={script} onChange={e => setScript(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && e.ctrlKey) convert(); }}
               placeholder={"Kisi bhi bhasha mein script paste karo...\n\nHindi, English, Bhojpuri, Gujarati, Haryanvi, Rajasthani, ya koi bhi mix.\n\nMultiple languages select karke ek saath convert karo!"}
-              style={{ width: "100%", background: "transparent", border: "none", outline: "none", color: "#3d3425", fontSize: "14px", resize: "none", lineHeight: 1.9, fontFamily: "'Inter','Segoe UI',sans-serif", minHeight: "140px", boxSizing: "border-box" }}
+              style={{ width: "100%", background: "transparent", border: "none", outline: "none", color: "inherit", fontSize: "14px", resize: "none", lineHeight: 1.9, fontFamily: "'Inter','Segoe UI',sans-serif", minHeight: "140px", boxSizing: "border-box" }}
             />
             {script.length > 0 && (
               <div style={{ marginTop: "8px", height: "3px", borderRadius: "2px", background: "rgba(166,152,130,0.15)", overflow: "hidden" }}>
@@ -1583,7 +1657,7 @@ export default function App() {
             )}
           </div>
           <div style={{ padding: "14px 22px", borderTop: "1px solid rgba(166,152,130,0.1)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(166,152,130,0.04)", flexWrap: "wrap", gap: "8px" }}>
-            <span style={{ fontSize: "11px", color: "#a08060", fontWeight: 500 }}>Ctrl + Enter</span>
+            <span className="ctrl-hint" style={{ fontSize: "11px", color: "#a08060", fontWeight: 500 }}>Ctrl + Enter</span>
             <button onClick={csvMode ? convertBatch : convert} disabled={!can} className={can ? "clay-btn-primary" : "clay-btn-primary"} style={{
               padding: "11px 28px", borderRadius: "14px", border: "none",
               cursor: can ? "pointer" : "not-allowed", fontSize: "13px",
@@ -1602,7 +1676,7 @@ export default function App() {
 
         {/* Error */}
         {error && (
-          <div className="clay" style={{ padding: "14px 18px", marginBottom: "14px", borderLeft: "4px solid #ef4444", color: "#991b1b", fontSize: "13px", display: "flex", gap: "9px" }}>
+          <div className="clay error-box" style={{ padding: "14px 18px", marginBottom: "14px", borderLeft: "4px solid #ef4444", color: "#991b1b", fontSize: "13px", display: "flex", gap: "9px" }}>
             <span>&#9888;</span><span>{error}</span>
           </div>
         )}
@@ -1613,10 +1687,10 @@ export default function App() {
             <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "18px" }}>
               {[0, 1, 2].map(i => <div key={i} style={{ width: "12px", height: "12px", borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#d97706)", boxShadow: "3px 3px 6px rgba(200,130,20,0.3), -2px -2px 4px rgba(255,220,150,0.4)", animation: `pulse 1.3s ${i * 0.22}s ease-in-out infinite` }} />)}
             </div>
-            <div style={{ fontSize: "14px", color: "#78350f", fontWeight: 700, marginBottom: "6px" }}>
+            <div className="loading-text" style={{ fontSize: "14px", color: "#78350f", fontWeight: 700, marginBottom: "6px" }}>
               Converting to {selected.length} language{selected.length > 1 ? "s" : ""}...
             </div>
-            <div style={{ fontSize: "11px", color: "#a08060" }}>
+            <div className="loading-sub" style={{ fontSize: "11px", color: "#a08060" }}>
               {selected.map(id => LANGUAGES.find(l => l.id === id)?.label).join(", ")}
             </div>
           </div>
@@ -1632,21 +1706,21 @@ export default function App() {
                   : <span style={{ fontSize: "18px", color: "#16a34a" }}>&#10004;</span>
                 }
                 <div>
-                  <div style={{ fontSize: "13px", fontWeight: 700, color: "#1e1b18" }}>
+                  <div className="results-title" style={{ fontSize: "13px", fontWeight: 700, color: "#1e1b18" }}>
                     {loading
                       ? `Converting... ${Object.keys(results).length}/${selected.length} languages`
                       : `Conversion complete \u2014 ${Object.keys(results).length} language${Object.keys(results).length > 1 ? "s" : ""}`
                     }
                   </div>
-                  <div style={{ fontSize: "10.5px", color: "#78350f" }}>{loading ? "Results appear as they stream in" : "Ready to copy & use"}</div>
+                  <div className="results-sub" style={{ fontSize: "10.5px", color: "#78350f" }}>{loading ? "Results appear as they stream in" : "Ready to copy & use"}</div>
                 </div>
               </div>
               {!loading && (
                 <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
-                  <button onClick={copyAll} className="clay-btn" style={{ padding: "6px 14px", fontSize: "11px", fontWeight: 700, color: copied === "__all__" ? "#16a34a" : "#78350f" }}>
+                  <button onClick={copyAll} className="clay-btn results-btn" style={{ padding: "6px 14px", fontSize: "11px", fontWeight: 700, color: copied === "__all__" ? "#16a34a" : "#78350f" }}>
                     {copied === "__all__" ? "\u2713 Copied All" : "\u{1F4CB} Copy All"}
                   </button>
-                  <button onClick={downloadAll} className="clay-btn" style={{ padding: "6px 14px", fontSize: "11px", fontWeight: 700, color: "#78350f" }}>
+                  <button onClick={downloadAll} className="clay-btn results-btn" style={{ padding: "6px 14px", fontSize: "11px", fontWeight: 700, color: "#78350f" }}>
                     {"\u2B07"} Download
                   </button>
                   <button onClick={() => { setResults({}); setScript(""); }} className="clay-btn" style={{ padding: "6px 14px", fontSize: "11px", fontWeight: 700, color: "#6b5e50" }}>New Script</button>
@@ -1680,7 +1754,7 @@ export default function App() {
                 <div style={{ fontSize: "14px", fontWeight: 700, color: darkMode ? "#e8e0d4" : "#1e1b18" }}>
                   {"\u2705"} Batch complete — {csvMode.rows.length} rows &times; {Object.keys(batchResults).length} languages
                 </div>
-                <div style={{ fontSize: "11px", color: "#92400e", marginTop: "2px" }}>
+                <div className="batch-lang-text" style={{ fontSize: "11px", color: "#92400e", marginTop: "2px" }}>
                   {Object.keys(batchResults).map(id => LANGUAGES.find(l => l.id === id)?.label).join(", ")}
                 </div>
               </div>
@@ -1734,13 +1808,13 @@ export default function App() {
       {/* Footer */}
       <div style={{ borderTop: `1px solid ${darkMode ? "rgba(60,50,35,0.3)" : "rgba(166,152,130,0.15)"}`, padding: "16px 28px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "7px", background: darkMode ? "linear-gradient(145deg, #1a1510, #151008)" : "linear-gradient(145deg, #f0ebe3, #e8e0d4)", transition: "background 0.3s" }}>
         <div style={{ fontSize: "11.5px", fontWeight: 500, display: "flex", alignItems: "center", gap: "5px", flexWrap: "wrap" }}>
-          <span style={{ color: "#92400e" }}>Powered by</span>
+          <span className="footer-powered" style={{ color: "#92400e" }}>Powered by</span>
           <span className="gold-shine">Claude</span>
           <span style={{ color: "#c4a870" }}>&middot;</span>
           <span className="gold-shine">Built by</span>
           <span className="gold-shine">Manik Prajapati</span>
         </div>
-        <div style={{ fontSize: "10.5px", color: "#a08060" }}>{LANGUAGES.length} languages &middot; Multi-select &middot; Auto-detect</div>
+        <div className="footer-info" style={{ fontSize: "10.5px", color: "#a08060" }}>{LANGUAGES.length} languages &middot; Multi-select &middot; Auto-detect</div>
       </div>
 
       {/* History Sidebar */}
