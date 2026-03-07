@@ -948,6 +948,37 @@ const CSS = `
 
   /* Error text dark */
   .dark .error-box { color: #fca5a5 !important; }
+
+  /* TTS Voice Over */
+  .tts-panel { padding: 16px; margin-bottom: 14px; }
+  .tts-toggle { display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; }
+  .tts-toggle-track { width: 40px; height: 22px; border-radius: 11px; background: rgba(166,152,130,0.25); position: relative; transition: background 0.25s; flex-shrink: 0; }
+  .tts-toggle-track.active { background: linear-gradient(135deg, #f59e0b, #d97706); }
+  .tts-toggle-thumb { width: 18px; height: 18px; border-radius: 50%; background: white; position: absolute; top: 2px; left: 2px; transition: transform 0.25s; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+  .tts-toggle-track.active .tts-toggle-thumb { transform: translateX(18px); }
+  .tts-options { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; }
+  .tts-field { flex: 1 1 180px; min-width: 150px; }
+  .tts-field label { display: block; font-size: 10.5px; font-weight: 700; color: #78350f; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .tts-field select, .tts-field input[type="range"] { width: 100%; }
+  .tts-field select { padding: 8px 12px; border-radius: 10px; border: none; font-size: 12px; font-weight: 600; color: #3d3425; cursor: pointer; }
+  .tts-slider-row { display: flex; align-items: center; gap: 8px; }
+  .tts-slider-row input[type="range"] { flex: 1; accent-color: #f59e0b; height: 4px; }
+  .tts-slider-val { font-size: 11px; font-weight: 700; color: #92400e; min-width: 32px; text-align: right; }
+  .tts-generate-btn { display: flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 10px; border: none; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+  .tts-audio-row { margin-top: 10px; }
+  .tts-audio-row audio { width: 100%; border-radius: 8px; height: 36px; }
+  .tts-error { color: #ef4444; font-size: 11px; font-weight: 600; margin-top: 6px; }
+
+  .dark .tts-field label { color: #a09080 !important; }
+  .dark .tts-field select { color: #e8e0d4 !important; background: rgba(60,50,35,0.3) !important; }
+  .dark .tts-slider-val { color: #d4c8b0 !important; }
+  .dark .tts-toggle-track { background: rgba(60,50,35,0.4); }
+  .dark .tts-audio-row audio { filter: invert(0.85) hue-rotate(180deg); }
+
+  @media (max-width: 600px) {
+    .tts-options { flex-direction: column; }
+    .tts-field { flex: 1 1 100%; }
+  }
 `;
 
 /* --- Logo --- */
@@ -1314,6 +1345,65 @@ export default function App() {
   const [batchResults, setBatchResults] = useState(null); // null or { langId: string[] }
   const [batchProgress, setBatchProgress] = useState(null); // null or { done: number, total: number }
   const fileInputRef = useRef(null);
+
+  // TTS state
+  const [ttsEnabled, setTtsEnabled] = useState(false);
+  const [voices, setVoices] = useState([]);
+  const [selectedVoice, setSelectedVoice] = useState("");
+  const [ttsModel, setTtsModel] = useState("eleven_multilingual_v2");
+  const [ttsSettings, setTtsSettings] = useState({ stability: 0.5, similarity_boost: 0.75, style: 0, speed: 1.0 });
+  const [ttsGenerating, setTtsGenerating] = useState({});
+  const [audioUrls, setAudioUrls] = useState({});
+  const [ttsError, setTtsError] = useState("");
+
+  const fetchVoices = async () => {
+    try {
+      const res = await fetch("/api/voices");
+      if (!res.ok) throw new Error("Failed");
+      const data = await res.json();
+      setVoices(data);
+      if (data.length > 0 && !selectedVoice) setSelectedVoice(data[0].voice_id);
+    } catch { setTtsError("Failed to load voices"); }
+  };
+
+  const toggleTts = () => {
+    const next = !ttsEnabled;
+    setTtsEnabled(next);
+    if (next && voices.length === 0) fetchVoices();
+  };
+
+  const generateTTS = async (langId, text) => {
+    if (!selectedVoice || !text) return;
+    setTtsGenerating(p => ({ ...p, [langId]: true }));
+    setTtsError("");
+    try {
+      const res = await fetch("/api/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: text.substring(0, 5000),
+          voice_id: selectedVoice,
+          model_id: ttsModel,
+          voice_settings: ttsSettings,
+          output_format: "mp3_44100_128"
+        })
+      });
+      if (!res.ok) throw new Error("Voice generation failed");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      setAudioUrls(p => ({ ...p, [langId]: url }));
+    } catch (e) { setTtsError(e.message); }
+    setTtsGenerating(p => ({ ...p, [langId]: false }));
+  };
+
+  const downloadAudio = (langId) => {
+    const url = audioUrls[langId];
+    if (!url) return;
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `voiceover_${langId}.mp3`;
+    a.click();
+  };
 
   const loadFromHistory = (entry) => {
     setScript(entry.input);
@@ -1753,9 +1843,102 @@ export default function App() {
                 </div>
               )}
             </div>
+            {/* TTS Voice Over Panel */}
+            {!loading && (
+              <div className="clay tts-panel">
+                <div className="tts-toggle" onClick={toggleTts}>
+                  <div className={`tts-toggle-track${ttsEnabled ? " active" : ""}`}>
+                    <div className="tts-toggle-thumb" />
+                  </div>
+                  <span style={{ fontSize: "13px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#3d3425" }}>Voice Over Generation</span>
+                  <span style={{ fontSize: "10px", color: darkMode ? "#6b5e50" : "#92400e", fontWeight: 600 }}>ElevenLabs</span>
+                </div>
+                {ttsEnabled && (
+                  <div className="tts-options">
+                    <div className="tts-field">
+                      <label>Voice</label>
+                      <select className="clay-inner" value={selectedVoice} onChange={e => setSelectedVoice(e.target.value)}>
+                        {voices.length === 0 && <option value="">Loading voices...</option>}
+                        {voices.map(v => (
+                          <option key={v.voice_id} value={v.voice_id}>
+                            {v.name}{v.labels?.accent ? ` (${v.labels.accent})` : ""}{v.labels?.gender ? ` - ${v.labels.gender}` : ""}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="tts-field">
+                      <label>Model</label>
+                      <select className="clay-inner" value={ttsModel} onChange={e => setTtsModel(e.target.value)}>
+                        <option value="eleven_multilingual_v2">Multilingual v2</option>
+                        <option value="eleven_turbo_v2_5">Turbo v2.5</option>
+                        <option value="eleven_turbo_v2">Turbo v2</option>
+                        <option value="eleven_monolingual_v1">Monolingual v1</option>
+                      </select>
+                    </div>
+                    <div className="tts-field">
+                      <label>Stability ({ttsSettings.stability.toFixed(2)})</label>
+                      <div className="tts-slider-row">
+                        <input type="range" min="0" max="1" step="0.05" value={ttsSettings.stability} onChange={e => setTtsSettings(p => ({ ...p, stability: +e.target.value }))} />
+                      </div>
+                    </div>
+                    <div className="tts-field">
+                      <label>Similarity ({ttsSettings.similarity_boost.toFixed(2)})</label>
+                      <div className="tts-slider-row">
+                        <input type="range" min="0" max="1" step="0.05" value={ttsSettings.similarity_boost} onChange={e => setTtsSettings(p => ({ ...p, similarity_boost: +e.target.value }))} />
+                      </div>
+                    </div>
+                    <div className="tts-field">
+                      <label>Style ({ttsSettings.style.toFixed(2)})</label>
+                      <div className="tts-slider-row">
+                        <input type="range" min="0" max="1" step="0.05" value={ttsSettings.style} onChange={e => setTtsSettings(p => ({ ...p, style: +e.target.value }))} />
+                      </div>
+                    </div>
+                    <div className="tts-field">
+                      <label>Speed ({ttsSettings.speed.toFixed(1)}x)</label>
+                      <div className="tts-slider-row">
+                        <input type="range" min="0.5" max="2" step="0.1" value={ttsSettings.speed} onChange={e => setTtsSettings(p => ({ ...p, speed: +e.target.value }))} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {ttsError && <div className="tts-error">{ttsError}</div>}
+              </div>
+            )}
             {selected.map(langId => {
               const lang = LANGUAGES.find(l => l.id === langId);
-              return results[langId] ? <ResultCard key={langId} result={results[langId]} lang={lang} copied={copied} onCopy={copy} isStreaming={!!streaming[langId]} srtMode={srtMode} onDownloadSrt={downloadSrt} /> : null;
+              return results[langId] ? (
+                <div key={langId}>
+                  <ResultCard result={results[langId]} lang={lang} copied={copied} onCopy={copy} isStreaming={!!streaming[langId]} srtMode={srtMode} onDownloadSrt={downloadSrt} />
+                  {ttsEnabled && !streaming[langId] && (
+                    <div className="clay" style={{ padding: "12px 18px", marginTop: "-10px", marginBottom: "14px", borderLeft: `4px solid ${lang.color}20`, display: "flex", flexWrap: "wrap", alignItems: "center", gap: "10px" }}>
+                      {!audioUrls[langId] ? (
+                        <button
+                          onClick={() => generateTTS(langId, results[langId])}
+                          disabled={ttsGenerating[langId] || !selectedVoice}
+                          className="clay-btn tts-generate-btn"
+                          style={{ color: ttsGenerating[langId] ? "#92400e" : lang.color, opacity: ttsGenerating[langId] ? 0.7 : 1 }}
+                        >
+                          {ttsGenerating[langId] ? (
+                            <><span style={{ width: "14px", height: "14px", borderRadius: "50%", border: "2px solid rgba(245,158,11,0.3)", borderTopColor: "#f59e0b", display: "inline-block", animation: "spin 0.7s linear infinite" }} /> Generating...</>
+                          ) : (
+                            <>{"\uD83D\uDD0A"} Generate Voice</>
+                          )}
+                        </button>
+                      ) : (
+                        <div className="tts-audio-row" style={{ flex: "1 1 100%", display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                          <audio controls src={audioUrls[langId]} style={{ flex: "1 1 200px", minWidth: 0 }} />
+                          <button onClick={() => downloadAudio(langId)} className="clay-btn" style={{ padding: "6px 12px", fontSize: "11px", fontWeight: 700, color: "#16a34a", whiteSpace: "nowrap" }}>
+                            {"\u2B07"} Download
+                          </button>
+                          <button onClick={() => { setAudioUrls(p => { const n = { ...p }; delete n[langId]; return n; }); }} className="clay-btn" style={{ padding: "6px 12px", fontSize: "11px", fontWeight: 700, color: "#6b5e50", whiteSpace: "nowrap" }}>
+                            Regenerate
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : null;
             })}
           </>
         )}
