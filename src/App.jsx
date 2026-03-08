@@ -2419,7 +2419,7 @@ After writing the converted text in the target script, add a blank line and then
   return (
     <div className={darkMode ? "dark" : ""} style={{ fontFamily: "'Inter','Segoe UI',sans-serif", background: darkMode ? "#000000" : "#f0ebe3", minHeight: "100vh", color: darkMode ? "#e8e0d4" : "#1e1b18", position: "relative", transition: "background 0.3s, color 0.3s" }}>
       <style>{CSS}</style>
-      <FireflyBackground />
+      {activeTab === "converter" && <FireflyBackground />}
 
       {/* Command Palette */}
       <CommandPalette open={cmdPaletteOpen} onClose={() => setCmdPaletteOpen(false)} darkMode={darkMode} onAction={handleCmdAction} />
@@ -2579,33 +2579,23 @@ After writing the converted text in the target script, add a blank line and then
         </button>
       </div>
 
-      {/* Content Studio Tab */}
-      {activeTab === "studio" && <ContentStudio darkMode={darkMode} streamConvert={streamConvert} dialectRules={DIALECT_RULES} />}
-
-      {/* Dubbing Studio Tab */}
-      {activeTab === "dubbing" && <VideoDub darkMode={darkMode} streamConvert={streamConvert} />}
-
-      {/* TTS Preview Tab */}
-      {activeTab === "ttsPreview" && <TTSPreview darkMode={darkMode} />}
-
-      {/* Subtitle Studio Tab */}
-      {activeTab === "subtitle" && <SubtitleStudio darkMode={darkMode} streamConvert={streamConvert} />}
-
-      {/* Script Diff Tab */}
-      {activeTab === "diff" && (
-        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "28px 22px 80px", position: "relative", zIndex: 1 }}>
-          <ScriptDiff original={script} results={results} languages={LANGUAGES} darkMode={darkMode} />
+      {/* Non-converter tabs — solid background to prevent firefly bleed-through */}
+      {activeTab !== "converter" && (
+        <div style={{ position: "relative", zIndex: 1, minHeight: "calc(100vh - 160px)", background: darkMode ? "#000000" : "#f0ebe3" }}>
+          {activeTab === "studio" && <ContentStudio darkMode={darkMode} streamConvert={streamConvert} dialectRules={DIALECT_RULES} />}
+          {activeTab === "dubbing" && <VideoDub darkMode={darkMode} streamConvert={streamConvert} />}
+          {activeTab === "ttsPreview" && <TTSPreview darkMode={darkMode} />}
+          {activeTab === "subtitle" && <SubtitleStudio darkMode={darkMode} streamConvert={streamConvert} />}
+          {activeTab === "diff" && (
+            <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "28px 22px 80px" }}>
+              <ScriptDiff original={script} results={results} languages={LANGUAGES} darkMode={darkMode} />
+            </div>
+          )}
+          {activeTab === "templates" && <TemplateLibrary darkMode={darkMode} onUseTemplate={handleUseTemplate} />}
+          {activeTab === "analytics" && <AnalyticsDashboard darkMode={darkMode} />}
+          {activeTab === "glossary" && <GlossaryManager darkMode={darkMode} />}
         </div>
       )}
-
-      {/* Template Library Tab */}
-      {activeTab === "templates" && <TemplateLibrary darkMode={darkMode} onUseTemplate={handleUseTemplate} />}
-
-      {/* Analytics Dashboard Tab */}
-      {activeTab === "analytics" && <AnalyticsDashboard darkMode={darkMode} />}
-
-      {/* Glossary Manager Tab */}
-      {activeTab === "glossary" && <GlossaryManager darkMode={darkMode} />}
 
       {/* Script Converter Tab */}
       {activeTab === "converter" && <div className="main-c" style={{ maxWidth: "1400px", margin: "0 auto", padding: "28px 22px 80px", position: "relative", zIndex: 1 }}>
