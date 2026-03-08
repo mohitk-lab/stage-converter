@@ -100,6 +100,31 @@ const LANGUAGES = [
     bg: { grad1: "rgba(5,150,105,0.12)", grad2: "rgba(4,120,87,0.08)", grad3: "rgba(52,211,153,0.06)",
           glyphs: ["\u0C24\u0C46","\u0C32\u0C41","\u0C17\u0C41","\u0C28\u0C47","\u0C28\u0C41","\u0C2E\u0C40","\u0C30\u0C41","\u0C05","\u0C26\u0C3F","\u0C07","\u0C26\u0C3F","\u0C0E\u0C02","\u0C26\u0C41","\u0C15\u0C41","\u0C1A\u0C47","\u0C2E\u0C3E","\u0C30\u0C41","\u0C35"], accent: "#059669" }
   },
+  {
+    id: "kannada", label: "\u0C95\u0CA8\u0CCD\u0CA8\u0CA1", sub: "Kannada", region: "Karnataka", color: "#dc2626",
+    bg: { grad1: "rgba(220,38,38,0.12)", grad2: "rgba(185,28,28,0.08)", grad3: "rgba(248,113,113,0.06)",
+          glyphs: ["\u0C95","\u0CA8\u0CCD","\u0CA8","\u0CA1","\u0CAE","\u0CBE","\u0CA4","\u0CC1","\u0CB9","\u0CC7","\u0CB3","\u0CC0","\u0CA8\u0CBE","\u0CB5\u0CC1","\u0C87","\u0CA6\u0CC1","\u0C8E\u0CA8\u0CCD"], accent: "#dc2626" }
+  },
+  {
+    id: "malayalam", label: "\u0D2E\u0D32\u0D2F\u0D3E\u0D33\u0D02", sub: "Malayalam", region: "Kerala", color: "#0d9488",
+    bg: { grad1: "rgba(13,148,136,0.12)", grad2: "rgba(15,118,110,0.08)", grad3: "rgba(45,212,191,0.06)",
+          glyphs: ["\u0D2E","\u0D32","\u0D2F\u0D3E","\u0D33","\u0D02","\u0D28\u0D3F","\u0D19\u0D4D\u0D19","\u0D33\u0D4D","\u0D0E","\u0D28\u0D4D\u0D24","\u0D41","\u0D15\u0D4A","\u0D23\u0D4D\u0D1F","\u0D24","\u0D28\u0D4D","\u0D28\u0D40","\u0D07","\u0D24\u0D41"], accent: "#0d9488" }
+  },
+  {
+    id: "odia", label: "\u0B13\u0B21\u0B3C\u0B3F\u0B06", sub: "Odia", region: "Odisha", color: "#6366f1",
+    bg: { grad1: "rgba(99,102,241,0.12)", grad2: "rgba(79,70,229,0.08)", grad3: "rgba(129,140,248,0.06)",
+          glyphs: ["\u0B13","\u0B21\u0B3C\u0B3F","\u0B06","\u0B2E\u0B41","\u0B01","\u0B24\u0B41","\u0B2E\u0B47","\u0B15\u0B47","\u0B0F","\u0B39\u0B47","\u0B32","\u0B28\u0B3E","\u0B39\u0B3F\u0B01","\u0B0F\u0B39\u0B3F","\u0B15\u0B3F","\u0B2E\u0B3E","\u0B28\u0B47","\u0B38\u0B47"], accent: "#6366f1" }
+  },
+  {
+    id: "assamese", label: "\u0985\u09B8\u09AE\u09C0\u09AF\u09BC\u09BE", sub: "Assamese", region: "Assam", color: "#be185d",
+    bg: { grad1: "rgba(190,24,93,0.12)", grad2: "rgba(157,23,77,0.08)", grad3: "rgba(236,72,153,0.06)",
+          glyphs: ["\u0985","\u09B8","\u09AE\u09C0","\u09AF\u09BC\u09BE","\u09AE\u0987","\u09A4\u09C1","\u09AE\u09BF","\u0986","\u09AE\u09BE","\u09B0","\u098F","\u0987","\u09B9\u09AF\u09BC","\u09A8\u09C7","\u0995\u09BF","\u09AC\u09BE","\u09B2\u09BE","\u0997"], accent: "#be185d" }
+  },
+  {
+    id: "urdu", label: "\u0627\u0631\u062F\u0648", sub: "Urdu", region: "India / Pakistan", color: "#4f46e5",
+    bg: { grad1: "rgba(79,70,229,0.12)", grad2: "rgba(67,56,202,0.08)", grad3: "rgba(129,140,248,0.06)",
+          glyphs: ["\u0627","\u0631","\u062F","\u0648","\u0632","\u0628","\u0627","\u0646","\u0645","\u062D","\u0628","\u062A","\u06A9","\u06CC","\u0627","\u0633","\u0644","\u0639"], accent: "#4f46e5" }
+  },
 ];
 
 /* --- Dialect Rules --- */
@@ -511,6 +536,132 @@ CRITICAL:
 - Write ENTIRE output in Telugu script — NOT Devanagari
 - Telugu is agglutinative — verb endings change based on person/number/gender
 - Use natural Telugu sentence structure (SOV order)`,
+
+  kannada: `KANNADA (Kannada script — write ALL output in Kannada script):
+
+OUTPUT IN: Kannada script (ಕನ್ನಡ ಲಿಪಿ). NOT Devanagari or Latin.
+
+PRONOUNS: ನಾನು (I), ನನ್ನ (my), ನೀನು (you informal), ನೀವು (you formal), ಅವನು (he), ಅವಳು (she), ಅವರು (they), ನಾವು (we)
+
+VERBS — Key conjugations:
+- ಇದೆ = is, ಇತ್ತು = was, ಇರುತ್ತದೆ = will be
+- ಮಾಡುತ್ತೇನೆ = I do, ಮಾಡಿದೆ = did, ಮಾಡುವೆ = will do
+- ಹೋಗುತ್ತೇನೆ = going, ಹೋದೆ = went, ಹೋಗುವೆ = will go
+- ಬರುತ್ತೇನೆ = coming, ಬಂದೆ = came, ಬರುವೆ = will come
+
+NEGATION: ಇಲ್ಲ (not), ಬೇಡ (don't want), ಆಗುವುದಿಲ್ಲ (won't happen)
+
+QUESTION WORDS: ಏನು (what), ಯಾಕೆ (why), ಎಲ್ಲಿ (where), ಯಾವಾಗ (when), ಯಾರು (who), ಹೇಗೆ (how), ಎಷ್ಟು (how much)
+
+COMMON WORDS: ಒಳ್ಳೆಯ (good), ಕೆಟ್ಟ (bad), ತುಂಬಾ (very), ಮನೆ (house), ನೀರು (water), ಊಟ (food), ಮನುಷ್ಯ (person), ಗೆಳೆಯ (friend), ಇಂದು (today), ನಾಳೆ (tomorrow)
+
+FLAVOR: ಮಗಾ, ಗುರೂ, ಏನಪ್ಪಾ, ಲೋ, ಹೌದಾ, ಬಾರೋ, ಅಲ್ವಾ
+
+CRITICAL:
+- Write ENTIRE output in Kannada script — NOT Devanagari
+- Kannada is agglutinative with gender/number agreement
+- Use natural Kannada sentence structure (SOV)`,
+
+  malayalam: `MALAYALAM (Malayalam script — write ALL output in Malayalam script):
+
+OUTPUT IN: Malayalam script (മലയാളം ലിപി). NOT Devanagari or Latin.
+
+PRONOUNS: ഞാൻ (I), എന്റെ (my), നീ (you informal), നിങ്ങൾ (you formal), അവൻ (he), അവൾ (she), അവർ (they), ഞങ്ങൾ/നമ്മൾ (we)
+
+VERBS — Key conjugations:
+- ആണ് = is, ആയിരുന്നു = was, ആയിരിക്കും = will be
+- ചെയ്യുന്നു = does, ചെയ്തു = did, ചെയ്യും = will do
+- പോകുന്നു = goes, പോയി = went, പോകും = will go
+- വരുന്നു = comes, വന്നു = came, വരും = will come
+
+NEGATION: ഇല്ല (not), വേണ്ട (don't want), അല്ല (is not)
+
+QUESTION WORDS: എന്ത് (what), എന്തുകൊണ്ട് (why), എവിടെ (where), എപ്പോൾ (when), ആര് (who), എങ്ങനെ (how), എത്ര (how much)
+
+COMMON WORDS: നല്ല (good), മോശം (bad), വളരെ (very), വീട് (house), വെള്ളം (water), ഭക്ഷണം (food), മനുഷ്യൻ (person), സുഹൃത്ത് (friend), ഇന്ന് (today), നാളെ (tomorrow)
+
+FLAVOR: മച്ചാനേ, ചേട്ടാ, ചേച്ചി, എടാ, എടി, അല്ലേ, പിന്നെ, ശരി
+
+CRITICAL:
+- Write ENTIRE output in Malayalam script — NOT Devanagari
+- Malayalam has unique conjunct consonants
+- Use natural Malayalam sentence structure`,
+
+  odia: `ODIA (Odia script — write ALL output in Odia script):
+
+OUTPUT IN: Odia script (ଓଡ଼ିଆ ଲିପି). NOT Devanagari or Latin.
+
+PRONOUNS: ମୁଁ (I), ମୋର (my), ତୁ (you informal), ଆପଣ (you formal), ସେ (he/she), ସେମାନେ (they), ଆମେ (we)
+
+VERBS — Key conjugations:
+- ଅଛି = is, ଥିଲା = was, ହେବ = will be
+- କରୁଛି = doing, କଲା = did, କରିବ = will do
+- ଯାଉଛି = going, ଗଲା = went, ଯିବ = will go
+- ଆସୁଛି = coming, ଆସିଲା = came, ଆସିବ = will come
+
+NEGATION: ନାହିଁ (not), ନୁହେଁ (is not)
+
+QUESTION WORDS: କ'ଣ (what), କାହିଁକି (why), କେଉଁଠି (where), କେବେ (when), କିଏ (who), କେମିତି (how), କେତେ (how much)
+
+COMMON WORDS: ଭଲ (good), ଖରାପ (bad), ବହୁତ (very), ଘର (house), ପାଣି (water), ଖାଦ୍ୟ (food), ମଣିଷ (person), ସାଥୀ (friend), ଆଜି (today), ଆସନ୍ତାକାଲି (tomorrow)
+
+FLAVOR: ଭାଇ, ଅପା, ହଁ, ନା, ଆଉ, ତ, ମୁଁ କହିଲି
+
+CRITICAL:
+- Write ENTIRE output in Odia script — NOT Devanagari
+- Odia has rounded letterforms distinct from other scripts
+- Use natural Odia sentence structure`,
+
+  assamese: `ASSAMESE (Assamese/Bengali script — write ALL output in Assamese script):
+
+OUTPUT IN: Assamese script (অসমীয়া লিপি). Similar to Bengali but with distinct characters.
+
+PRONOUNS: মই (I), মোৰ (my), তুমি (you informal), আপুনি (you formal), সি/তেওঁ (he/she), সিহঁত (they), আমি (we)
+
+VERBS — Key conjugations:
+- হয় = is, আছিল = was, হ'ব = will be
+- কৰোঁ = do, কৰিলোঁ = did, কৰিম = will do
+- যাওঁ = go, গ'লোঁ = went, যাম = will go
+- আহোঁ = come, আহিলোঁ = came, আহিম = will come
+
+NEGATION: নাই (not), নহয় (is not)
+
+QUESTION WORDS: কি (what), কিয় (why), ক'ত (where), কেতিয়া (when), কোন (who), কেনেকৈ (how), কিমান (how much)
+
+COMMON WORDS: ভাল (good), বেয়া (bad), বহুত (very), ঘৰ (house), পানী (water), খাদ্য (food), মানুহ (person), বন্ধু (friend), আজি (today), কাইলৈ (tomorrow)
+
+FLAVOR: দাদা, বাইদেউ, হয়নে, অ', আৰে, হেৰা
+
+CRITICAL:
+- Write ENTIRE output in Assamese script
+- Assamese uses ৰ (ro) and ৱ (wo) which are distinct from Bengali
+- Use natural Assamese sentence structure`,
+
+  urdu: `URDU (Nastaliq/Arabic script — write ALL output in Urdu script):
+
+OUTPUT IN: Urdu script (اردو). NOT Devanagari or Latin.
+
+PRONOUNS: میں (I), میرا/میری (my), تم (you informal), آپ (you formal), وہ (he/she/they), ہم (we)
+
+VERBS — Key conjugations:
+- ہے = is, تھا/تھی = was, ہوگا = will be
+- کرتا/کرتی = does, کیا/کی = did, کرے گا = will do
+- جاتا/جاتی = goes, گیا/گئی = went, جائے گا = will go
+- آتا/آتی = comes, آیا/آئی = came, آئے گا = will come
+
+NEGATION: نہیں (not), مت (don't), نا (no)
+
+QUESTION WORDS: کیا (what), کیوں (why), کہاں (where), کب (when), کون (who), کیسے (how), کتنا (how much)
+
+COMMON WORDS: اچھا (good), برا (bad), بہت (very), گھر (house), پانی (water), کھانا (food), انسان (person), دوست (friend), آج (today), کل (tomorrow)
+
+FLAVOR: جناب, یار, بھائی, ارے, واہ, خیر, بس
+
+CRITICAL:
+- Write ENTIRE output in Urdu script (right-to-left)
+- Use proper Nastaliq forms
+- Preserve Urdu literary vocabulary where appropriate
+- Do NOT write in Devanagari or Roman Urdu`,
 };
 
 /* --- Few-shot examples for each dialect --- */
@@ -566,6 +717,26 @@ const FEW_SHOT_EXAMPLES = {
   telugu: [
     { role: "user", content: "\u092D\u093E\u0908 \u0906\u091C \u092E\u0947\u0930\u093E \u0926\u094B\u0938\u094D\u0924 \u0906\u092F\u093E \u0939\u0948, \u0939\u092E \u0926\u094B\u0928\u094B\u0902 \u0938\u093E\u0925 \u092E\u0947\u0902 \u0916\u093E\u0928\u093E \u0916\u093E\u090F\u0902\u0917\u0947\u0964 \u092C\u0939\u0941\u0924 \u092E\u091C\u093C\u093E \u0906\u090F\u0917\u093E\u0964" },
     { role: "assistant", content: "\u0C2E\u0C3E\u0C1A\u0C3F, \u0C08\u0C30\u0C4B\u0C1C\u0C41 \u0C28\u0C3E \u0C2B\u0C4D\u0C30\u0C46\u0C02\u0C21\u0C4D \u0C35\u0C1A\u0C4D\u0C1A\u0C3E\u0C21\u0C41, \u0C2E\u0C47\u0C2E\u0C41 \u0C07\u0C26\u0C4D\u0C26\u0C30\u0C42 \u0C15\u0C32\u0C3F\u0C38\u0C3F \u0C24\u0C3F\u0C28\u0C26\u0C3E\u0C02. \u0C1A\u0C3E\u0C32\u0C3E \u0C2E\u0C1C\u0C3E \u0C35\u0C38\u0C4D\u0C24\u0C41\u0C02\u0C26\u0C3F!" },
+  ],
+  kannada: [
+    { role: "user", content: "\u092D\u093E\u0908 \u0906\u091C \u092E\u0947\u0930\u093E \u0926\u094B\u0938\u094D\u0924 \u0906\u092F\u093E \u0939\u0948, \u0939\u092E \u0926\u094B\u0928\u094B\u0902 \u0938\u093E\u0925 \u092E\u0947\u0902 \u0916\u093E\u0928\u093E \u0916\u093E\u090F\u0902\u0917\u0947\u0964 \u092C\u0939\u0941\u0924 \u092E\u091C\u093C\u093E \u0906\u090F\u0917\u093E\u0964" },
+    { role: "assistant", content: "\u0CAE\u0C97\u0CBE, \u0C87\u0CB5\u0CA4\u0CCD\u0CA4\u0CC1 \u0CA8\u0CA8\u0CCD\u0CA8 \u0C97\u0CC6\u0CB3\u0CC6\u0CAF \u0CAC\u0C82\u0CA6\u0CBF\u0CA6\u0CCD\u0CA6\u0CBE\u0CA8\u0CC6, \u0CA8\u0CBE\u0CB5\u0CC1 \u0C87\u0CAC\u0CCD\u0CAC\u0CB0\u0CC2 \u0C92\u0CA3\u0CCD\u0CA3\u0CBE\u0C97\u0CBF \u0CA4\u0CBF\u0CA8\u0CCD\u0CA4\u0CC0\u0CB5\u0CBF. \u0CA4\u0CC1\u0C82\u0CAC\u0CBE \u0CAE\u0C9C\u0CBE \u0CAC\u0CB0\u0CC1\u0CA4\u0CCD\u0CA4\u0CC6!" },
+  ],
+  malayalam: [
+    { role: "user", content: "\u092D\u093E\u0908 \u0906\u091C \u092E\u0947\u0930\u093E \u0926\u094B\u0938\u094D\u0924 \u0906\u092F\u093E \u0939\u0948, \u0939\u092E \u0926\u094B\u0928\u094B\u0902 \u0938\u093E\u0925 \u092E\u0947\u0902 \u0916\u093E\u0928\u093E \u0916\u093E\u090F\u0902\u0917\u0947\u0964 \u092C\u0939\u0941\u0924 \u092E\u091C\u093C\u093E \u0906\u090F\u0917\u093E\u0964" },
+    { role: "assistant", content: "\u0D2E\u0D1A\u0D4D\u0D1A\u0D3E\u0D28\u0D47, \u0D07\u0D28\u0D4D\u0D28\u0D4D \u0D0E\u0D28\u0D4D\u0D31\u0D46 \u0D15\u0D42\u0D1F\u0D4D\u0D1F\u0D41\u0D15\u0D3E\u0D30\u0D28\u0D4D \u0D35\u0D28\u0D4D\u0D28\u0D3F\u0D1F\u0D4D\u0D1F\u0D41\u0D23\u0D4D\u0D1F\u0D4D, \u0D28\u0D2E\u0D4D\u0D2E\u0D33\u0D4D \u0D30\u0D23\u0D4D\u0D1F\u0D41\u0D2A\u0D47\u0D30\u0D41\u0D02 \u0D12\u0D23\u0D4D\u0D23\u0D3F\u0D1A\u0D4D\u0D1A\u0D4D \u0D15\u0D34\u0D3F\u0D15\u0D4D\u0D15\u0D3E\u0D02. \u0D28\u0D32\u0D4D\u0D32 \u0D0E\u0D28\u0D4D\u200D\u0D1C\u0D4B\u0D2F\u0D4D \u0D06\u0D15\u0D41\u0D02!" },
+  ],
+  odia: [
+    { role: "user", content: "\u092D\u093E\u0908 \u0906\u091C \u092E\u0947\u0930\u093E \u0926\u094B\u0938\u094D\u0924 \u0906\u092F\u093E \u0939\u0948, \u0939\u092E \u0926\u094B\u0928\u094B\u0902 \u0938\u093E\u0925 \u092E\u0947\u0902 \u0916\u093E\u0928\u093E \u0916\u093E\u090F\u0902\u0917\u0947\u0964 \u092C\u0939\u0941\u0924 \u092E\u091C\u093C\u093E \u0906\u090F\u0917\u093E\u0964" },
+    { role: "assistant", content: "\u0B2D\u0B3E\u0B07, \u0B06\u0B1C\u0B3F \u0B2E\u0B4B\u0B30 \u0B2C\u0B28\u0B4D\u0B27\u0B41 \u0B06\u0B38\u0B3F\u0B1B\u0B3F, \u0B06\u0B2E\u0B47 \u0B26\u0B41\u0B39\u0B47\u0B01 \u0B0F\u0B15\u0B3E \u0B38\u0B3E\u0B19\u0B4D\u0B17\u0B30\u0B47 \u0B16\u0B3E\u0B07\u0B2C\u0B3E\u0964 \u0B2C\u0B39\u0B41\u0B24 \u0B2E\u0B1C\u0B3E \u0B39\u0B47\u0B2C!" },
+  ],
+  assamese: [
+    { role: "user", content: "\u092D\u093E\u0908 \u0906\u091C \u092E\u0947\u0930\u093E \u0926\u094B\u0938\u094D\u0924 \u0906\u092F\u093E \u0939\u0948, \u0939\u092E \u0926\u094B\u0928\u094B\u0902 \u0938\u093E\u0925 \u092E\u0947\u0902 \u0916\u093E\u0928\u093E \u0916\u093E\u090F\u0902\u0917\u0947\u0964 \u092C\u0939\u0941\u0924 \u092E\u091C\u093C\u093E \u0906\u090F\u0917\u093E\u0964" },
+    { role: "assistant", content: "\u09A6\u09BE\u09A6\u09BE, \u0986\u099C\u09BF \u09AE\u09CB\u09F0 \u09AC\u09A8\u09CD\u09A7\u09C1 \u0986\u09B9\u09BF\u099B\u09C7, \u0986\u09AE\u09BF \u09A6\u09C1\u09AF\u09BC\u09CB\u099C\u09A8\u09C7 \u09B2\u0997\u09A4\u09C7 \u0996\u09BE\u09AE\u0964 \u09AC\u09B9\u09C1\u09A4 \u09AE\u099C\u09BE \u09B9'\u09AC!" },
+  ],
+  urdu: [
+    { role: "user", content: "\u092D\u093E\u0908 \u0906\u091C \u092E\u0947\u0930\u093E \u0926\u094B\u0938\u094D\u0924 \u0906\u092F\u093E \u0939\u0948, \u0939\u092E \u0926\u094B\u0928\u094B\u0902 \u0938\u093E\u0925 \u092E\u0947\u0902 \u0916\u093E\u0928\u093E \u0916\u093E\u090F\u0902\u0917\u0947\u0964 \u092C\u0939\u0941\u0924 \u092E\u091C\u093C\u093E \u0906\u090F\u0917\u093E\u0964" },
+    { role: "assistant", content: "\u06CC\u0627\u0631\u060C \u0622\u062C \u0645\u06CC\u0631\u0627 \u062F\u0648\u0633\u062A \u0622\u06CC\u0627 \u06C1\u06D2\u060C \u06C1\u0645 \u062F\u0648\u0646\u0648\u06BA \u0633\u0627\u062A\u06BE \u0645\u0644 \u06A9\u0631 \u06A9\u06BE\u0646\u0627 \u06A9\u06BE\u0626\u06CC\u06BA \u06AF\u06D2\u06D4 \u0628\u06C1\u062A \u0645\u0632\u06C1 \u0622\u0626\u06D2 \u06AF\u0627!" },
   ],
 };
 
@@ -706,6 +877,9 @@ const CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
   @keyframes fadeUp    {from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes slideInLeft {from{opacity:0;transform:translateX(-20px);}to{opacity:1;transform:translateX(0);}}
+  @keyframes scaleIn   {from{opacity:0;transform:scale(0.9);}to{opacity:1;transform:scale(1);}}
+  @keyframes fadeInScale {from{opacity:0;transform:scale(0.95);}to{opacity:1;transform:scale(1);}}
   @keyframes pulse     {0%,100%{opacity:.3;transform:scale(.7);}50%{opacity:1;transform:scale(1);}}
   @keyframes spin      {to{transform:rotate(360deg);}}
   @keyframes ruhiShine {0%{background-position:-300% center;}100%{background-position:300% center;}}
@@ -1071,6 +1245,26 @@ const FIREFLY_WORDS = [
   { text: "\u0C2A\u0C4D\u0C30\u0C47\u0C2E", color: "#059669" },
   { text: "\u0C2E\u0C28\u0C38\u0C41", color: "#059669" },
   { text: "\u0C38\u0C4D\u0C28\u0C47\u0C39\u0C02", color: "#059669" },
+  // Kannada
+  { text: "\u0CAA\u0CCD\u0CB0\u0CC0\u0CA4\u0CBF", color: "#dc2626" },
+  { text: "\u0C97\u0CC6\u0CB3\u0CC6\u0CAF", color: "#dc2626" },
+  { text: "\u0C95\u0CA8\u0CCD\u0CA8\u0CA1", color: "#dc2626" },
+  // Malayalam
+  { text: "\u0D38\u0D4D\u0D28\u0D47\u0D39\u0D02", color: "#0d9488" },
+  { text: "\u0D2E\u0D32\u0D2F\u0D3E\u0D33\u0D02", color: "#0d9488" },
+  { text: "\u0D15\u0D25", color: "#0d9488" },
+  // Odia
+  { text: "\u0B2D\u0B3E\u0B32", color: "#6366f1" },
+  { text: "\u0B13\u0B21\u0B3C\u0B3F\u0B06", color: "#6366f1" },
+  { text: "\u0B2E\u0B3E\u0B5F\u0B3E", color: "#6366f1" },
+  // Assamese
+  { text: "\u09AE\u09BE\u09AF\u09BC\u09BE", color: "#be185d" },
+  { text: "\u09AE\u0987", color: "#be185d" },
+  { text: "\u0986\u09B6\u09BE", color: "#be185d" },
+  // Urdu
+  { text: "\u0645\u062D\u0628\u062A", color: "#4f46e5" },
+  { text: "\u062E\u0648\u0627\u0628", color: "#4f46e5" },
+  { text: "\u0627\u0631\u062F\u0648", color: "#4f46e5" },
   // Extra
   { text: "Ruhi", color: "#d97706" },
   { text: "Dream", color: "#3b82f6" },
@@ -1143,6 +1337,8 @@ function LanguageCards({ selected, onToggle, onSelectAll, onDeselectAll }) {
                 ? `linear-gradient(145deg, ${d.color}20, ${d.color}10)`
                 : "linear-gradient(145deg, #f5f0e8, #e8e0d4)",
               border: on ? `2px solid ${d.color}60` : "1px solid rgba(255,255,255,0.4)",
+              transition: "all 0.25s cubic-bezier(0.4,0,0.2,1), transform 0.2s ease",
+              animation: "fadeInScale 0.2s ease",
               boxShadow: on
                 ? `4px 4px 10px ${d.color}25, -3px -3px 8px rgba(255,255,255,0.6), inset 0 1px 0 rgba(255,255,255,0.4)`
                 : "4px 4px 10px rgba(166,152,130,0.3), -3px -3px 8px rgba(255,255,255,0.7), inset 0 1px 0 rgba(255,255,255,0.5)",
@@ -1175,7 +1371,7 @@ function LanguageCards({ selected, onToggle, onSelectAll, onDeselectAll }) {
 }
 
 /* --- Result Card --- */
-function ResultCard({ result, lang, copied, onCopy, isStreaming, srtMode, onDownloadSrt }) {
+function ResultCard({ result, lang, copied, onCopy, isStreaming, srtMode, onDownloadSrt, onShare }) {
   if (!result) return null;
   const wc = result.trim() ? result.trim().split(/\s+/).length : 0;
   return (
@@ -1206,6 +1402,11 @@ function ResultCard({ result, lang, copied, onCopy, isStreaming, srtMode, onDown
               <button onClick={() => onCopy(result, lang.id)} className="clay-btn" style={{ padding: "6px 14px", fontSize: "11.5px", fontWeight: 700, color: copied === lang.id ? lang.color : "#6b5e50", background: copied === lang.id ? `linear-gradient(145deg, ${lang.color}15, ${lang.color}08)` : undefined }}>
                 {copied === lang.id ? "Copied!" : "Copy"}
               </button>
+              {onShare && (
+                <button onClick={() => onShare(lang.id)} className="clay-btn" style={{ padding: "6px 10px", fontSize: "11px", fontWeight: 700, color: "#6b5e50" }} title="Share via WhatsApp or native share">
+                  {"\uD83D\uDD17"}
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -1382,6 +1583,84 @@ export default function App() {
   const [downloadDropdown, setDownloadDropdown] = useState(false);
   const downloadRef = useRef(null);
   const bulkFileRef = useRef(null);
+
+  /* --- New Feature States --- */
+  const [fontSize, setFontSize] = useState(() => parseInt(localStorage.getItem("ruhi_fontsize") || "14"));
+  const [fullscreen, setFullscreen] = useState(false);
+  const [favorites, setFavorites] = useState(() => { try { return JSON.parse(localStorage.getItem("ruhi_favorites") || "[]"); } catch { return []; } });
+  const [themeSchedule, setThemeSchedule] = useState(() => localStorage.getItem("ruhi_theme_schedule") === "1");
+  const [showShortcuts, setShowShortcuts] = useState(false);
+
+  // Theme auto-scheduling
+  useEffect(() => {
+    if (!themeSchedule) return;
+    const checkTime = () => {
+      const hour = new Date().getHours();
+      const shouldBeDark = hour >= 19 || hour < 7;
+      if (shouldBeDark !== darkMode) {
+        setDarkMode(shouldBeDark);
+        localStorage.setItem("ruhi_dark", shouldBeDark ? "1" : "0");
+      }
+    };
+    checkTime();
+    const interval = setInterval(checkTime, 60000);
+    return () => clearInterval(interval);
+  }, [themeSchedule, darkMode]);
+
+  // Font size persistence
+  useEffect(() => { localStorage.setItem("ruhi_fontsize", String(fontSize)); }, [fontSize]);
+
+  // Favorites persistence
+  useEffect(() => { localStorage.setItem("ruhi_favorites", JSON.stringify(favorites)); }, [favorites]);
+
+  // Global keyboard shortcuts
+  useEffect(() => {
+    const handler = (e) => {
+      // Ctrl+Enter — convert
+      if (e.ctrlKey && e.key === "Enter" && !loading && script.trim() && selected.length > 0) {
+        e.preventDefault();
+        (csvMode ? convertBatch : convert)();
+      }
+      // Ctrl+Shift+F — fullscreen toggle
+      if (e.ctrlKey && e.shiftKey && e.key === "F") { e.preventDefault(); setFullscreen(f => !f); }
+      // Ctrl+Shift+D — dark mode toggle
+      if (e.ctrlKey && e.shiftKey && e.key === "D") { e.preventDefault(); setDarkMode(d => { localStorage.setItem("ruhi_dark", d ? "0" : "1"); return !d; }); }
+      // Ctrl+Shift+H — history
+      if (e.ctrlKey && e.shiftKey && e.key === "H") { e.preventDefault(); setHistoryOpen(h => !h); }
+      // Escape — exit fullscreen / close shortcuts
+      if (e.key === "Escape") { setFullscreen(false); setShowShortcuts(false); }
+      // Ctrl+/ — show shortcuts
+      if (e.ctrlKey && e.key === "/") { e.preventDefault(); setShowShortcuts(s => !s); }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [loading, script, selected, csvMode]);
+
+  // Save/load favorite pairs
+  const saveFavorite = () => {
+    if (selected.length === 0) return;
+    const key = selected.sort().join(",");
+    if (favorites.some(f => f.key === key)) return;
+    const name = selected.map(id => LANGUAGES.find(l => l.id === id)?.sub || id).join(", ");
+    setFavorites(prev => [...prev, { key, langs: [...selected], name }]);
+    playSuccess();
+  };
+  const loadFavorite = (fav) => { setSelected(fav.langs); playPop(); };
+  const removeFavorite = (key) => { setFavorites(prev => prev.filter(f => f.key !== key)); };
+
+  // Share functionality
+  const shareResult = async (langId) => {
+    const text = results[langId];
+    if (!text) return;
+    const lang = LANGUAGES.find(l => l.id === langId);
+    const shareText = `${lang?.label} (${lang?.sub}):\n\n${text}\n\n— Converted by RUHI Studio`;
+    if (navigator.share) {
+      try { await navigator.share({ title: `RUHI — ${lang?.label} Script`, text: shareText }); } catch {}
+    } else {
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+      window.open(whatsappUrl, "_blank");
+    }
+  };
 
   useEffect(() => {
     const handler = (e) => { if (downloadRef.current && !downloadRef.current.contains(e.target)) setDownloadDropdown(false); };
@@ -1877,11 +2156,54 @@ export default function App() {
       <style>{CSS}</style>
       <FireflyBackground />
 
+      {/* Keyboard Shortcuts Modal */}
+      {showShortcuts && (
+        <>
+          <div onClick={() => setShowShortcuts(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.3)", zIndex: 100, backdropFilter: "blur(4px)" }} />
+          <div style={{
+            position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 101,
+            width: "380px", maxWidth: "90vw", borderRadius: "20px", overflow: "hidden",
+            background: darkMode ? "linear-gradient(145deg, #111, #0a0a0a)" : "linear-gradient(145deg, #f5f0e8, #ece7dd)",
+            border: `1px solid ${darkMode ? "rgba(255,255,255,0.08)" : "rgba(166,152,130,0.2)"}`,
+            boxShadow: "0 20px 60px rgba(0,0,0,0.3)", animation: "fadeInScale 0.2s ease",
+          }}>
+            <div style={{ padding: "16px 20px", borderBottom: `1px solid ${darkMode ? "rgba(255,255,255,0.06)" : "rgba(166,152,130,0.12)"}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ fontSize: "14px", fontWeight: 800, color: darkMode ? "#d4c8b0" : "#78350f" }}>{"\u2328\uFE0F"} Keyboard Shortcuts</span>
+              <button onClick={() => setShowShortcuts(false)} className="clay-btn" style={{ padding: "4px 10px", fontSize: "12px", fontWeight: 700 }}>{"\u2716"}</button>
+            </div>
+            <div style={{ padding: "16px 20px" }}>
+              {[
+                ["Ctrl + Enter", "Convert script"],
+                ["Ctrl + Shift + F", "Toggle fullscreen"],
+                ["Ctrl + Shift + D", "Toggle dark mode"],
+                ["Ctrl + Shift + H", "Toggle history"],
+                ["Ctrl + /", "Show shortcuts"],
+                ["Escape", "Exit fullscreen / close"],
+              ].map(([key, desc]) => (
+                <div key={key} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: `1px solid ${darkMode ? "rgba(255,255,255,0.04)" : "rgba(166,152,130,0.08)"}` }}>
+                  <span style={{ fontSize: "12px", color: darkMode ? "#e8e0d4" : "#3d3425" }}>{desc}</span>
+                  <span style={{ fontSize: "10px", fontWeight: 700, padding: "3px 8px", borderRadius: "6px", background: darkMode ? "rgba(245,158,11,0.12)" : "rgba(245,158,11,0.1)", color: "#d97706", fontFamily: "monospace" }}>{key}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
       {/* Topbar */}
       <div className="topbar-c" style={{ padding: "0 28px", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between", background: darkMode ? "linear-gradient(145deg, #231e14ee, #1c1810ee)" : "linear-gradient(145deg, #f5f0e8ee, #ece7ddee)", backdropFilter: "blur(20px)", position: "sticky", top: 0, zIndex: 20, borderBottom: `1px solid ${darkMode ? "rgba(60,50,35,0.3)" : "rgba(166,152,130,0.15)"}`, boxShadow: darkMode ? "0 4px 12px rgba(0,0,0,0.3)" : "0 4px 12px rgba(166,152,130,0.15)", transition: "background 0.3s" }}>
         <Logo />
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
           <Notifications darkMode={darkMode} />
+          <button onClick={() => { playClick(); setShowShortcuts(s => !s); }} className="clay-btn" style={{ padding: "6px 10px", fontSize: "12px", lineHeight: 1 }} title="Keyboard Shortcuts (Ctrl+/)">
+            {"\u2328\uFE0F"}
+          </button>
+          <button onClick={() => { playClick(); setFullscreen(f => !f); }} className="clay-btn" style={{ padding: "6px 10px", fontSize: "12px", lineHeight: 1 }} title={fullscreen ? "Exit Fullscreen (Esc)" : "Fullscreen (Ctrl+Shift+F)"}>
+            {fullscreen ? "\u2716" : "\u26F6"}
+          </button>
+          <button onClick={() => { playClick(); setThemeSchedule(s => { const next = !s; localStorage.setItem("ruhi_theme_schedule", next ? "1" : "0"); return next; }); }} className="clay-btn" style={{ padding: "6px 10px", fontSize: "12px", lineHeight: 1, background: themeSchedule ? (darkMode ? "rgba(245,158,11,0.15)" : "rgba(245,158,11,0.12)") : undefined }} title={themeSchedule ? "Auto theme ON (7pm-7am dark)" : "Auto theme OFF"}>
+            {"\u{1F553}"}
+          </button>
           <button onClick={() => { playClick(); setDarkMode(d => { localStorage.setItem("ruhi_dark", d ? "0" : "1"); return !d; }); }} className="clay-btn" style={{ padding: "6px 12px", fontSize: "15px", lineHeight: 1 }} title={darkMode ? "Light Mode" : "Dark Mode"}>
             {darkMode ? "\u2600\uFE0F" : "\u{1F319}"}
           </button>
@@ -1962,13 +2284,28 @@ export default function App() {
           </div>
         </div>
 
+        {/* Favorites Bar */}
+        {favorites.length > 0 && (
+          <div className="clay" style={{ padding: "10px 18px", marginBottom: "14px", display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", animation: "fadeUp 0.25s ease" }}>
+            <span style={{ fontSize: "10px", fontWeight: 800, color: darkMode ? "#d4c8b0" : "#78350f", textTransform: "uppercase", letterSpacing: "1px" }}>{"\u2B50"} Favorites</span>
+            {favorites.map(fav => (
+              <div key={fav.key} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                <button onClick={() => loadFavorite(fav)} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 600, color: darkMode ? "#d4c8b0" : "#78350f" }}>
+                  {fav.name}
+                </button>
+                <button onClick={() => removeFavorite(fav.key)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: "10px", color: "#dc2626", padding: "2px", lineHeight: 1 }}>{"\u2716"}</button>
+              </div>
+            ))}
+          </div>
+        )}
+
         {/* Two-column layout: Input (left) | Output (right) */}
-        <div className="converter-cols" style={{ display: "flex", gap: "20px", alignItems: "flex-start" }}>
+        <div className="converter-cols" style={{ display: "flex", gap: "20px", alignItems: "flex-start", ...(fullscreen ? { position: "fixed", inset: 0, zIndex: 60, background: darkMode ? "#000" : "#f0ebe3", padding: "20px", overflow: "auto" } : {}) }}>
 
         {/* Left Column — Script Input */}
         <div style={{ flex: "1 1 0", minWidth: 0 }}>
         <div className="clay ta-focus" style={{ marginBottom: "16px", overflow: "hidden" }}>
-          <div style={{ padding: "14px 22px", borderBottom: "1px solid rgba(166,152,130,0.12)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ padding: "14px 22px", borderBottom: "1px solid rgba(166,152,130,0.12)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <span>&#9997;&#65039;</span>
               <span style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "1.2px", textTransform: "uppercase", color: darkMode ? "#d4c8b0" : "#78350f" }}>Script Input</span>
@@ -1988,14 +2325,23 @@ export default function App() {
               <button onClick={() => fileInputRef.current?.click()} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#78350f" }}>
                 {"\u{1F4C1}"} Upload
               </button>
+              <button onClick={saveFavorite} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#78350f" }} title="Save current languages as favorite">
+                {"\u2B50"} Save Fav
+              </button>
               <span className="word-count-text" style={{ fontSize: "11px", color: "#92400e", fontWeight: 600 }}>{wc} words</span>
               <span className="char-count-text" style={{ fontSize: "11px", color: script.length > 2000 ? "#dc2626" : "#92400e", fontWeight: 600 }}>{script.length} chars</span>
             </div>
           </div>
+          {/* Font Size Slider */}
+          <div style={{ padding: "6px 22px", borderBottom: "1px solid rgba(166,152,130,0.08)", display: "flex", alignItems: "center", gap: "10px" }}>
+            <span style={{ fontSize: "10px", fontWeight: 700, color: darkMode ? "#807060" : "#a08060" }}>Aa</span>
+            <input type="range" min="11" max="22" value={fontSize} onChange={e => setFontSize(+e.target.value)} style={{ flex: 1, accentColor: "#f59e0b", height: "3px", maxWidth: "140px" }} />
+            <span style={{ fontSize: "10px", fontWeight: 700, color: darkMode ? "#807060" : "#a08060", minWidth: "22px" }}>{fontSize}</span>
+          </div>
           <div style={{ padding: "18px 22px" }}>
             <textarea value={script} onChange={e => setScript(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && e.ctrlKey) convert(); }}
               placeholder={"Kisi bhi bhasha mein script paste karo...\n\nHindi, English, Bhojpuri, Gujarati, Haryanvi, Rajasthani, ya koi bhi mix.\n\nMultiple languages select karke ek saath convert karo!"}
-              style={{ width: "100%", background: "transparent", border: "none", outline: "none", color: "inherit", fontSize: "14px", resize: "none", lineHeight: 1.9, fontFamily: "'Inter','Segoe UI',sans-serif", minHeight: "140px", boxSizing: "border-box" }}
+              style={{ width: "100%", background: "transparent", border: "none", outline: "none", color: "inherit", fontSize: `${fontSize}px`, resize: "none", lineHeight: 1.9, fontFamily: "'Inter','Segoe UI',sans-serif", minHeight: fullscreen ? "60vh" : "140px", boxSizing: "border-box", transition: "font-size 0.2s" }}
             />
             {script.length > 0 && (
               <div style={{ marginTop: "8px", height: "3px", borderRadius: "2px", background: "rgba(166,152,130,0.15)", overflow: "hidden" }}>
@@ -2283,7 +2629,7 @@ export default function App() {
               const lang = LANGUAGES.find(l => l.id === langId);
               return results[langId] ? (
                 <div key={langId}>
-                  <ResultCard result={results[langId]} lang={lang} copied={copied} onCopy={copy} isStreaming={!!streaming[langId]} srtMode={srtMode} onDownloadSrt={downloadSrt} />
+                  <ResultCard result={results[langId]} lang={lang} copied={copied} onCopy={copy} isStreaming={!!streaming[langId]} srtMode={srtMode} onDownloadSrt={downloadSrt} onShare={shareResult} />
                   {ttsEnabled && !streaming[langId] && (
                     <div className="clay" style={{ padding: "8px 14px", marginTop: "-10px", marginBottom: "14px", borderLeft: `4px solid ${lang.color}20` }}>
                       <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px" }}>
