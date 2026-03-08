@@ -1584,6 +1584,10 @@ export default function App() {
   const downloadRef = useRef(null);
   const bulkFileRef = useRef(null);
 
+  /* --- Voice Input State --- */
+  const [voiceListening, setVoiceListening] = useState(false);
+  const recognitionRef = useRef(null);
+
   /* --- New Feature States --- */
   const [fontSize, setFontSize] = useState(() => parseInt(localStorage.getItem("ruhi_fontsize") || "14"));
   const [fullscreen, setFullscreen] = useState(false);
@@ -1635,6 +1639,50 @@ export default function App() {
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   }, [loading, script, selected, csvMode]);
+
+  // Voice input (Web Speech API)
+  const voiceBaseRef = useRef("");
+  const toggleVoice = () => {
+    if (voiceListening) {
+      recognitionRef.current?.stop();
+      setVoiceListening(false);
+      return;
+    }
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setError("Voice input not supported in this browser. Try Chrome.");
+      playError();
+      return;
+    }
+    voiceBaseRef.current = script;
+    const recognition = new SpeechRecognition();
+    recognition.lang = "hi-IN";
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    let accumulated = "";
+    recognition.onresult = (event) => {
+      let interim = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          accumulated += event.results[i][0].transcript + " ";
+        } else {
+          interim += event.results[i][0].transcript;
+        }
+      }
+      const base = voiceBaseRef.current;
+      const sep = base && !base.endsWith(" ") && !base.endsWith("\n") ? " " : "";
+      setScript(base + sep + accumulated + interim);
+    };
+    recognition.onerror = (e) => {
+      if (e.error !== "aborted") { setError("Voice error: " + e.error); playError(); }
+      setVoiceListening(false);
+    };
+    recognition.onend = () => { setVoiceListening(false); };
+    recognitionRef.current = recognition;
+    recognition.start();
+    setVoiceListening(true);
+    playPop();
+  };
 
   // Save/load favorite pairs
   const saveFavorite = () => {
@@ -2324,6 +2372,9 @@ export default function App() {
               <input ref={fileInputRef} type="file" accept=".txt,.srt,.csv,.text" onChange={handleFileUpload} style={{ display: "none" }} />
               <button onClick={() => fileInputRef.current?.click()} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#78350f" }}>
                 {"\u{1F4C1}"} Upload
+              </button>
+              <button onClick={toggleVoice} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: voiceListening ? "#ef4444" : (darkMode ? "#d4c8b0" : "#78350f"), background: voiceListening ? "rgba(239,68,68,0.12)" : undefined, animation: voiceListening ? "pulse 1.5s infinite" : undefined }} title={voiceListening ? "Stop listening" : "Voice input (speak to type)"}>
+                {"\u{1F3A4}"} {voiceListening ? "Stop" : "Mic"}
               </button>
               <button onClick={saveFavorite} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#78350f" }} title="Save current languages as favorite">
                 {"\u2B50"} Save Fav

@@ -61,6 +61,8 @@ const ANSWERS = {
   "font": "Use the font size slider below the Script Input header to adjust text size from 11px to 22px. Your preference is saved automatically.",
   "offline": "RUHI works as a PWA! Add it to your home screen for an app-like experience. Note: conversions require internet, but the UI is cached for fast loading.",
   "export": "RUHI supports multiple export formats: TXT, PDF, RTF, or individual files per language. Click the Download button after converting to choose your format.",
+  "voice": "Click the Mic button next to Upload in the Script Input area. RUHI uses your browser's speech recognition (works best in Chrome). Speak in Hindi or any language — it'll type as you talk! Click Stop when done.",
+  "mic": "Click the Mic button next to Upload in the Script Input area. RUHI uses your browser's speech recognition (works best in Chrome). Speak in Hindi or any language — it'll type as you talk! Click Stop when done.",
   "kannada": "Kannada (ಕನ್ನಡ) is a Dravidian language spoken in Karnataka. It has a rich literary tradition spanning over 2000 years, with 8 Jnanpith Awards — the most for any Dravidian language!",
   "malayalam": "Malayalam (മലയാളം) is spoken in Kerala. It has one of the most complex scripts in India with about 578 characters including conjuncts. Fun fact: 'Malayalam' is a palindrome!",
   "odia": "Odia (ଓଡ଼ିଆ) is spoken in Odisha. Its rounded letterforms evolved because palm-leaf manuscripts would tear with straight lines. It's one of India's 6 classical languages.",
