@@ -4,11 +4,6 @@ import VideoDub from "./VideoDub.jsx";
 import ChatBot from "./ChatBot.jsx";
 import Notifications from "./Notifications.jsx";
 import CommandPalette from "./CommandPalette.jsx";
-import AnalyticsDashboard from "./AnalyticsDashboard.jsx";
-import TemplateLibrary from "./TemplateLibrary.jsx";
-import SubtitleStudio from "./SubtitleStudio.jsx";
-import ScriptDiff from "./ScriptDiff.jsx";
-import TTSPreview from "./TTSPreview.jsx";
 import GlossaryManager from "./GlossaryManager.jsx";
 import { playClick, playSuccess, playPop, playError } from "./sounds.js";
 
@@ -2369,12 +2364,7 @@ After writing the converted text in the target script, add a blank line and then
       case "tabDubbing": setActiveTab("dubbing"); break;
       case "tabConverter": setActiveTab("converter"); break;
       case "voiceInput": toggleVoice(); break;
-      case "tabAnalytics": setActiveTab("analytics"); break;
-      case "tabSubtitle": setActiveTab("subtitle"); break;
-      case "tabTemplates": setActiveTab("templates"); break;
       case "tabGlossary": setActiveTab("glossary"); break;
-      case "tabTTS": setActiveTab("ttsPreview"); break;
-      case "tabDiff": setActiveTab("diff"); break;
       default: break;
     }
     playClick();
@@ -2515,41 +2505,6 @@ After writing the converted text in the target script, add a blank line and then
         }}>
           {"\uD83C\uDFA5"} Video Dub
         </button>
-        <button onClick={() => { playClick(); setActiveTab("ttsPreview"); }} className={activeTab === "ttsPreview" ? "clay-btn-primary" : "clay-btn"} style={{
-          padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
-          cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
-          ...(activeTab !== "ttsPreview" ? { color: darkMode ? "#b0a090" : "#6b5e50" } : {})
-        }}>
-          {"🔊"} TTS Preview
-        </button>
-        <button onClick={() => { playClick(); setActiveTab("subtitle"); }} className={activeTab === "subtitle" ? "clay-btn-primary" : "clay-btn"} style={{
-          padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
-          cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
-          ...(activeTab !== "subtitle" ? { color: darkMode ? "#b0a090" : "#6b5e50" } : {})
-        }}>
-          {"📝"} Subtitle Studio
-        </button>
-        <button onClick={() => { playClick(); setActiveTab("diff"); }} className={activeTab === "diff" ? "clay-btn-primary" : "clay-btn"} style={{
-          padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
-          cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
-          ...(activeTab !== "diff" ? { color: darkMode ? "#b0a090" : "#6b5e50" } : {})
-        }}>
-          {"🔍"} Diff View
-        </button>
-        <button onClick={() => { playClick(); setActiveTab("templates"); }} className={activeTab === "templates" ? "clay-btn-primary" : "clay-btn"} style={{
-          padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
-          cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
-          ...(activeTab !== "templates" ? { color: darkMode ? "#b0a090" : "#6b5e50" } : {})
-        }}>
-          {"📚"} Templates
-        </button>
-        <button onClick={() => { playClick(); setActiveTab("analytics"); }} className={activeTab === "analytics" ? "clay-btn-primary" : "clay-btn"} style={{
-          padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
-          cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
-          ...(activeTab !== "analytics" ? { color: darkMode ? "#b0a090" : "#6b5e50" } : {})
-        }}>
-          {"📊"} Analytics
-        </button>
         <button onClick={() => { playClick(); setActiveTab("glossary"); }} className={activeTab === "glossary" ? "clay-btn-primary" : "clay-btn"} style={{
           padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
           cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
@@ -2564,15 +2519,6 @@ After writing the converted text in the target script, add a blank line and then
         <div style={{ position: "relative", zIndex: 1, minHeight: "calc(100vh - 160px)" }}>
           {activeTab === "studio" && <ContentStudio darkMode={darkMode} streamConvert={streamConvert} dialectRules={DIALECT_RULES} />}
           {activeTab === "dubbing" && <VideoDub darkMode={darkMode} streamConvert={streamConvert} />}
-          {activeTab === "ttsPreview" && <TTSPreview darkMode={darkMode} />}
-          {activeTab === "subtitle" && <SubtitleStudio darkMode={darkMode} streamConvert={streamConvert} />}
-          {activeTab === "diff" && (
-            <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "28px 22px 80px" }}>
-              <ScriptDiff original={script} results={results} languages={LANGUAGES} darkMode={darkMode} />
-            </div>
-          )}
-          {activeTab === "templates" && <TemplateLibrary darkMode={darkMode} onUseTemplate={handleUseTemplate} />}
-          {activeTab === "analytics" && <AnalyticsDashboard darkMode={darkMode} />}
           {activeTab === "glossary" && <GlossaryManager darkMode={darkMode} />}
         </div>
       )}
