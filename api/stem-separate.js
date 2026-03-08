@@ -19,7 +19,6 @@ export default async function handler(req, res) {
         version: "25a173108cff36ef9f80f854c162d01df9e6528be175794b81571f6e0c0f3d47",
         input: {
           audio: audioUrl,
-          stem: "vocals",
         },
       }),
     });

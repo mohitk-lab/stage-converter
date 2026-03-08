@@ -10,6 +10,7 @@ const MODULES = [
   { id: "campaign", icon: "\uD83D\uDCE2", label: "Campaign" },
   { id: "script", icon: "\uD83D\uDCDC", label: "Script Gen" },
   { id: "caption", icon: "\uD83D\uDCAC", label: "Captions" },
+  { id: "headline", icon: "\uD83D\uDCF0", label: "Headline" },
   { id: "learning", icon: "\uD83E\uDDE0", label: "Learning" },
 ];
 
@@ -319,6 +320,9 @@ MOVIE/SHOW: ${data.movieName || "Content"}
 LANGUAGE: ${data.language}
 PLATFORM: ${data.platform}
 MOOD: ${data.mood}
+${data.styleDescription ? `STYLE REFERENCE: ${data.styleDescription}` : ""}
+${data.vocabularyPrefs ? `VOCABULARY PREFERENCES: ${data.vocabularyPrefs}` : ""}
+${data.tonePatterns ? `TONE PATTERNS: ${data.tonePatterns}` : ""}
 
 OUTPUT FORMAT:
 Number each caption. Each caption should include:
@@ -343,7 +347,44 @@ RULES:
 - Each caption should be unique in approach
 - Include emojis naturally (not forced)
 - Make captions shareable and engagement-friendly
-- Reference Stage OTT brand naturally`;
+- Reference Stage OTT brand naturally
+- If sample scripts are provided, match that writing style exactly`;
+}
+
+/* --- Headline System Prompt --- */
+function buildHeadlineSystem(data) {
+  return `You are a headline specialist for Stage OTT platform.
+
+TASK: Generate ${data.count} compelling headlines.
+
+MOVIE/SHOW: ${data.movieName || "Content"}
+LANGUAGE: ${data.language}
+PLATFORM: ${data.platform}
+TONE: ${data.tone}
+${data.styleDescription ? `STYLE REFERENCE: ${data.styleDescription}` : ""}
+${data.vocabularyPrefs ? `VOCABULARY PREFERENCES: ${data.vocabularyPrefs}` : ""}
+${data.tonePatterns ? `TONE PATTERNS: ${data.tonePatterns}` : ""}
+
+OUTPUT FORMAT:
+Number each headline. For each headline include:
+- Main headline text in ${data.language}
+- A short subtitle/subheadline (optional)
+- Platform context (where this headline works best)
+
+TONE GUIDELINES:
+- catchy: Click-worthy, attention-grabbing, curiosity gaps
+- dramatic: Bold, impactful, emotional stakes
+- funny: Witty, playful, meme-worthy
+- urgent: Time-sensitive, FOMO, breaking-news style
+- emotional: Heartfelt, relatable, sentiment-driven
+
+RULES:
+- Write in authentic ${data.language}
+- Each headline should be unique in approach and angle
+- Keep headlines concise and punchy (under 15 words)
+- Make them shareable and scroll-stopping
+- Reference Stage OTT brand naturally
+- If sample scripts are provided, match that writing style exactly`;
 }
 
 /* --- Learning System Prompt --- */
@@ -519,7 +560,12 @@ export default function ContentStudio({ darkMode, streamConvert }) {
     title: "", genre: "comedy", language: "bhojpuri", scenes: "3", tone: "dramatic", synopsis: ""
   });
   const [captionData, setCaptionData] = useState({
-    movieName: "", platform: "instagram", language: "bhojpuri", mood: "hype", count: "10"
+    movieName: "", platform: "instagram", language: "bhojpuri", mood: "hype", count: "10",
+    styleDescription: "", vocabularyPrefs: "", tonePatterns: "", scriptInput: ""
+  });
+  const [headlineData, setHeadlineData] = useState({
+    movieName: "", language: "bhojpuri", platform: "instagram", tone: "catchy", count: "10",
+    styleDescription: "", vocabularyPrefs: "", tonePatterns: "", scriptInput: ""
   });
 
   // Persona & Learning state
@@ -618,7 +664,16 @@ Synopsis: ${scriptData.synopsis || "Create an original story"}`;
 Platform: ${captionData.platform}
 Language: ${captionData.language}
 Mood: ${captionData.mood}
-Count: ${captionData.count}`;
+Count: ${captionData.count}${captionData.scriptInput ? `\n\n=== REFERENCE SCRIPTS (match this style) ===\n${captionData.scriptInput}` : ""}`;
+          break;
+
+        case "headline":
+          system = buildHeadlineSystem(headlineData);
+          userMessage = `Movie/Show: ${headlineData.movieName || "Content"}
+Platform: ${headlineData.platform}
+Language: ${headlineData.language}
+Tone: ${headlineData.tone}
+Count: ${headlineData.count}${headlineData.scriptInput ? `\n\n=== REFERENCE SCRIPTS (match this style) ===\n${headlineData.scriptInput}` : ""}`;
           break;
 
         case "learning": {
@@ -824,6 +879,53 @@ ${system}`;
                   { value: "5", label: "5 Captions" }, { value: "10", label: "10 Captions" },
                   { value: "15", label: "15 Captions" }
                 ]} darkMode={dm} />
+              </div>
+              <div style={{ borderTop: `1px solid ${dm ? "rgba(255,255,255,0.06)" : "rgba(166,152,130,0.15)"}`, paddingTop: "12px", marginTop: "4px" }}>
+                <label style={{ display: "block", fontSize: "10px", fontWeight: 700, color: dm ? "#b0a090" : "#92400e", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.8px" }}>Style Learning (Optional)</label>
+                <StudioInput label="Style Description" value={captionData.styleDescription} onChange={v => setCaptionData({ ...captionData, styleDescription: v })} placeholder="" darkMode={dm} />
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginTop: "10px" }}>
+                  <StudioInput label="Vocabulary Preferences" value={captionData.vocabularyPrefs} onChange={v => setCaptionData({ ...captionData, vocabularyPrefs: v })} placeholder="" darkMode={dm} />
+                  <StudioInput label="Tone Patterns" value={captionData.tonePatterns} onChange={v => setCaptionData({ ...captionData, tonePatterns: v })} placeholder="" darkMode={dm} />
+                </div>
+                <div style={{ marginTop: "10px" }}>
+                  <StudioTextArea label="Paste Sample Scripts" value={captionData.scriptInput} onChange={v => setCaptionData({ ...captionData, scriptInput: v })} placeholder="" rows={4} darkMode={dm} />
+                </div>
+              </div>
+            </>)}
+
+            {/* HEADLINE */}
+            {activeModule === "headline" && (<>
+              <PersonaSelector moduleId="headline" personas={personas} activePersonaMap={activePersonaMap} onSelect={handlePersonaSelect} darkMode={dm} />
+              <StudioInput label="Movie/Show Name" value={headlineData.movieName} onChange={v => setHeadlineData({ ...headlineData, movieName: v })} placeholder="" darkMode={dm} />
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                <StudioSelect label="Platform" value={headlineData.platform} onChange={v => setHeadlineData({ ...headlineData, platform: v })} options={[
+                  { value: "instagram", label: "Instagram" }, { value: "facebook", label: "Facebook" },
+                  { value: "youtube", label: "YouTube" }, { value: "twitter", label: "Twitter" },
+                  { value: "push", label: "Push Notification" }, { value: "email", label: "Email" }
+                ]} darkMode={dm} />
+                <StudioSelect label="Language" value={headlineData.language} onChange={v => setHeadlineData({ ...headlineData, language: v })} options={LANGUAGES} darkMode={dm} />
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                <StudioSelect label="Tone" value={headlineData.tone} onChange={v => setHeadlineData({ ...headlineData, tone: v })} options={[
+                  { value: "catchy", label: "Catchy" }, { value: "dramatic", label: "Dramatic" },
+                  { value: "funny", label: "Funny" }, { value: "urgent", label: "Urgent" },
+                  { value: "emotional", label: "Emotional" }
+                ]} darkMode={dm} />
+                <StudioSelect label="Count" value={headlineData.count} onChange={v => setHeadlineData({ ...headlineData, count: v })} options={[
+                  { value: "5", label: "5 Headlines" }, { value: "10", label: "10 Headlines" },
+                  { value: "15", label: "15 Headlines" }
+                ]} darkMode={dm} />
+              </div>
+              <div style={{ borderTop: `1px solid ${dm ? "rgba(255,255,255,0.06)" : "rgba(166,152,130,0.15)"}`, paddingTop: "12px", marginTop: "4px" }}>
+                <label style={{ display: "block", fontSize: "10px", fontWeight: 700, color: dm ? "#b0a090" : "#92400e", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.8px" }}>Style Learning (Optional)</label>
+                <StudioInput label="Style Description" value={headlineData.styleDescription} onChange={v => setHeadlineData({ ...headlineData, styleDescription: v })} placeholder="" darkMode={dm} />
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginTop: "10px" }}>
+                  <StudioInput label="Vocabulary Preferences" value={headlineData.vocabularyPrefs} onChange={v => setHeadlineData({ ...headlineData, vocabularyPrefs: v })} placeholder="" darkMode={dm} />
+                  <StudioInput label="Tone Patterns" value={headlineData.tonePatterns} onChange={v => setHeadlineData({ ...headlineData, tonePatterns: v })} placeholder="" darkMode={dm} />
+                </div>
+                <div style={{ marginTop: "10px" }}>
+                  <StudioTextArea label="Paste Sample Scripts" value={headlineData.scriptInput} onChange={v => setHeadlineData({ ...headlineData, scriptInput: v })} placeholder="" rows={4} darkMode={dm} />
+                </div>
               </div>
             </>)}
 

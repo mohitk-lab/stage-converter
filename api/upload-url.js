@@ -1,14 +1,21 @@
 import { handleUpload } from "@vercel/blob/client";
 
-export const config = { api: { bodyParser: false } };
-
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
+
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return res.status(500).json({
+      error: "BLOB_READ_WRITE_TOKEN is not configured. Please add it to your Vercel project environment variables."
+    });
+  }
+
   try {
+    // Pass req.body (Vercel auto-parses JSON in non-Next.js functions)
+    // handleUpload accepts both parsed body objects and raw requests
     const body = await handleUpload({
-      body: req,
+      body: req.body,
       request: req,
       onBeforeGenerateToken: async (pathname) => {
         return {
@@ -27,6 +34,12 @@ export default async function handler(req, res) {
     });
     res.json(body);
   } catch (e) {
-    res.status(400).json({ error: e.message || "Upload failed" });
+    const message = e.message || "Upload failed";
+    const isBlobTokenError = message.toLowerCase().includes("token") || message.toLowerCase().includes("unauthorized");
+    res.status(isBlobTokenError ? 500 : 400).json({
+      error: isBlobTokenError
+        ? "Blob storage token error. Check BLOB_READ_WRITE_TOKEN in Vercel environment variables."
+        : message
+    });
   }
 }
