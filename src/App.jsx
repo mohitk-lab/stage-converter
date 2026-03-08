@@ -872,7 +872,15 @@ STEP 3 \u2014 REWRITE in ${id === "hindi" ? "standard Hindi" : id === "english" 
 - Output ONLY the converted text. No explanation, no labels, nothing else.
 ${needsContrastive ? "\n" + CONTRASTIVE_TABLE : ""}
 ${DIALECT_RULES[id]}
-${checklist}`;
+${checklist}
+
+\u2605\u2605\u2605 CRITICAL OUTPUT RULES \u2605\u2605\u2605
+1. Output ONLY the converted version of the user's EXACT input text. Nothing more, nothing less.
+2. Do NOT add any extra sentences, phrases, or content that was not in the original input.
+3. Do NOT prepend or append any example text, greetings, or filler sentences.
+4. The number of sentences in your output must match the number of sentences in the input.
+5. If the input has 3 sentences, your output must have exactly 3 sentences (converted).
+6. NEVER add content from training examples or previous context into the output.`;
 };
 
 /* ============================================
