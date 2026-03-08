@@ -162,10 +162,11 @@ export default function ChatBot({ darkMode, streamConvert }) {
     try {
       if (streamConvert) {
         let accumulated = "";
-        await streamConvert(
-          msg,
-          systemPrompt,
-          (chunk) => {
+        await streamConvert({
+          model: "anthropic/claude-sonnet-4",
+          system: systemPrompt,
+          messages: [{ role: "user", content: msg }],
+          onChunk: (chunk) => {
             accumulated += chunk;
             const current = accumulated;
             setMessages(prev => {
@@ -176,29 +177,16 @@ export default function ChatBot({ darkMode, streamConvert }) {
               return updated;
             });
           },
-          () => {
-            playPop();
-            setMessages(prev => {
-              const updated = [...prev];
-              if (botIdx.current >= 0 && botIdx.current < updated.length) {
-                updated[botIdx.current] = { ...updated[botIdx.current], streaming: false };
-              }
-              return updated;
-            });
-            setIsStreaming(false);
-          },
-          (error) => {
-            console.error("RUHI AI error:", error);
-            setMessages(prev => {
-              const updated = [...prev];
-              if (botIdx.current >= 0 && botIdx.current < updated.length) {
-                updated[botIdx.current] = { from: "bot", text: "Sorry, I couldn't reach the AI service. Here's what I know: " + ANSWERS.default, streaming: false };
-              }
-              return updated;
-            });
-            setIsStreaming(false);
+        });
+        playPop();
+        setMessages(prev => {
+          const updated = [...prev];
+          if (botIdx.current >= 0 && botIdx.current < updated.length) {
+            updated[botIdx.current] = { ...updated[botIdx.current], streaming: false };
           }
-        );
+          return updated;
+        });
+        setIsStreaming(false);
       } else {
         // No streamConvert available, fall back to default
         setMessages(prev => {

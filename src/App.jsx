@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import ContentStudio from "./ContentStudio.jsx";
 import VideoDub from "./VideoDub.jsx";
 import ChatBot from "./ChatBot.jsx";
@@ -1181,7 +1181,66 @@ const CSS = `
     .tts-options { grid-template-columns: 1fr; }
     .tts-advanced { grid-template-columns: 1fr; }
   }
+
+  /* Skeleton shimmer animation */
+  @keyframes skeletonShimmer {
+    0% { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+  }
+  .skeleton-line {
+    height: 14px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, rgba(166,152,130,0.12) 25%, rgba(166,152,130,0.24) 50%, rgba(166,152,130,0.12) 75%);
+    background-size: 400px 100%;
+    animation: skeletonShimmer 1.8s ease-in-out infinite;
+    margin-bottom: 12px;
+  }
+  .dark .skeleton-line {
+    background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.04) 75%);
+    background-size: 400px 100%;
+  }
+
+  /* Theme picker */
+  .theme-picker-wrap { position: relative; display: inline-block; }
+  .theme-picker-dropdown {
+    position: absolute; top: 100%; right: 0; margin-top: 6px;
+    border-radius: 14px; padding: 8px; z-index: 50;
+    display: flex; flex-wrap: wrap; gap: 6px; width: 170px;
+  }
+  .theme-dot {
+    width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
+    border: 2px solid transparent; transition: all 0.15s ease;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.15), -1px -1px 3px rgba(255,255,255,0.3);
+  }
+  .theme-dot:hover { transform: scale(1.15); }
+  .theme-dot.active { border-color: #fff; box-shadow: 0 0 0 2px currentColor, 2px 2px 5px rgba(0,0,0,0.2); }
 `;
+
+/* --- Accent Themes --- */
+const ACCENT_THEMES = {
+  amber:   { label: "Amber",   primary: "#f59e0b", dark: "#d97706" },
+  rose:    { label: "Rose",    primary: "#f43f5e", dark: "#e11d48" },
+  violet:  { label: "Violet",  primary: "#8b5cf6", dark: "#7c3aed" },
+  emerald: { label: "Emerald", primary: "#10b981", dark: "#059669" },
+  ocean:   { label: "Ocean",   primary: "#0ea5e9", dark: "#0284c7" },
+  sunset:  { label: "Sunset",  primary: "#f97316", dark: "#ea580c" },
+};
+
+/* --- Skeleton Loader --- */
+function SkeletonLoader({ lines = 5, darkMode }) {
+  const widths = ["100%", "85%", "92%", "70%", "60%"];
+  return (
+    <div style={{ padding: "28px 24px" }}>
+      {widths.slice(0, lines).map((w, i) => (
+        <div
+          key={i}
+          className="skeleton-line"
+          style={{ width: w, animationDelay: `${i * 0.12}s` }}
+        />
+      ))}
+    </div>
+  );
+}
 
 /* --- Logo --- */
 function Logo() {
@@ -1606,6 +1665,51 @@ export default function App() {
   const [onboardingStep, setOnboardingStep] = useState(() => localStorage.getItem("ruhi_onboarding_done") ? -1 : 0);
   const [accentColor, setAccentColor] = useState(() => localStorage.getItem("ruhi_accent") || "amber");
 
+  /* --- Find & Replace State --- */
+  const [findReplaceOpen, setFindReplaceOpen] = useState(false);
+  const [findText, setFindText] = useState("");
+  const [replaceText, setReplaceText] = useState("");
+  const [findCaseInsensitive, setFindCaseInsensitive] = useState(true);
+  const [findRegex, setFindRegex] = useState(false);
+
+  /* --- Transliteration Mode --- */
+  const [translitMode, setTranslitMode] = useState(false);
+
+  // Find & Replace helpers
+  const findMatchCount = useMemo(() => {
+    if (!findText || !script) return 0;
+    try {
+      if (findRegex) {
+        const re = new RegExp(findText, findCaseInsensitive ? "gi" : "g");
+        return (script.match(re) || []).length;
+      }
+      const search = findCaseInsensitive ? findText.toLowerCase() : findText;
+      const hay = findCaseInsensitive ? script.toLowerCase() : script;
+      let count = 0, idx = 0;
+      while ((idx = hay.indexOf(search, idx)) !== -1) { count++; idx += search.length; }
+      return count;
+    } catch { return 0; }
+  }, [findText, script, findCaseInsensitive, findRegex]);
+
+  const doReplace = (all) => {
+    if (!findText) return;
+    try {
+      if (findRegex) {
+        const flags = findCaseInsensitive ? "gi" : "g";
+        const re = new RegExp(findText, all ? flags : (findCaseInsensitive ? "i" : ""));
+        setScript(prev => prev.replace(re, replaceText));
+      } else {
+        if (all) {
+          const re = new RegExp(findText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), findCaseInsensitive ? "gi" : "g");
+          setScript(prev => prev.replace(re, replaceText));
+        } else {
+          const idx = findCaseInsensitive ? script.toLowerCase().indexOf(findText.toLowerCase()) : script.indexOf(findText);
+          if (idx !== -1) setScript(prev => prev.slice(0, idx) + replaceText + prev.slice(idx + findText.length));
+        }
+      }
+    } catch { /* invalid regex */ }
+  };
+
   // Theme auto-scheduling
   useEffect(() => {
     if (!themeSchedule) return;
@@ -1847,9 +1951,13 @@ export default function App() {
           streamingSet[langId] = true;
           setStreaming(s => ({ ...s, [langId]: true }));
           const examples = FEW_SHOT_EXAMPLES[langId] || [];
+          const sysPrompt = buildSingleConverterSystem(langId, tone) + (translitMode ? `
+
+TRANSLITERATION MODE (IMPORTANT):
+After writing the converted text in the target script, add a blank line and then provide a full Roman script (Latin alphabet) transliteration of your output. Label it "Transliteration:" on its own line. The transliteration should be natural Hinglish-style romanization (e.g. "Kaise ho bhai?" not "Kaisē hō bhāī?"). Use simple English letters, no diacritics. This applies to all non-English outputs.` : "");
           const raw = await streamConvert({
             model: "anthropic/claude-sonnet-4-5",
-            system: buildSingleConverterSystem(langId, tone),
+            system: sysPrompt,
             messages: [...examples, { role: "user", content: script }],
             onChunk: (partial) => {
               setResults(prev => ({ ...prev, [langId]: partial }));
@@ -2534,6 +2642,9 @@ export default function App() {
               <button onClick={saveFavorite} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#78350f" }} title="Save current languages as favorite">
                 {"\u2B50"} Save Fav
               </button>
+              <button onClick={() => { setFindReplaceOpen(v => !v); playClick(); }} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: findReplaceOpen ? "#f59e0b" : (darkMode ? "#d4c8b0" : "#78350f"), background: findReplaceOpen ? "rgba(245,158,11,0.12)" : undefined }} title="Find & Replace">
+                {"\uD83D\uDD0D"} Find
+              </button>
               {detectedLang && (
                 <span style={{ fontSize: "9px", fontWeight: 700, color: "#d97706", background: "rgba(245,158,11,0.1)", padding: "2px 8px", borderRadius: "6px", display: "flex", alignItems: "center", gap: "3px" }}>
                   {"🌐"} {detectedLang.label} ({detectedLang.confidence}%)
@@ -2549,6 +2660,22 @@ export default function App() {
             <input type="range" min="11" max="22" value={fontSize} onChange={e => setFontSize(+e.target.value)} style={{ flex: 1, accentColor: "#f59e0b", height: "3px", maxWidth: "140px" }} />
             <span style={{ fontSize: "10px", fontWeight: 700, color: darkMode ? "#807060" : "#a08060", minWidth: "22px" }}>{fontSize}</span>
           </div>
+          {/* Find & Replace Panel */}
+          {findReplaceOpen && (
+            <div style={{ padding: "10px 22px", borderBottom: "1px solid rgba(166,152,130,0.1)", background: darkMode ? "rgba(255,255,255,0.03)" : "rgba(166,152,130,0.04)" }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", alignItems: "center", marginBottom: "8px" }}>
+                <input value={findText} onChange={e => setFindText(e.target.value)} placeholder="Find..." style={{ flex: "1 1 120px", padding: "6px 10px", fontSize: "12px", borderRadius: "8px", border: `1px solid ${darkMode ? "rgba(255,255,255,0.1)" : "rgba(166,152,130,0.25)"}`, background: darkMode ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.7)", color: "inherit", outline: "none", minWidth: "100px" }} />
+                <input value={replaceText} onChange={e => setReplaceText(e.target.value)} placeholder="Replace..." style={{ flex: "1 1 120px", padding: "6px 10px", fontSize: "12px", borderRadius: "8px", border: `1px solid ${darkMode ? "rgba(255,255,255,0.1)" : "rgba(166,152,130,0.25)"}`, background: darkMode ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.7)", color: "inherit", outline: "none", minWidth: "100px" }} />
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", alignItems: "center" }}>
+                <button onClick={() => doReplace(false)} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#78350f" }}>Replace</button>
+                <button onClick={() => doReplace(true)} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#78350f" }}>Replace All</button>
+                <button onClick={() => setFindCaseInsensitive(v => !v)} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: findCaseInsensitive ? "#f59e0b" : (darkMode ? "#d4c8b0" : "#78350f"), background: findCaseInsensitive ? "rgba(245,158,11,0.12)" : undefined }} title="Case insensitive">Aa</button>
+                <button onClick={() => setFindRegex(v => !v)} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: findRegex ? "#f59e0b" : (darkMode ? "#d4c8b0" : "#78350f"), background: findRegex ? "rgba(245,158,11,0.12)" : undefined }} title="Regex mode">.*</button>
+                {findText && <span style={{ fontSize: "10px", fontWeight: 700, color: findMatchCount > 0 ? "#16a34a" : "#dc2626" }}>{findMatchCount} match{findMatchCount !== 1 ? "es" : ""}</span>}
+              </div>
+            </div>
+          )}
           <div style={{ padding: "18px 22px" }}>
             <textarea value={script} onChange={e => setScript(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && e.ctrlKey) convert(); }}
               placeholder={"Kisi bhi bhasha mein script paste karo...\n\nHindi, English, Bhojpuri, Gujarati, Haryanvi, Rajasthani, ya koi bhi mix.\n\nMultiple languages select karke ek saath convert karo!"}
@@ -2562,6 +2689,9 @@ export default function App() {
           </div>
           <div style={{ padding: "14px 22px", borderTop: "1px solid rgba(166,152,130,0.1)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(166,152,130,0.04)", flexWrap: "wrap", gap: "8px" }}>
             <span className="ctrl-hint" style={{ fontSize: "11px", color: "#a08060", fontWeight: 500 }}>Ctrl + Enter</span>
+            <button onClick={() => { setTranslitMode(v => !v); playClick(); }} className="clay-btn" style={{ padding: "6px 14px", fontSize: "10px", fontWeight: 700, borderRadius: "10px", color: translitMode ? "#fff" : (darkMode ? "#d4c8b0" : "#78350f"), background: translitMode ? "linear-gradient(135deg,#f59e0b,#d97706)" : undefined, boxShadow: translitMode ? "0 2px 8px rgba(245,158,11,0.3)" : undefined, transition: "all 0.2s" }} title="Transliterate Devanagari to Roman script (Hinglish)">
+              {translitMode ? "Aa" : "Aa"} Translit {translitMode ? "ON" : "OFF"}
+            </button>
             <button onClick={() => { playClick(); (csvMode ? convertBatch : convert)(); }} disabled={!can} className={can ? "clay-btn-primary" : "clay-btn-primary"} style={{
               padding: "11px 28px", borderRadius: "14px", border: "none",
               cursor: can ? "pointer" : "not-allowed", fontSize: "13px",
