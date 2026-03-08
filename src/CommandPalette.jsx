@@ -19,6 +19,7 @@ const ACTIONS = [
   { id: "tabAnalytics", icon: "📊", label: "Open Analytics" },
   { id: "tabSubtitle", icon: "💬", label: "Open Subtitle Studio" },
   { id: "tabTemplates", icon: "📁", label: "Open Template Library" },
+  { id: "tabGlossary", icon: "📖", label: "Open Glossary Manager" },
 ];
 
 const KEYFRAMES_ID = "command-palette-keyframes";
