@@ -196,6 +196,13 @@ export default function VideoDub({ darkMode, streamConvert }) {
   const dm = darkMode;
   const ffmpegRef = useRef(null);
   const ffmpegLoadedRef = useRef(false);
+  const urlsRef = useRef([]);
+
+  const createObjectURL = (blob) => {
+    const url = URL.createObjectURL(blob);
+    urlsRef.current.push(url);
+    return url;
+  };
 
   // Pipeline state
   const [currentStep, setCurrentStep] = useState(1);
@@ -220,6 +227,9 @@ export default function VideoDub({ darkMode, streamConvert }) {
   const [musicUrl, setMusicUrl] = useState(null);
   const [separating, setSeparating] = useState(false);
   const [separateStatus, setSeparateStatus] = useState(null);
+
+  // Cached vocals upload URL (reused across steps)
+  const [vocalsUploadUrl, setVocalsUploadUrl] = useState(null);
 
   // Step 4: Transcription
   const [detectedLanguage, setDetectedLanguage] = useState(null);
@@ -249,7 +259,8 @@ export default function VideoDub({ darkMode, streamConvert }) {
   // Cleanup object URLs on unmount
   useEffect(() => {
     return () => {
-      [videoLocalUrl, audioUrl, vocalsUrl, musicUrl, dubbedAudioUrl, finalAudioUrl].forEach(u => { if (u) URL.revokeObjectURL(u); });
+      urlsRef.current.forEach(u => URL.revokeObjectURL(u));
+      urlsRef.current = [];
     };
   }, []);
 
@@ -279,7 +290,7 @@ export default function VideoDub({ darkMode, streamConvert }) {
     }
     clearError(1);
     setVideoFile(file);
-    setVideoLocalUrl(URL.createObjectURL(file));
+    setVideoLocalUrl(createObjectURL(file));
     setUploading(true);
     setUploadProgress(0);
 
@@ -293,7 +304,8 @@ export default function VideoDub({ darkMode, streamConvert }) {
       setUploadProgress(100);
       setCurrentStep(2);
     } catch (err) {
-      setError(1, err.message || "Upload failed. Try again.");
+      const msg = err.message || "Upload failed. Try again.";
+      setError(1, msg.includes("token") ? "Blob storage not configured. Admin ko BLOB_READ_WRITE_TOKEN set karne bolo." : msg);
     }
     setUploading(false);
   };
@@ -310,7 +322,7 @@ export default function VideoDub({ darkMode, streamConvert }) {
       const data = await ffmpeg.readFile("output.wav");
       const blob = new Blob([data.buffer], { type: "audio/wav" });
       setAudioBlob(blob);
-      setAudioUrl(URL.createObjectURL(blob));
+      setAudioUrl(createObjectURL(blob));
       await ffmpeg.deleteFile("input.mp4");
       await ffmpeg.deleteFile("output.wav");
       setCurrentStep(3);
@@ -355,18 +367,21 @@ export default function VideoDub({ darkMode, streamConvert }) {
           // Demucs returns object with vocal and accompaniment URLs
           const output = statusData.output;
           // Fetch vocals
-          const vocalsResp = await fetch(typeof output === "string" ? output : output.vocals || output[0]);
+          const vocalsSrc = typeof output === "string" ? output : output.vocals || output[0];
+          const vocalsResp = await fetch(vocalsSrc);
+          if (!vocalsResp.ok) throw new Error("Failed to download vocals track");
           const vBlob = new Blob([await vocalsResp.arrayBuffer()], { type: "audio/wav" });
           setVocalsBlob(vBlob);
-          setVocalsUrl(URL.createObjectURL(vBlob));
+          setVocalsUrl(createObjectURL(vBlob));
 
           // Fetch music/accompaniment (may be "other" or "accompaniment")
-          const musicSrc = output.accompaniment || output.no_vocals || output[1];
+          const musicSrc = output.accompaniment || output.no_vocals || output.other || output[1];
           if (musicSrc) {
             const musicResp = await fetch(musicSrc);
+            if (!musicResp.ok) throw new Error("Failed to download music track");
             const mBlob = new Blob([await musicResp.arrayBuffer()], { type: "audio/wav" });
             setMusicBlob(mBlob);
-            setMusicUrl(URL.createObjectURL(mBlob));
+            setMusicUrl(createObjectURL(mBlob));
           }
 
           setSeparateStatus(null);
@@ -393,16 +408,21 @@ export default function VideoDub({ darkMode, streamConvert }) {
     clearError(4);
     setTranscribing(true);
     try {
-      // Upload vocals for transcription
-      const vocalsUpload = await upload("vocals.wav", vocalsBlob, {
-        access: "public",
-        handleUploadUrl: "/api/upload-url",
-      });
+      // Upload vocals for transcription (cache URL for reuse in voice cloning)
+      let uploadUrl = vocalsUploadUrl;
+      if (!uploadUrl) {
+        const vocalsUpload = await upload("vocals.wav", vocalsBlob, {
+          access: "public",
+          handleUploadUrl: "/api/upload-url",
+        });
+        uploadUrl = vocalsUpload.url;
+        setVocalsUploadUrl(uploadUrl);
+      }
 
       const resp = await fetch("/api/transcribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ audioUrl: vocalsUpload.url }),
+        body: JSON.stringify({ audioUrl: uploadUrl }),
       });
       if (!resp.ok) {
         const err = await resp.json();
@@ -456,17 +476,22 @@ ${(transcription.segments || []).map(s => `[${s.start.toFixed(1)}s - ${s.end.toF
     setGenerating(true);
     setTtsProgress("Voice cloning...");
     try {
-      // Upload vocals for cloning
-      const vocalsUpload = await upload("vocals_clone.wav", vocalsBlob, {
-        access: "public",
-        handleUploadUrl: "/api/upload-url",
-      });
+      // Reuse cached vocals URL or upload if not available
+      let uploadUrl = vocalsUploadUrl;
+      if (!uploadUrl) {
+        const vocalsUpload = await upload("vocals_clone.wav", vocalsBlob, {
+          access: "public",
+          handleUploadUrl: "/api/upload-url",
+        });
+        uploadUrl = vocalsUpload.url;
+        setVocalsUploadUrl(uploadUrl);
+      }
 
       // Clone voice
       const cloneResp = await fetch("/api/clone-voice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ audioUrl: vocalsUpload.url, name: `dub_${Date.now()}` }),
+        body: JSON.stringify({ audioUrl: uploadUrl, name: `dub_${Date.now()}` }),
       });
       if (!cloneResp.ok) {
         const err = await cloneResp.json();
@@ -488,7 +513,7 @@ ${(transcription.segments || []).map(s => `[${s.start.toFixed(1)}s - ${s.end.toF
           body: JSON.stringify({
             text: segments[i],
             voice_id: voice_id,
-            model_id: "eleven_multilingual_v3",
+            model_id: "eleven_multilingual_v2",
             voice_settings: { stability: 0.6, similarity_boost: 0.85, style: 0.3, use_speaker_boost: true },
             speed: 1.0,
           }),
@@ -497,18 +522,28 @@ ${(transcription.segments || []).map(s => `[${s.start.toFixed(1)}s - ${s.end.toF
         audioChunks.push(await ttsResp.arrayBuffer());
       }
 
-      // Concatenate audio chunks
-      const totalLen = audioChunks.reduce((s, c) => s + c.byteLength, 0);
-      const combined = new Uint8Array(totalLen);
-      let offset = 0;
-      for (const chunk of audioChunks) {
-        combined.set(new Uint8Array(chunk), offset);
-        offset += chunk.byteLength;
+      // Concatenate audio chunks using FFmpeg for proper MP3 merging
+      const ffmpeg = await loadFFmpeg();
+      const { fetchFile } = await import("@ffmpeg/util");
+      const concatList = [];
+      for (let j = 0; j < audioChunks.length; j++) {
+        const name = `seg_${j}.mp3`;
+        await ffmpeg.writeFile(name, new Uint8Array(audioChunks[j]));
+        concatList.push(`file '${name}'`);
       }
+      await ffmpeg.writeFile("concat_list.txt", new TextEncoder().encode(concatList.join("\n")));
+      await ffmpeg.exec(["-f", "concat", "-safe", "0", "-i", "concat_list.txt", "-c", "copy", "dubbed_out.mp3"]);
+      const dubbedData = await ffmpeg.readFile("dubbed_out.mp3");
+      // Cleanup temp files
+      for (let j = 0; j < audioChunks.length; j++) {
+        try { await ffmpeg.deleteFile(`seg_${j}.mp3`); } catch {}
+      }
+      try { await ffmpeg.deleteFile("concat_list.txt"); } catch {}
+      try { await ffmpeg.deleteFile("dubbed_out.mp3"); } catch {}
 
-      const dubbedBlob = new Blob([combined], { type: "audio/mpeg" });
+      const dubbedBlob = new Blob([dubbedData.buffer], { type: "audio/mpeg" });
       setDubbedAudioBlob(dubbedBlob);
-      setDubbedAudioUrl(URL.createObjectURL(dubbedBlob));
+      setDubbedAudioUrl(createObjectURL(dubbedBlob));
       setTtsProgress("");
       setCurrentStep(7);
     } catch (err) {
@@ -547,7 +582,7 @@ ${(transcription.segments || []).map(s => `[${s.start.toFixed(1)}s - ${s.end.toF
       const data = await ffmpeg.readFile("final.mp3");
       const blob = new Blob([data.buffer], { type: "audio/mpeg" });
       setFinalAudioBlob(blob);
-      setFinalAudioUrl(URL.createObjectURL(blob));
+      setFinalAudioUrl(createObjectURL(blob));
 
       // Cleanup ffmpeg files
       try { await ffmpeg.deleteFile("music.wav"); } catch {}
@@ -561,12 +596,14 @@ ${(transcription.segments || []).map(s => `[${s.start.toFixed(1)}s - ${s.end.toF
 
   /* --- Reset --- */
   const resetPipeline = () => {
-    [videoLocalUrl, audioUrl, vocalsUrl, musicUrl, dubbedAudioUrl, finalAudioUrl].forEach(u => { if (u) URL.revokeObjectURL(u); });
+    urlsRef.current.forEach(u => URL.revokeObjectURL(u));
+    urlsRef.current = [];
     setCurrentStep(1);
     setErrors({});
     setVideoFile(null); setVideoLocalUrl(null); setVideoBlobUrl(null); setUploading(false); setUploadProgress(0);
     setAudioBlob(null); setAudioUrl(null); setExtracting(false);
     setVocalsBlob(null); setVocalsUrl(null); setMusicBlob(null); setMusicUrl(null); setSeparating(false); setSeparateStatus(null);
+    setVocalsUploadUrl(null);
     setDetectedLanguage(null); setTranscription(null); setTranscribing(false);
     setTargetLanguage("hindi"); setTranslatedText(""); setTranslating(false);
     setClonedVoiceId(null); setDubbedAudioBlob(null); setDubbedAudioUrl(null); setGenerating(false); setTtsProgress("");
