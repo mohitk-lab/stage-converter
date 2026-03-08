@@ -1664,6 +1664,7 @@ export default function App() {
   const [detectedLang, setDetectedLang] = useState(null);
   const [onboardingStep, setOnboardingStep] = useState(() => localStorage.getItem("ruhi_onboarding_done") ? -1 : 0);
   const [accentColor, setAccentColor] = useState(() => localStorage.getItem("ruhi_accent") || "amber");
+  const [themePickerOpen, setThemePickerOpen] = useState(false);
 
   /* --- Find & Replace State --- */
   const [findReplaceOpen, setFindReplaceOpen] = useState(false);
@@ -1731,6 +1732,18 @@ export default function App() {
 
   // Favorites persistence
   useEffect(() => { localStorage.setItem("ruhi_favorites", JSON.stringify(favorites)); }, [favorites]);
+
+  // Apply accent theme CSS variables
+  useEffect(() => {
+    const theme = ACCENT_THEMES[accentColor] || ACCENT_THEMES.amber;
+    const root = document.documentElement;
+    root.style.setProperty("--accent-primary", theme.primary);
+    root.style.setProperty("--accent-dark", theme.dark);
+    root.style.setProperty("--accent-primary-12", theme.primary + "1f");
+    root.style.setProperty("--accent-primary-30", theme.primary + "4d");
+    root.style.setProperty("--accent-dark-30", theme.dark + "4d");
+    localStorage.setItem("ruhi_accent", accentColor);
+  }, [accentColor]);
 
   // Auto-detect input language
   useEffect(() => {
@@ -2451,6 +2464,29 @@ After writing the converted text in the target script, add a blank line and then
           <button onClick={() => { playClick(); setThemeSchedule(s => { const next = !s; localStorage.setItem("ruhi_theme_schedule", next ? "1" : "0"); return next; }); }} className="clay-btn" style={{ padding: "6px 10px", fontSize: "12px", lineHeight: 1, background: themeSchedule ? (darkMode ? "rgba(245,158,11,0.15)" : "rgba(245,158,11,0.12)") : undefined }} title={themeSchedule ? "Auto theme ON (7pm-7am dark)" : "Auto theme OFF"}>
             {"\u{1F553}"}
           </button>
+          <div className="theme-picker-wrap">
+            <button onClick={() => { playClick(); setThemePickerOpen(p => !p); }} className="clay-btn" style={{ padding: "6px 10px", fontSize: "12px", lineHeight: 1, display: "flex", alignItems: "center", gap: "5px" }} title="Accent Theme">
+              <span style={{ width: "14px", height: "14px", borderRadius: "50%", background: (ACCENT_THEMES[accentColor] || ACCENT_THEMES.amber).primary, display: "inline-block", boxShadow: `0 0 6px ${(ACCENT_THEMES[accentColor] || ACCENT_THEMES.amber).primary}40` }} />
+              <span style={{ fontSize: "10px", fontWeight: 700, color: darkMode ? "#b0a090" : "#6b5e50" }}>{"\u25BE"}</span>
+            </button>
+            {themePickerOpen && (
+              <div className="theme-picker-dropdown" style={{
+                background: darkMode ? "linear-gradient(145deg, #0d0d0d, #080808)" : "linear-gradient(145deg, #f5f0e8, #ece7dd)",
+                border: `1px solid ${darkMode ? "rgba(255,255,255,0.08)" : "rgba(166,152,130,0.2)"}`,
+                boxShadow: darkMode ? "0 8px 24px rgba(0,0,0,0.5)" : "6px 6px 18px rgba(166,152,130,0.3), -4px -4px 12px rgba(255,255,255,0.6)",
+              }}>
+                {Object.entries(ACCENT_THEMES).map(([key, theme]) => (
+                  <div
+                    key={key}
+                    className={`theme-dot${accentColor === key ? " active" : ""}`}
+                    style={{ background: theme.primary, color: theme.primary }}
+                    title={theme.label}
+                    onClick={() => { playClick(); setAccentColor(key); setThemePickerOpen(false); }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
           <button onClick={() => { playClick(); setDarkMode(d => { localStorage.setItem("ruhi_dark", d ? "0" : "1"); return !d; }); }} className="clay-btn" style={{ padding: "6px 12px", fontSize: "15px", lineHeight: 1 }} title={darkMode ? "Light Mode" : "Dark Mode"}>
             {darkMode ? "\u2600\uFE0F" : "\u{1F319}"}
           </button>
@@ -2807,18 +2843,21 @@ After writing the converted text in the target script, add a blank line and then
           </div>
         )}
 
-        {/* Loading indicator (only when no streaming results yet) */}
+        {/* Loading indicator with skeleton UI (only when no streaming results yet) */}
         {loading && Object.keys(results).length === 0 && (
-          <div className="clay" style={{ padding: "40px 24px", textAlign: "center", marginBottom: "14px" }}>
-            <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "18px" }}>
-              {[0, 1, 2].map(i => <div key={i} style={{ width: "12px", height: "12px", borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#d97706)", boxShadow: "3px 3px 6px rgba(200,130,20,0.3), -2px -2px 4px rgba(255,220,150,0.4)", animation: `pulse 1.3s ${i * 0.22}s ease-in-out infinite` }} />)}
+          <div className="clay" style={{ marginBottom: "14px", overflow: "hidden" }}>
+            <div style={{ padding: "18px 24px 0", textAlign: "center" }}>
+              <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "12px" }}>
+                {[0, 1, 2].map(i => <div key={i} style={{ width: "10px", height: "10px", borderRadius: "50%", background: `linear-gradient(135deg, var(--accent-primary, #f59e0b), var(--accent-dark, #d97706))`, boxShadow: `3px 3px 6px var(--accent-dark-30, rgba(200,130,20,0.3)), -2px -2px 4px rgba(255,220,150,0.4)`, animation: `pulse 1.3s ${i * 0.22}s ease-in-out infinite` }} />)}
+              </div>
+              <div className="loading-text" style={{ fontSize: "13px", color: darkMode ? "#d4c8b0" : "#78350f", fontWeight: 700, marginBottom: "4px" }}>
+                Converting to {selected.length} language{selected.length > 1 ? "s" : ""}...
+              </div>
+              <div className="loading-sub" style={{ fontSize: "10.5px", color: darkMode ? "#807060" : "#a08060", marginBottom: "6px" }}>
+                {selected.map(id => LANGUAGES.find(l => l.id === id)?.label).join(", ")}
+              </div>
             </div>
-            <div className="loading-text" style={{ fontSize: "14px", color: "#78350f", fontWeight: 700, marginBottom: "6px" }}>
-              Converting to {selected.length} language{selected.length > 1 ? "s" : ""}...
-            </div>
-            <div className="loading-sub" style={{ fontSize: "11px", color: "#a08060" }}>
-              {selected.map(id => LANGUAGES.find(l => l.id === id)?.label).join(", ")}
-            </div>
+            <SkeletonLoader lines={5} darkMode={darkMode} />
           </div>
         )}
 
