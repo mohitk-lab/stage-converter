@@ -158,7 +158,7 @@ export default function ChatBot({ darkMode }) {
           </div>
 
           {/* Suggestions */}
-          {messages.length <= 2 && (
+          {messages.length > 0 && messages[messages.length - 1].from === "bot" && (
             <div style={{ padding: "0 14px 8px", display: "flex", flexWrap: "wrap", gap: "6px" }}>
               {SUGGESTIONS.map((s, i) => (
                 <button key={i} onClick={() => send(s)} style={{

@@ -1,4 +1,4 @@
-/* --- Subtle UI Sound Effects using Web Audio API --- */
+/* --- Gentle UI Sound Effects using Web Audio API --- */
 
 let audioCtx = null;
 
@@ -7,66 +7,32 @@ function getCtx() {
   return audioCtx;
 }
 
-/* Soft click — for button presses */
+/* Soft tap — for button presses */
 export function playClick() {
   try {
     const ctx = getCtx();
     const o = ctx.createOscillator();
     const g = ctx.createGain();
     o.type = "sine";
-    o.frequency.setValueAtTime(800, ctx.currentTime);
-    o.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.08);
-    g.gain.setValueAtTime(0.08, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
-    o.connect(g).connect(ctx.destination);
-    o.start(); o.stop(ctx.currentTime + 0.08);
-  } catch {}
-}
-
-/* Success chime — for completed actions */
-export function playSuccess() {
-  try {
-    const ctx = getCtx();
-    [520, 660, 780].forEach((freq, i) => {
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type = "sine";
-      o.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.1);
-      g.gain.setValueAtTime(0.07, ctx.currentTime + i * 0.1);
-      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.1 + 0.2);
-      o.connect(g).connect(ctx.destination);
-      o.start(ctx.currentTime + i * 0.1);
-      o.stop(ctx.currentTime + i * 0.1 + 0.2);
-    });
-  } catch {}
-}
-
-/* Soft pop — for copy, toggle actions */
-export function playPop() {
-  try {
-    const ctx = getCtx();
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.type = "sine";
-    o.frequency.setValueAtTime(1200, ctx.currentTime);
-    o.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.06);
-    g.gain.setValueAtTime(0.06, ctx.currentTime);
+    o.frequency.setValueAtTime(680, ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(520, ctx.currentTime + 0.06);
+    g.gain.setValueAtTime(0.035, ctx.currentTime);
     g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
     o.connect(g).connect(ctx.destination);
     o.start(); o.stop(ctx.currentTime + 0.06);
   } catch {}
 }
 
-/* Notification ding */
-export function playNotification() {
+/* Sweet chime — for completed actions */
+export function playSuccess() {
   try {
     const ctx = getCtx();
-    [880, 1100].forEach((freq, i) => {
+    [523, 659, 784].forEach((freq, i) => {
       const o = ctx.createOscillator();
       const g = ctx.createGain();
-      o.type = "sine";
+      o.type = "triangle";
       o.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.12);
-      g.gain.setValueAtTime(0.06, ctx.currentTime + i * 0.12);
+      g.gain.setValueAtTime(0.03, ctx.currentTime + i * 0.12);
       g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.25);
       o.connect(g).connect(ctx.destination);
       o.start(ctx.currentTime + i * 0.12);
@@ -75,33 +41,68 @@ export function playNotification() {
   } catch {}
 }
 
-/* Whoosh — for sending messages */
+/* Gentle bubble — for copy, toggle actions */
+export function playPop() {
+  try {
+    const ctx = getCtx();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = "triangle";
+    o.frequency.setValueAtTime(900, ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.07);
+    g.gain.setValueAtTime(0.025, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.07);
+    o.connect(g).connect(ctx.destination);
+    o.start(); o.stop(ctx.currentTime + 0.07);
+  } catch {}
+}
+
+/* Soft bell — notification */
+export function playNotification() {
+  try {
+    const ctx = getCtx();
+    [784, 988].forEach((freq, i) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "triangle";
+      o.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.15);
+      g.gain.setValueAtTime(0.025, ctx.currentTime + i * 0.15);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.15 + 0.3);
+      o.connect(g).connect(ctx.destination);
+      o.start(ctx.currentTime + i * 0.15);
+      o.stop(ctx.currentTime + i * 0.15 + 0.3);
+    });
+  } catch {}
+}
+
+/* Gentle swoosh — for sending messages */
 export function playSend() {
   try {
     const ctx = getCtx();
     const o = ctx.createOscillator();
     const g = ctx.createGain();
-    o.type = "sine";
-    o.frequency.setValueAtTime(400, ctx.currentTime);
-    o.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.15);
-    g.gain.setValueAtTime(0.05, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+    o.type = "triangle";
+    o.frequency.setValueAtTime(350, ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(900, ctx.currentTime + 0.12);
+    g.gain.setValueAtTime(0.02, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
     o.connect(g).connect(ctx.destination);
-    o.start(); o.stop(ctx.currentTime + 0.15);
+    o.start(); o.stop(ctx.currentTime + 0.12);
   } catch {}
 }
 
-/* Error buzz */
+/* Soft dip — for errors */
 export function playError() {
   try {
     const ctx = getCtx();
     const o = ctx.createOscillator();
     const g = ctx.createGain();
-    o.type = "square";
-    o.frequency.setValueAtTime(200, ctx.currentTime);
-    g.gain.setValueAtTime(0.04, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+    o.type = "triangle";
+    o.frequency.setValueAtTime(330, ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(220, ctx.currentTime + 0.12);
+    g.gain.setValueAtTime(0.025, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
     o.connect(g).connect(ctx.destination);
-    o.start(); o.stop(ctx.currentTime + 0.15);
+    o.start(); o.stop(ctx.currentTime + 0.12);
   } catch {}
 }
