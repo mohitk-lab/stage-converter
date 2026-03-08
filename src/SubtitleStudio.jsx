@@ -421,15 +421,10 @@ export default function SubtitleStudio({ darkMode, streamConvert }) {
   /* ===== RENDER ===== */
   return (
     <div style={{ maxWidth: "900px", margin: "0 auto", fontFamily: "'Inter','Segoe UI',sans-serif" }}>
-      {/* Header */}
-      <div style={{ textAlign: "center", marginBottom: "24px" }}>
-        <h2 style={{ fontSize: "22px", fontWeight: 800, color: textColor, margin: "0 0 4px 0" }}>
-          Subtitle Studio
-        </h2>
-        <p style={{ fontSize: "12px", color: mutedColor, margin: 0 }}>
-          SRT / VTT Editor &bull; Format Conversion &bull; AI Translation
-        </p>
-      </div>
+      {/* Subtitle tagline */}
+      <p style={{ fontSize: "12px", color: mutedColor, margin: "0 0 20px", textAlign: "center" }}>
+        SRT / VTT Editor &bull; Format Conversion &bull; AI Translation
+      </p>
 
       {/* Upload + Controls Card */}
       <div style={cardStyle}>
