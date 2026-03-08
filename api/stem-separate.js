@@ -2,6 +2,9 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
+  if (!process.env.REPLICATE_API_TOKEN) {
+    return res.status(500).json({ error: "REPLICATE_API_TOKEN is not configured. Please add it to your Vercel project environment variables." });
+  }
   try {
     const { audioUrl } = req.body;
     if (!audioUrl) {
