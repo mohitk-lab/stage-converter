@@ -322,33 +322,30 @@ export default function TemplateLibrary({ darkMode, onUseTemplate }) {
 
   return (
     <div style={containerStyle}>
-      {/* Header + Search & Filter — single bar */}
-      <div style={{ ...headerStyle, marginBottom: "20px" }}>
-        <h2 style={titleStyle}>Template Library</h2>
-        <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
-          <input
-            style={{ ...inputStyle, maxWidth: "220px", width: "auto" }}
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search templates..."
-          />
-          <select
-            style={{ ...selectStyle, maxWidth: "160px", width: "auto" }}
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
-          >
-            <option value="All">All Categories</option>
-            {CATEGORIES.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-          <button style={btnStyle} onClick={() => setShowForm((v) => !v)}>
-            {showForm ? "Cancel" : "+ Save Template"}
-          </button>
-        </div>
+      {/* Search, Filter & Add — single toolbar */}
+      <div style={filtersStyle}>
+        <input
+          style={{ ...inputStyle, maxWidth: "260px" }}
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search templates..."
+        />
+        <select
+          style={{ ...selectStyle, maxWidth: "160px" }}
+          value={filterCategory}
+          onChange={(e) => setFilterCategory(e.target.value)}
+        >
+          <option value="All">All Categories</option>
+          {CATEGORIES.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
+        <button style={btnStyle} onClick={() => setShowForm((v) => !v)}>
+          {showForm ? "Cancel" : "+ Save Template"}
+        </button>
       </div>
 
       {/* Save Template Form */}
