@@ -16,9 +16,6 @@ const ACTIONS = [
   { id: "tabDubbing", icon: "🎙️", label: "Open Video Dub" },
   { id: "tabConverter", icon: "🔤", label: "Open Script Converter" },
   { id: "voiceInput", icon: "🎤", label: "Toggle Voice Input", shortcut: "Ctrl+M" },
-  { id: "tabAnalytics", icon: "📊", label: "Open Analytics" },
-  { id: "tabSubtitle", icon: "💬", label: "Open Subtitle Studio" },
-  { id: "tabTemplates", icon: "📁", label: "Open Template Library" },
   { id: "tabGlossary", icon: "📖", label: "Open Glossary Manager" },
 ];
 
