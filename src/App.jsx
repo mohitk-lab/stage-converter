@@ -2582,9 +2582,9 @@ After writing the converted text in the target script, add a blank line and then
         </button>
       </div>
 
-      {/* Non-converter tabs — solid background to prevent firefly bleed-through */}
+      {/* Non-converter tabs */}
       {activeTab !== "converter" && (
-        <div style={{ position: "relative", zIndex: 1, minHeight: "calc(100vh - 160px)", background: darkMode ? "#000000" : "#f0ebe3" }}>
+        <div style={{ position: "relative", zIndex: 1, minHeight: "calc(100vh - 160px)" }}>
           {activeTab === "studio" && <ContentStudio darkMode={darkMode} streamConvert={streamConvert} dialectRules={DIALECT_RULES} />}
           {activeTab === "dubbing" && <VideoDub darkMode={darkMode} streamConvert={streamConvert} />}
           {activeTab === "ttsPreview" && <TTSPreview darkMode={darkMode} />}
