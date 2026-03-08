@@ -1726,7 +1726,7 @@ export default function App() {
       </div>
 
       {/* Content Studio Tab */}
-      {activeTab === "studio" && <ContentStudio darkMode={darkMode} streamConvert={streamConvert} />}
+      {activeTab === "studio" && <ContentStudio darkMode={darkMode} streamConvert={streamConvert} dialectRules={DIALECT_RULES} />}
 
       {/* Dubbing Studio Tab */}
       {activeTab === "dubbing" && <VideoDub darkMode={darkMode} streamConvert={streamConvert} />}

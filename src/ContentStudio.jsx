@@ -128,44 +128,82 @@ const LANG_TEMPLATES = {
   }
 };
 
+/* --- Reference VO narration examples for promo writer --- */
+const PROMO_VO_EXAMPLES = {
+  bhojpuri: `=== VO Example 1 (Overall Story) ===
+रात में जब शिवम सुतल रहल त ओकर उम्र 12 साल के रहल, लेकिन जइसही भोरे उठलस त ओकर उम्र पैंतालिस साल हो गइल अउर आपन नाम अजय बोले लागल. ई सुनके माई-बाप के लागल की शिवम अभी सपने में बड़बड़ा रहल बा, मगर अब शिवम पूरी तरह से बदल गइल बा. गांव में जे भी ओकरा के शिवम कहेला त ऊ चिढ़ जाला. सवाल बा कि एक रात में 12 साल के लइका कैसे पैंतालिस साल के हो गइल. ई सवाल के जवाब आपलोग के स्टेज ओटीटी ऐप पे मौजूद फिल्म पुनर्जनम में मिली. पूरा रहस्य जानें खातिर देखीं सच्ची घटना पे आधारित फिल्म पुनर्जनम.
+
+=== VO Example 2 (Character Angle) ===
+एक अमीरजादी लड़की एतना मनबढ़ु बाड़ी की अपना सामने गरीब के जानवर से भी बदत्तर समझेली. पइसा के नशा में एतना अंधा हो गइल बाड़ी की गरीब लोगन के हमेशा मजाक उड़ावेली. हद त तब हो गइल, जब बाप से धोखा करके कंपनी के बागडोर आपन हाथ में ले लिहली. जिनगी में मोड़ तब आइल जब बचपन के दोस्त के मंगेतर पसंद आ गइल, अब घमंडी लड़की ऊ लइका के पावे खातिर दिन रात प्लानिंग करे लागली. सवाल बा कि का सच में बदलाव भइल या ई कौनो नया चाल बा. सबकुछ जानें खातिर देखीं जिद्दी सिर्फ स्टेज ऐप पे.`,
+  hindi: `=== VO Example 1 (Overall Story) ===
+रात को जब शिवम सोया था तो उसकी उम्र 12 साल थी, लेकिन सुबह उठते ही उसकी उम्र पैंतालीस साल हो गई और अपना नाम अजय बताने लगा. माँ-बाप को लगा कि शिवम सपने में बड़बड़ा रहा है, मगर शिवम पूरी तरह बदल चुका था. गांव में जो भी उसे शिवम कहता वो चिढ़ जाता. सवाल ये है कि एक रात में 12 साल का बच्चा कैसे पैंतालीस साल का हो गया. इस सवाल का जवाब आपको स्टेज ओटीटी ऐप पर मौजूद फिल्म पुनर्जनम में मिलेगा.
+
+=== VO Example 2 (Character Angle) ===
+एक अमीर घमंडी लड़की जो गरीबों को जानवर से भी बदतर समझती है. पैसे के नशे में इतनी अंधी कि गरीब लोगों का हमेशा मज़ाक उड़ाती है. हद तब हो गई जब बाप से धोखा करके कंपनी अपने हाथ में ले ली. ज़िंदगी में मोड़ तब आया जब बचपन की दोस्त का मंगेतर पसंद आ गया. सवाल ये है कि क्या सच में बदलाव हुआ या ये कोई नई चाल है. सबकुछ जानने के लिए देखिए जिद्दी सिर्फ स्टेज ऐप पर.`
+};
+
 /* --- System Prompts for each module --- */
-function buildPromoSystem(data) {
+function buildPromoSystem(data, dialectRulesMap) {
   const lang = data.language || "hindi";
   const templates = LANG_TEMPLATES[lang] || LANG_TEMPLATES.hindi;
   const hooks = templates.hooks[data.genre] || templates.hooks.default || templates.hooks.comedy || [];
-  return `You are a promo writer for Stage OTT platform. You write compelling promotional content for movies and shows.
+  const voExamples = PROMO_VO_EXAMPLES[lang] || PROMO_VO_EXAMPLES.bhojpuri;
+  const dialectRule = dialectRulesMap?.[lang] || "";
+  return `You are a promo VO narration writer for Stage OTT platform. You write story-driven voiceover scripts that hook viewers and make them download the Stage app.
 
-TASK: Generate complete promo content package for a ${data.genre} ${lang} film/show.
+TASK: Generate 6-8 complete VO narration scripts for a ${data.genre} ${lang} film/show.
 
-OUTPUT FORMAT (use EXACTLY this structure):
-=== HOOK LINES (First 3 Seconds) ===
-Generate 5 hook lines in ${lang}. These are the first thing the viewer sees/hears. Must be punchy, emotional, curiosity-driven.
+EACH VO MUST:
+- Be a self-contained narration paragraph (150-250 words)
+- Flow as pure storytelling narration — NO timestamps, NO section headers, NO bullet points within each VO
+- Follow this arc: Curiosity Hook → Story Setup → Suspense/Mystery Build → Natural CTA woven in
+- Be written from a DIFFERENT perspective/angle
+- Use authentic ${lang} dialect throughout
+- Weave the CTA naturally into the story (e.g., "सबकुछ जानें खातिर देखीं [film name] सिर्फ स्टेज ऐप पे")
+- Each VO should feel like a mini-story that makes the listener NEED to watch the film
 
-=== VO SCRIPT WITH TIMESTAMPS ===
-Write a complete voiceover script for a ${data.duration}-second promo in ${lang}.
-Format: [START-END] Text
-Include: Opening hook, plot teaser, star cast mention, social proof, CTA.
-Style: ${data.promoStyle}
+PERSPECTIVES TO COVER (pick 6-8):
+1. Overall Story — the film's big picture narrative hook
+2. Character Angle — one key character's journey or flaw
+3. Relationship Angle — a central relationship dynamic or conflict
+4. Emotional Angle — the core emotional conflict that tugs heartstrings
+5. Comedy/Entertainment — the fun, entertainment, or shock value
+6. Mystery/Suspense — what you don't know yet, the unanswered question
+7. Social/Cultural — relevance to audience's life and society
+8. Audience/Fan — why viewers are going crazy over this film
 
-=== SOCIAL CAPTIONS ===
-Generate 6 social media captions in ${lang} for ${data.platform}. Include emojis and hashtags.
+OUTPUT FORMAT:
+=== VO 1: [PERSPECTIVE NAME] ===
+[Complete narration paragraph — pure flowing story, no formatting]
 
-=== TEXT OVERLAYS ===
-Generate 4 text overlay suggestions with timestamps and style notes.
-Format: [TIME] STYLE: Text
+=== VO 2: [PERSPECTIVE NAME] ===
+[Complete narration paragraph]
 
-=== CALL-TO-ACTION ===
-Generate 4 CTA variations (1 Primary, 3 Secondary) in ${lang}.
+... (continue for 6-8 VOs)
+
+WRITING TECHNIQUES:
+- Open with a shocking fact, impossible situation, or emotional gut-punch
+- Build suspense using rhetorical questions ("सवाल बा कि...")
+- Create cliffhangers ("का शिवम पागल बा, या सच में पुनर्जनम भइल बा")
+- End each VO with a natural CTA that feels like part of the story
+- Use repetition for dramatic effect
+- Paint vivid scenes the listener can visualize
 
 REFERENCE HOOKS for ${lang} ${data.genre}: ${hooks.join(" | ")}
-REFERENCE CTAs: ${templates.cta.join(" | ")}
+
+${dialectRule ? `DIALECT RULES (MUST FOLLOW for ${lang}):\n${dialectRule.substring(0, 600)}\n` : ""}
+
+REFERENCE VO EXAMPLES (match this narration style):
+${voExamples}
 
 RULES:
 - Write in authentic ${lang} dialect/script
-- Keep hooks under 8 words
-- VO script must fit ${data.duration} seconds (roughly 2.5 words/sec)
-- Captions should be platform-optimized for ${data.platform}
-- Be culturally relevant to Stage OTT's regional audience`;
+- NEVER include timestamps like [00:01-00:05] — pure narration only
+- Each VO is a complete story, NOT a list or bullet points
+- CTAs must feel like a natural part of the narrative
+- Make every VO so gripping the listener cannot stop midway
+- Platform: ${data.platform} — optimize narration length accordingly
+- Promo Style: ${data.promoStyle}`;
 }
 
 function buildCampaignSystem(data) {
@@ -311,10 +349,11 @@ RULES:
 - Colors should evoke the right emotion for ${data.genre}`;
 }
 
-function buildCaptionSystem(data) {
-  return `You are a social media specialist for Stage OTT platform.
+function buildCaptionSystem(data, dialectRulesMap) {
+  const dialectRule = dialectRulesMap?.[data.language] || "";
+  return `You are an expert social media content creator for Stage OTT platform, specializing in viral regional language content.
 
-TASK: Generate ${data.count} social media captions for ${data.platform}.
+TASK: Generate ${data.count} scroll-stopping social media captions for ${data.platform}.
 
 MOVIE/SHOW: ${data.movieName || "Content"}
 LANGUAGE: ${data.language}
@@ -327,35 +366,54 @@ ${data.tonePatterns ? `TONE PATTERNS: ${data.tonePatterns}` : ""}
 OUTPUT FORMAT:
 Number each caption. Each caption should include:
 - Main text in ${data.language} (with emoji)
-- Relevant hashtags (mix of Hindi/English)
+- Relevant hashtags (mix of ${data.language}/English)
 - Platform-specific formatting
 
+ENGAGEMENT TECHNIQUES (use in EVERY caption):
+- Start with a HOOK: shocking question, emotional trigger, relatable situation, or bold statement
+- Use pattern interrupts: unexpected twists, contradictions, "wait till you see..." moments
+- Create emotional triggers: nostalgia, pride, FOMO, curiosity, humor, outrage
+- End with engagement drivers: questions, polls, "tag someone who...", debate starters, cliff-hangers
+- Use the storytelling approach — don't just describe, NARRATE
+
+CAPTION FORMATS TO MIX:
+- Question hook ("क्या आपने कभी सोचा कि...")
+- Bold statement ("ये फिल्म आपकी नींद उड़ा देगी")
+- Relatable situation ("जब आपकी माँ ये फिल्म देखे...")
+- Quote from film (a powerful dialogue)
+- Fan reaction style ("10 लाख लोग रो पड़े इस सीन पर")
+- Challenge/dare ("हिम्मत है तो अकेले देखो")
+
 PLATFORM GUIDELINES:
-- Instagram: Visual storytelling, 3-5 hashtags, line breaks for readability
-- YouTube: SEO-friendly, question hooks, mention "subscribe"
-- Facebook: Conversational, shareable, tag-a-friend format
-- Twitter: Short punchy takes, trending hashtag integration, thread potential
+- Instagram: Visual storytelling, 3-5 hashtags, line breaks for readability, carousel-friendly
+- YouTube: SEO-friendly, question hooks, comment-bait, mention "subscribe"
+- Facebook: Conversational, shareable, tag-a-friend, debate-starting
+- Twitter: Short punchy takes, trending hashtag integration, ratio potential
 
 MOOD: ${data.mood}
-- hype: Exciting, energetic, FOMO-inducing
-- funny: Witty, meme-worthy, relatable humor
-- emotional: Heartfelt, nostalgic, emotional connection
-- mysterious: Suspenseful, curiosity-driven, cliffhanger
+- hype: Explosive energy, FOMO, "everyone's watching this"
+- funny: Witty wordplay, meme-worthy, regional humor and inside jokes
+- emotional: Heartfelt, nostalgic, tear-jerking, family sentiment
+- mysterious: Suspenseful, curiosity gaps, "you won't believe what happens"
+
+${dialectRule ? `DIALECT RULES (CRITICAL — MUST FOLLOW for authentic ${data.language}):\n${dialectRule.substring(0, 500)}\n` : ""}
 
 RULES:
-- Write in authentic ${data.language}
-- Each caption should be unique in approach
-- Include emojis naturally (not forced)
-- Make captions shareable and engagement-friendly
-- Reference Stage OTT brand naturally
-- If sample scripts are provided, match that writing style exactly`;
+- Write in AUTHENTIC ${data.language} — use real dialect, not textbook language
+- Each caption must be UNIQUE in approach, angle, and format
+- Emojis should feel natural, not forced
+- Every caption must make the reader want to share, comment, or watch
+- Reference Stage OTT/Stage App naturally
+- If sample scripts are provided, match that writing style exactly
+- Think like a viral content creator, not a copywriter`;
 }
 
 /* --- Headline System Prompt --- */
-function buildHeadlineSystem(data) {
-  return `You are a headline specialist for Stage OTT platform.
+function buildHeadlineSystem(data, dialectRulesMap) {
+  const dialectRule = dialectRulesMap?.[data.language] || "";
+  return `You are an expert headline and thumbnail copy specialist for Stage OTT platform. You write headlines that STOP the scroll and FORCE the click.
 
-TASK: Generate ${data.count} compelling headlines.
+TASK: Generate ${data.count} scroll-stopping headlines.
 
 MOVIE/SHOW: ${data.movieName || "Content"}
 LANGUAGE: ${data.language}
@@ -366,25 +424,47 @@ ${data.vocabularyPrefs ? `VOCABULARY PREFERENCES: ${data.vocabularyPrefs}` : ""}
 ${data.tonePatterns ? `TONE PATTERNS: ${data.tonePatterns}` : ""}
 
 OUTPUT FORMAT:
-Number each headline. For each headline include:
+Number each headline. For each include:
 - Main headline text in ${data.language}
 - A short subtitle/subheadline (optional)
-- Platform context (where this headline works best)
+- Where it works best (thumbnail, push notification, social post, email)
+
+SCROLL-STOPPING TECHNIQUES (use these):
+- Power words: shocking, exclusive, secret, heartbreaking, hilarious, controversial
+- Curiosity gaps: create information gaps ("...जो कोई नहीं जानता", "...के बाद जो हुआ")
+- Numbers & specifics: "5 reasons...", "the one scene that..."
+- Controversy/debate: take a stance, create discussion, provoke opinion
+- Personal/relatable: "जब आपकी...", "वो moment जब..."
+- Urgency markers: "अभी देखो", "miss मत करो"
+- Incomplete stories: leave the reader needing to know more
+
+HEADLINE FORMATS TO MIX:
+- Question headlines (provocative, rhetorical)
+- Bold statement headlines (controversial claims)
+- "How/Why" headlines (explanatory hooks)
+- List headlines ("3 reasons...", "5 scenes...")
+- Quote/dialogue headlines (powerful film lines)
+- Emotional headlines (tug at heartstrings)
+- Shock-value headlines (unexpected facts)
+- Fan-reaction headlines ("10 लाख लोग...")
 
 TONE GUIDELINES:
-- catchy: Click-worthy, attention-grabbing, curiosity gaps
-- dramatic: Bold, impactful, emotional stakes
-- funny: Witty, playful, meme-worthy
-- urgent: Time-sensitive, FOMO, breaking-news style
-- emotional: Heartfelt, relatable, sentiment-driven
+- catchy: Click-worthy, curiosity gaps, "you won't believe" energy
+- dramatic: Bold, impactful, high emotional stakes, cinematic
+- funny: Witty wordplay, meme-worthy, regional humor puns
+- urgent: Time-sensitive, FOMO, breaking-news, "limited time" feel
+- emotional: Heartfelt, relatable, family sentiment, tear-jerking
+
+${dialectRule ? `DIALECT RULES (CRITICAL — MUST FOLLOW for authentic ${data.language}):\n${dialectRule.substring(0, 500)}\n` : ""}
 
 RULES:
-- Write in authentic ${data.language}
-- Each headline should be unique in approach and angle
-- Keep headlines concise and punchy (under 15 words)
-- Make them shareable and scroll-stopping
-- Reference Stage OTT brand naturally
-- If sample scripts are provided, match that writing style exactly`;
+- Write in AUTHENTIC ${data.language} dialect — not textbook, but real spoken language
+- Each headline must be UNIQUE in format, angle, and technique
+- Keep headlines punchy (under 15 words for thumbnails, under 25 for social)
+- Every headline must create an irresistible urge to click/watch
+- Reference Stage OTT/Stage App where natural
+- If sample scripts are provided, match that writing style exactly
+- Think YouTube thumbnail + push notification — every word counts`;
 }
 
 /* --- Learning System Prompt --- */
@@ -542,10 +622,11 @@ function downloadContent(content, filename) {
 /* ========================================
    MAIN COMPONENT
 ======================================== */
-export default function ContentStudio({ darkMode, streamConvert }) {
+export default function ContentStudio({ darkMode, streamConvert, dialectRules = {} }) {
   const [activeModule, setActiveModule] = useState("promo");
   const [isGenerating, setIsGenerating] = useState(false);
   const [output, setOutput] = useState("");
+  const [previousOutput, setPreviousOutput] = useState("");
   const [error, setError] = useState("");
 
   // Module form states
@@ -618,7 +699,15 @@ export default function ContentStudio({ darkMode, streamConvert }) {
     }
   };
 
+  const handleUndo = () => {
+    if (previousOutput && previousOutput !== output) {
+      setOutput(previousOutput);
+      setPreviousOutput("");
+    }
+  };
+
   const generate = async () => {
+    if (output) setPreviousOutput(output);
     setIsGenerating(true);
     setError("");
     setOutput("");
@@ -629,13 +718,12 @@ export default function ContentStudio({ darkMode, streamConvert }) {
     try {
       switch (activeModule) {
         case "promo":
-          system = buildPromoSystem(promoData);
+          system = buildPromoSystem(promoData, dialectRules);
           userMessage = `Movie: "${promoData.movieName || "Untitled"}"
 Star Cast: ${promoData.starCast || "N/A"}
 Genre: ${promoData.genre}
 Language: ${promoData.language}
 Platform: ${promoData.platform}
-Duration: ${promoData.duration} seconds
 Promo Style: ${promoData.promoStyle}
 Plot Points: ${promoData.plotPoints || "N/A"}`;
           break;
@@ -659,7 +747,7 @@ Synopsis: ${scriptData.synopsis || "Create an original story"}`;
           break;
 
         case "caption":
-          system = buildCaptionSystem(captionData);
+          system = buildCaptionSystem(captionData, dialectRules);
           userMessage = `Movie/Show: ${captionData.movieName || "Content"}
 Platform: ${captionData.platform}
 Language: ${captionData.language}
@@ -668,7 +756,7 @@ Count: ${captionData.count}${captionData.scriptInput ? `\n\n=== REFERENCE SCRIPT
           break;
 
         case "headline":
-          system = buildHeadlineSystem(headlineData);
+          system = buildHeadlineSystem(headlineData, dialectRules);
           userMessage = `Movie/Show: ${headlineData.movieName || "Content"}
 Platform: ${headlineData.platform}
 Language: ${headlineData.language}
@@ -702,14 +790,23 @@ ${learningData.scriptInput}`;
       if (activePersonaId && activeModule !== "learning") {
         const persona = personas.find(p => p.id === activePersonaId);
         if (persona?.styleFingerprint) {
-          system = `=== WRITING PERSONA: ${persona.name} ===
-You MUST mimic this writer's style exactly. This is your primary directive for tone, vocabulary, and structure.
+          system = `=== ACTIVE WRITING PERSONA: ${persona.name} ===
+CRITICAL DIRECTIVE: You MUST write in the exact style of "${persona.name}".
+This persona's writing fingerprint takes HIGHEST PRIORITY for all tone, vocabulary, sentence structure, and emotional register decisions.
 
+STYLE FINGERPRINT:
 ${persona.styleFingerprint}
-${persona.styleDescription ? `\nStyle notes: ${persona.styleDescription}` : ""}
-${persona.vocabularyPrefs ? `Vocabulary preferences: ${persona.vocabularyPrefs}` : ""}
-${persona.tonePatterns ? `Tone patterns: ${persona.tonePatterns}` : ""}
+${persona.styleDescription ? `\nSTYLE NOTES: ${persona.styleDescription}` : ""}
+${persona.vocabularyPrefs ? `VOCABULARY MUST-USE: ${persona.vocabularyPrefs}` : ""}
+${persona.tonePatterns ? `TONE PATTERN: ${persona.tonePatterns}` : ""}
 
+INTEGRATION RULES:
+- Apply this persona's vocabulary choices to every line of output
+- Match this persona's sentence rhythm and length patterns
+- Use this persona's hook style for openings
+- Use this persona's CTA patterns for closings
+- Maintain this persona's emotional register throughout
+- If the persona uses specific dialect markers, ALWAYS use them
 === END PERSONA ===
 
 ${system}`;
@@ -765,7 +862,7 @@ ${system}`;
           {MODULES.map(m => {
             const active = activeModule === m.id;
             return (
-              <button key={m.id} onClick={() => { setActiveModule(m.id); setOutput(""); setError(""); }} className="clay-btn" style={{
+              <button key={m.id} onClick={() => { setActiveModule(m.id); setOutput(""); setError(""); setPreviousOutput(""); }} className="clay-btn" style={{
                 padding: "10px 16px", fontSize: "12px", fontWeight: active ? 800 : 600,
                 color: active ? "#d97706" : (dm ? "#b0a090" : "#6b5e50"),
                 background: active ? (dm ? "linear-gradient(145deg, rgba(217,119,6,0.15), rgba(217,119,6,0.05))" : "linear-gradient(145deg, rgba(245,158,11,0.12), rgba(245,158,11,0.05))") : undefined,
@@ -799,16 +896,10 @@ ${system}`;
                 <StudioSelect label="Language" value={promoData.language} onChange={v => setPromoData({ ...promoData, language: v })} options={LANGUAGES} darkMode={dm} />
                 <StudioSelect label="Genre" value={promoData.genre} onChange={v => setPromoData({ ...promoData, genre: v })} options={GENRES} darkMode={dm} />
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                <StudioSelect label="Platform" value={promoData.platform} onChange={v => setPromoData({ ...promoData, platform: v })} options={[
-                  { value: "instagram", label: "Instagram" }, { value: "youtube", label: "YouTube" },
-                  { value: "facebook", label: "Facebook" }, { value: "whatsapp", label: "WhatsApp" }
-                ]} darkMode={dm} />
-                <StudioSelect label="Duration" value={promoData.duration} onChange={v => setPromoData({ ...promoData, duration: v })} options={[
-                  { value: "15", label: "15 sec" }, { value: "30", label: "30 sec" },
-                  { value: "60", label: "60 sec" }, { value: "120", label: "2 min" }
-                ]} darkMode={dm} />
-              </div>
+              <StudioSelect label="Platform" value={promoData.platform} onChange={v => setPromoData({ ...promoData, platform: v })} options={[
+                { value: "instagram", label: "Instagram" }, { value: "youtube", label: "YouTube" },
+                { value: "facebook", label: "Facebook" }, { value: "whatsapp", label: "WhatsApp" }
+              ]} darkMode={dm} />
               <StudioSelect label="Promo Style" value={promoData.promoStyle} onChange={v => setPromoData({ ...promoData, promoStyle: v })} options={[
                 { value: "storytelling", label: "Storytelling" }, { value: "comedy_warning", label: "Comedy Warning" },
                 { value: "question", label: "Question Hook" }, { value: "social_proof", label: "Social Proof" },
@@ -990,9 +1081,32 @@ ${system}`;
             <h3 style={{ fontSize: "13px", fontWeight: 800, color: dm ? "#d4c8b0" : "#78350f", display: "flex", alignItems: "center", gap: "8px" }}>
               <span style={{ fontSize: "14px" }}>{"\uD83D\uDCE4"}</span> Output
               {isGenerating && <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#f59e0b", display: "inline-block", animation: "pulse 1s ease-in-out infinite" }} />}
+              {(() => {
+                const activeId = activePersonaMap[activeModule];
+                const persona = activeId ? personas.find(p => p.id === activeId) : null;
+                if (!persona) return null;
+                return (
+                  <span style={{
+                    fontSize: "9px", fontWeight: 700, padding: "3px 8px", borderRadius: "8px",
+                    background: dm ? "rgba(217,119,6,0.15)" : "rgba(245,158,11,0.12)",
+                    color: "#d97706",
+                  }}>
+                    {"\uD83C\uDFAD"} {persona.name}
+                  </span>
+                );
+              })()}
             </h3>
             {output && !isGenerating && (
-              <div style={{ display: "flex", gap: "8px" }}>
+              <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                {previousOutput && previousOutput !== output && (
+                  <button onClick={handleUndo} className="clay-btn" style={{
+                    padding: "4px 10px", fontSize: "10px", fontWeight: 700,
+                    color: dm ? "#d4c8b0" : "#78350f",
+                    display: "flex", alignItems: "center", gap: "4px"
+                  }}>
+                    {"\u21A9"} Undo
+                  </button>
+                )}
                 <CopyBtn text={output} darkMode={dm} />
                 <button onClick={handleDownload} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: "#16a34a" }}>
                   {"\u2B07"} Download
