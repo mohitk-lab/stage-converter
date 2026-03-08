@@ -351,7 +351,10 @@ export default function VideoDub({ darkMode, streamConvert }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ audioUrl: audioBlobUpload.url }),
       });
-      if (!startResp.ok) throw new Error("Stem separation start fail hua");
+      if (!startResp.ok) {
+        const errData = await startResp.json().catch(() => ({}));
+        throw new Error(errData.error || `Stem separation start fail hua (${startResp.status})`);
+      }
       const { predictionId } = await startResp.json();
 
       // Poll for completion
@@ -364,18 +367,41 @@ export default function VideoDub({ darkMode, streamConvert }) {
         const statusData = await statusResp.json();
 
         if (statusData.status === "succeeded" && statusData.output) {
-          // Demucs returns object with vocal and accompaniment URLs
           const output = statusData.output;
-          // Fetch vocals
-          const vocalsSrc = typeof output === "string" ? output : output.vocals || output[0];
+          console.log("[StemSeparation] Replicate output:", JSON.stringify(output));
+
+          // Handle all known Demucs output formats:
+          // 1. String URL (single output)
+          // 2. Object with named keys: {vocals, drums, bass, other} or {vocals, accompaniment/no_vocals}
+          // 3. Array: [vocals_url, accompaniment_url, ...]
+          let vocalsSrc = null;
+          let musicSrc = null;
+
+          if (typeof output === "string") {
+            vocalsSrc = output;
+          } else if (Array.isArray(output)) {
+            vocalsSrc = output[0];
+            musicSrc = output[1] || null;
+          } else if (output && typeof output === "object") {
+            vocalsSrc = output.vocals || null;
+            // For accompaniment: try direct key, then fallback to "no_vocals" or "other"
+            musicSrc = output.accompaniment || output.no_vocals || output.other || null;
+            // If model returns individual stems (drums/bass/other) but no combined accompaniment,
+            // pick any non-vocal stem so user at least gets background music
+            if (!musicSrc) {
+              const nonVocalKey = Object.keys(output).find(k => k !== "vocals" && output[k]);
+              if (nonVocalKey) musicSrc = output[nonVocalKey];
+            }
+          }
+
+          if (!vocalsSrc) throw new Error("No vocals track found in output. Raw: " + JSON.stringify(output));
+
           const vocalsResp = await fetch(vocalsSrc);
           if (!vocalsResp.ok) throw new Error("Failed to download vocals track");
           const vBlob = new Blob([await vocalsResp.arrayBuffer()], { type: "audio/wav" });
           setVocalsBlob(vBlob);
           setVocalsUrl(createObjectURL(vBlob));
 
-          // Fetch music/accompaniment (may be "other" or "accompaniment")
-          const musicSrc = output.accompaniment || output.no_vocals || output.other || output[1];
           if (musicSrc) {
             const musicResp = await fetch(musicSrc);
             if (!musicResp.ok) throw new Error("Failed to download music track");
