@@ -3,6 +3,12 @@ import ContentStudio from "./ContentStudio.jsx";
 import VideoDub from "./VideoDub.jsx";
 import ChatBot from "./ChatBot.jsx";
 import Notifications from "./Notifications.jsx";
+import CommandPalette from "./CommandPalette.jsx";
+import AnalyticsDashboard from "./AnalyticsDashboard.jsx";
+import TemplateLibrary from "./TemplateLibrary.jsx";
+import SubtitleStudio from "./SubtitleStudio.jsx";
+import ScriptDiff from "./ScriptDiff.jsx";
+import TTSPreview from "./TTSPreview.jsx";
 import { playClick, playSuccess, playPop, playError } from "./sounds.js";
 
 /* --- Streaming fetch helper --- */
@@ -1594,6 +1600,8 @@ export default function App() {
   const [favorites, setFavorites] = useState(() => { try { return JSON.parse(localStorage.getItem("ruhi_favorites") || "[]"); } catch { return []; } });
   const [themeSchedule, setThemeSchedule] = useState(() => localStorage.getItem("ruhi_theme_schedule") === "1");
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [cmdPaletteOpen, setCmdPaletteOpen] = useState(false);
+  const [detectedLang, setDetectedLang] = useState(null);
 
   // Theme auto-scheduling
   useEffect(() => {
@@ -1617,9 +1625,43 @@ export default function App() {
   // Favorites persistence
   useEffect(() => { localStorage.setItem("ruhi_favorites", JSON.stringify(favorites)); }, [favorites]);
 
+  // Auto-detect input language
+  useEffect(() => {
+    if (!script.trim()) { setDetectedLang(null); return; }
+    const sample = script.slice(0, 200);
+    // Simple heuristic detection based on Unicode ranges
+    const devanagari = (sample.match(/[\u0900-\u097F]/g) || []).length;
+    const gujarati = (sample.match(/[\u0A80-\u0AFF]/g) || []).length;
+    const bengali = (sample.match(/[\u0980-\u09FF]/g) || []).length;
+    const gurmukhi = (sample.match(/[\u0A00-\u0A7F]/g) || []).length;
+    const tamil = (sample.match(/[\u0B80-\u0BFF]/g) || []).length;
+    const telugu = (sample.match(/[\u0C00-\u0C7F]/g) || []).length;
+    const kannada = (sample.match(/[\u0C80-\u0CFF]/g) || []).length;
+    const malayalam = (sample.match(/[\u0D00-\u0D7F]/g) || []).length;
+    const odia = (sample.match(/[\u0B00-\u0B7F]/g) || []).length;
+    const urdu = (sample.match(/[\u0600-\u06FF\u0750-\u077F]/g) || []).length;
+    const latin = (sample.match(/[a-zA-Z]/g) || []).length;
+    const counts = { hindi: devanagari, gujarati, bengali, punjabi: gurmukhi, tamil, telugu, kannada, malayalam, odia, urdu, english: latin };
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    if (sorted[0][1] > 5) {
+      const detected = sorted[0][0];
+      // For devanagari, could be hindi/bhojpuri/haryanvi/rajasthani/marathi — default to "hindi (Devanagari)"
+      if (detected === "hindi") {
+        setDetectedLang({ id: "hindi", label: "Devanagari (Hindi/Bhojpuri/Haryanvi/Rajasthani/Marathi)", confidence: Math.min(sorted[0][1] / sample.length * 200, 99).toFixed(0) });
+      } else {
+        const lang = LANGUAGES.find(l => l.id === detected);
+        setDetectedLang({ id: detected, label: lang?.label || detected, confidence: Math.min(sorted[0][1] / sample.length * 200, 99).toFixed(0) });
+      }
+    } else {
+      setDetectedLang(null);
+    }
+  }, [script]);
+
   // Global keyboard shortcuts
   useEffect(() => {
     const handler = (e) => {
+      // Ctrl+K — command palette
+      if (e.ctrlKey && e.key === "k") { e.preventDefault(); setCmdPaletteOpen(p => !p); }
       // Ctrl+Enter — convert
       if (e.ctrlKey && e.key === "Enter" && !loading && script.trim() && selected.length > 0) {
         e.preventDefault();
@@ -1631,8 +1673,8 @@ export default function App() {
       if (e.ctrlKey && e.shiftKey && e.key === "D") { e.preventDefault(); setDarkMode(d => { localStorage.setItem("ruhi_dark", d ? "0" : "1"); return !d; }); }
       // Ctrl+Shift+H — history
       if (e.ctrlKey && e.shiftKey && e.key === "H") { e.preventDefault(); setHistoryOpen(h => !h); }
-      // Escape — exit fullscreen / close shortcuts
-      if (e.key === "Escape") { setFullscreen(false); setShowShortcuts(false); }
+      // Escape — exit fullscreen / close shortcuts / close palette
+      if (e.key === "Escape") { setFullscreen(false); setShowShortcuts(false); setCmdPaletteOpen(false); }
       // Ctrl+/ — show shortcuts
       if (e.ctrlKey && e.key === "/") { e.preventDefault(); setShowShortcuts(s => !s); }
     };
@@ -2195,6 +2237,44 @@ export default function App() {
     URL.revokeObjectURL(url);
   };
 
+  // Command Palette action handler
+  const handleCmdAction = (action) => {
+    setCmdPaletteOpen(false);
+    switch (action) {
+      case "convert": (csvMode ? convertBatch : convert)(); break;
+      case "darkMode": setDarkMode(d => { localStorage.setItem("ruhi_dark", d ? "0" : "1"); return !d; }); break;
+      case "fullscreen": setFullscreen(f => !f); break;
+      case "history": setHistoryOpen(true); break;
+      case "shortcuts": setShowShortcuts(true); break;
+      case "selectAll": setSelected(LANGUAGES.map(l => l.id)); break;
+      case "deselectAll": setSelected([LANGUAGES[0].id]); break;
+      case "newScript": setResults({}); setScript(""); break;
+      case "copyAll": copyAll(); break;
+      case "download": downloadAll(); break;
+      case "saveFavorite": saveFavorite(); break;
+      case "tabStudio": setActiveTab("studio"); break;
+      case "tabDubbing": setActiveTab("dubbing"); break;
+      case "tabConverter": setActiveTab("converter"); break;
+      case "voiceInput": toggleVoice(); break;
+      case "tabAnalytics": setActiveTab("analytics"); break;
+      case "tabSubtitle": setActiveTab("subtitle"); break;
+      case "tabTemplates": setActiveTab("templates"); break;
+      case "tabTTS": setActiveTab("ttsPreview"); break;
+      case "tabDiff": setActiveTab("diff"); break;
+      default: break;
+    }
+    playClick();
+  };
+
+  // Template handler
+  const handleUseTemplate = (template) => {
+    setScript(template.script || "");
+    if (template.languages?.length > 0) setSelected(template.languages);
+    setActiveTab("converter");
+    setSrtMode(null); setCsvMode(null);
+    playSuccess();
+  };
+
   const wc = script.trim() ? script.trim().split(/\s+/).length : 0;
   const cp = Math.min((script.length / 2000) * 100, 100);
   const can = !loading && !!script.trim() && selected.length > 0;
@@ -2203,6 +2283,9 @@ export default function App() {
     <div className={darkMode ? "dark" : ""} style={{ fontFamily: "'Inter','Segoe UI',sans-serif", background: darkMode ? "#000000" : "#f0ebe3", minHeight: "100vh", color: darkMode ? "#e8e0d4" : "#1e1b18", position: "relative", transition: "background 0.3s, color 0.3s" }}>
       <style>{CSS}</style>
       <FireflyBackground />
+
+      {/* Command Palette */}
+      <CommandPalette open={cmdPaletteOpen} onClose={() => setCmdPaletteOpen(false)} darkMode={darkMode} onAction={handleCmdAction} />
 
       {/* Keyboard Shortcuts Modal */}
       {showShortcuts && (
@@ -2221,6 +2304,7 @@ export default function App() {
             </div>
             <div style={{ padding: "16px 20px" }}>
               {[
+                ["Ctrl + K", "Command Palette"],
                 ["Ctrl + Enter", "Convert script"],
                 ["Ctrl + Shift + F", "Toggle fullscreen"],
                 ["Ctrl + Shift + D", "Toggle dark mode"],
@@ -2243,6 +2327,9 @@ export default function App() {
         <Logo />
         <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
           <Notifications darkMode={darkMode} />
+          <button onClick={() => { playClick(); setCmdPaletteOpen(true); }} className="clay-btn" style={{ padding: "6px 12px", fontSize: "11px", lineHeight: 1, fontWeight: 700, color: darkMode ? "#b0a090" : "#6b5e50", display: "flex", alignItems: "center", gap: "4px" }} title="Command Palette (Ctrl+K)">
+            {"🔍"} <span style={{ fontSize: "9px", opacity: 0.7, fontFamily: "monospace" }}>Ctrl+K</span>
+          </button>
           <button onClick={() => { playClick(); setShowShortcuts(s => !s); }} className="clay-btn" style={{ padding: "6px 10px", fontSize: "12px", lineHeight: 1 }} title="Keyboard Shortcuts (Ctrl+/)">
             {"\u2328\uFE0F"}
           </button>
@@ -2266,7 +2353,7 @@ export default function App() {
       </div>
 
       {/* Tab Bar */}
-      <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "20px 28px 0", display: "flex", gap: "10px", position: "relative", zIndex: 1 }}>
+      <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "20px 28px 0", display: "flex", gap: "8px", position: "relative", zIndex: 1, overflowX: "auto", WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
         <button onClick={() => { playClick(); setActiveTab("converter"); }} className={activeTab === "converter" ? "clay-btn-primary" : "clay-btn"} style={{
           padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
           cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
@@ -2288,6 +2375,41 @@ export default function App() {
         }}>
           {"\uD83C\uDFA5"} Video Dub
         </button>
+        <button onClick={() => { playClick(); setActiveTab("ttsPreview"); }} className={activeTab === "ttsPreview" ? "clay-btn-primary" : "clay-btn"} style={{
+          padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
+          cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
+          ...(activeTab !== "ttsPreview" ? { color: darkMode ? "#b0a090" : "#6b5e50" } : {})
+        }}>
+          {"🔊"} TTS Preview
+        </button>
+        <button onClick={() => { playClick(); setActiveTab("subtitle"); }} className={activeTab === "subtitle" ? "clay-btn-primary" : "clay-btn"} style={{
+          padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
+          cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
+          ...(activeTab !== "subtitle" ? { color: darkMode ? "#b0a090" : "#6b5e50" } : {})
+        }}>
+          {"📝"} Subtitle Studio
+        </button>
+        <button onClick={() => { playClick(); setActiveTab("diff"); }} className={activeTab === "diff" ? "clay-btn-primary" : "clay-btn"} style={{
+          padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
+          cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
+          ...(activeTab !== "diff" ? { color: darkMode ? "#b0a090" : "#6b5e50" } : {})
+        }}>
+          {"🔍"} Diff View
+        </button>
+        <button onClick={() => { playClick(); setActiveTab("templates"); }} className={activeTab === "templates" ? "clay-btn-primary" : "clay-btn"} style={{
+          padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
+          cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
+          ...(activeTab !== "templates" ? { color: darkMode ? "#b0a090" : "#6b5e50" } : {})
+        }}>
+          {"📚"} Templates
+        </button>
+        <button onClick={() => { playClick(); setActiveTab("analytics"); }} className={activeTab === "analytics" ? "clay-btn-primary" : "clay-btn"} style={{
+          padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
+          cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
+          ...(activeTab !== "analytics" ? { color: darkMode ? "#b0a090" : "#6b5e50" } : {})
+        }}>
+          {"📊"} Analytics
+        </button>
       </div>
 
       {/* Content Studio Tab */}
@@ -2295,6 +2417,25 @@ export default function App() {
 
       {/* Dubbing Studio Tab */}
       {activeTab === "dubbing" && <VideoDub darkMode={darkMode} streamConvert={streamConvert} />}
+
+      {/* TTS Preview Tab */}
+      {activeTab === "ttsPreview" && <TTSPreview darkMode={darkMode} />}
+
+      {/* Subtitle Studio Tab */}
+      {activeTab === "subtitle" && <SubtitleStudio darkMode={darkMode} streamConvert={streamConvert} />}
+
+      {/* Script Diff Tab */}
+      {activeTab === "diff" && (
+        <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "28px 22px 80px", position: "relative", zIndex: 1 }}>
+          <ScriptDiff original={script} results={results} languages={LANGUAGES} darkMode={darkMode} />
+        </div>
+      )}
+
+      {/* Template Library Tab */}
+      {activeTab === "templates" && <TemplateLibrary darkMode={darkMode} onUseTemplate={handleUseTemplate} />}
+
+      {/* Analytics Dashboard Tab */}
+      {activeTab === "analytics" && <AnalyticsDashboard darkMode={darkMode} />}
 
       {/* Script Converter Tab */}
       {activeTab === "converter" && <div className="main-c" style={{ maxWidth: "1400px", margin: "0 auto", padding: "28px 22px 80px", position: "relative", zIndex: 1 }}>
@@ -2379,6 +2520,11 @@ export default function App() {
               <button onClick={saveFavorite} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#78350f" }} title="Save current languages as favorite">
                 {"\u2B50"} Save Fav
               </button>
+              {detectedLang && (
+                <span style={{ fontSize: "9px", fontWeight: 700, color: "#d97706", background: "rgba(245,158,11,0.1)", padding: "2px 8px", borderRadius: "6px", display: "flex", alignItems: "center", gap: "3px" }}>
+                  {"🌐"} {detectedLang.label} ({detectedLang.confidence}%)
+                </span>
+              )}
               <span className="word-count-text" style={{ fontSize: "11px", color: "#92400e", fontWeight: 600 }}>{wc} words</span>
               <span className="char-count-text" style={{ fontSize: "11px", color: script.length > 2000 ? "#dc2626" : "#92400e", fontWeight: 600 }}>{script.length} chars</span>
             </div>
