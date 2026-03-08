@@ -903,10 +903,10 @@ const CSS = `
   @keyframes connPulse {0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4);}60%{box-shadow:0 0 0 5px rgba(34,197,94,0);}}
   @keyframes fireflyDrift {
     0%   { transform: translate(0,0) scale(1); opacity:0; }
-    15%  { opacity:0.7; }
-    40%  { opacity:0.85; transform: translate(calc(var(--dx)*0.4), calc(var(--dy)*0.4)) scale(1.05); }
-    60%  { opacity:0.7; transform: translate(calc(var(--dx)*0.7), calc(var(--dy)*0.7)) scale(1.08); }
-    80%  { opacity:0.5; transform: translate(var(--dx), var(--dy)) scale(1.03); }
+    15%  { opacity:0.25; }
+    40%  { opacity:0.35; transform: translate(calc(var(--dx)*0.4), calc(var(--dy)*0.4)) scale(1.03); }
+    60%  { opacity:0.25; transform: translate(calc(var(--dx)*0.7), calc(var(--dy)*0.7)) scale(1.05); }
+    80%  { opacity:0.15; transform: translate(var(--dx), var(--dy)) scale(1.02); }
     100% { transform: translate(calc(var(--dx)*1.2), calc(var(--dy)*1.3)) scale(0.98); opacity:0; }
   }
 
@@ -1274,76 +1274,22 @@ function Logo() {
 
 /* --- Firefly Background --- */
 const FIREFLY_WORDS = [
-  // Hindi
-  { text: "\u0928\u092E\u0938\u094D\u0924\u0947", color: "#f97316" },
   { text: "\u092D\u093E\u0937\u093E", color: "#f97316" },
   { text: "\u0915\u0939\u093E\u0928\u0940", color: "#f97316" },
-  { text: "\u092A\u094D\u092F\u093E\u0930", color: "#f97316" },
-  // English
   { text: "Script", color: "#3b82f6" },
-  { text: "Language", color: "#3b82f6" },
-  { text: "Story", color: "#3b82f6" },
-  // Haryanvi
-  { text: "\u0930\u093E\u092E \u0930\u093E\u092E", color: "#22c55e" },
   { text: "\u092F\u093E\u0930", color: "#22c55e" },
-  { text: "\u0918\u0923\u093E", color: "#22c55e" },
-  // Rajasthani
-  { text: "\u0918\u0923\u094B", color: "#eab308" },
   { text: "\u092A\u093E\u0923\u0940", color: "#eab308" },
-  { text: "\u0938\u093E\u0930\u094B", color: "#eab308" },
-  // Bhojpuri
-  { text: "\u092D\u0907\u092F\u093E", color: "#ef4444" },
   { text: "\u0928\u0940\u092E\u0928", color: "#ef4444" },
-  { text: "\u091C\u093F\u0928\u0917\u0940", color: "#ef4444" },
-  // Gujarati
-  { text: "\u0A95\u0AC7\u0AAE \u0A9B\u0ACB", color: "#a855f7" },
   { text: "\u0AAA\u0ACD\u0AB0\u0AC7\u0AAE", color: "#a855f7" },
-  { text: "\u0AB8\u0ABE\u0AB0\u0AC1\u0A82", color: "#a855f7" },
-  // Marathi
-  { text: "\u0928\u092E\u0938\u094D\u0915\u093E\u0930", color: "#e11d48" },
   { text: "\u0915\u0925\u093E", color: "#e11d48" },
-  { text: "\u092A\u094D\u0930\u0947\u092E", color: "#e11d48" },
-  // Bengali
   { text: "\u0997\u09B2\u09CD\u09AA", color: "#0891b2" },
-  { text: "\u09AD\u09BE\u09B2\u09CB\u09AC\u09BE\u09B8\u09BE", color: "#0891b2" },
-  { text: "\u09B8\u09CD\u09AC\u09AA\u09CD\u09A8", color: "#0891b2" },
-  // Punjabi
   { text: "\u0A2A\u0A3F\u0A06\u0A30", color: "#ea580c" },
-  { text: "\u0A2F\u0A3E\u0A30", color: "#ea580c" },
-  { text: "\u0A16\u0A41\u0A36\u0A40", color: "#ea580c" },
-  // Tamil
-  { text: "\u0BB5\u0BA3\u0B95\u0BCD\u0B95\u0BAE\u0BCD", color: "#7c3aed" },
-  { text: "\u0B85\u0BA9\u0BCD\u0BAA\u0BC1", color: "#7c3aed" },
   { text: "\u0B95\u0BA9\u0BB5\u0BC1", color: "#7c3aed" },
-  // Telugu
   { text: "\u0C2A\u0C4D\u0C30\u0C47\u0C2E", color: "#059669" },
-  { text: "\u0C2E\u0C28\u0C38\u0C41", color: "#059669" },
-  { text: "\u0C38\u0C4D\u0C28\u0C47\u0C39\u0C02", color: "#059669" },
-  // Kannada
-  { text: "\u0CAA\u0CCD\u0CB0\u0CC0\u0CA4\u0CBF", color: "#dc2626" },
   { text: "\u0C97\u0CC6\u0CB3\u0CC6\u0CAF", color: "#dc2626" },
-  { text: "\u0C95\u0CA8\u0CCD\u0CA8\u0CA1", color: "#dc2626" },
-  // Malayalam
-  { text: "\u0D38\u0D4D\u0D28\u0D47\u0D39\u0D02", color: "#0d9488" },
-  { text: "\u0D2E\u0D32\u0D2F\u0D3E\u0D33\u0D02", color: "#0d9488" },
   { text: "\u0D15\u0D25", color: "#0d9488" },
-  // Odia
-  { text: "\u0B2D\u0B3E\u0B32", color: "#6366f1" },
-  { text: "\u0B13\u0B21\u0B3C\u0B3F\u0B06", color: "#6366f1" },
-  { text: "\u0B2E\u0B3E\u0B5F\u0B3E", color: "#6366f1" },
-  // Assamese
-  { text: "\u09AE\u09BE\u09AF\u09BC\u09BE", color: "#be185d" },
-  { text: "\u09AE\u0987", color: "#be185d" },
-  { text: "\u0986\u09B6\u09BE", color: "#be185d" },
-  // Urdu
   { text: "\u0645\u062D\u0628\u062A", color: "#4f46e5" },
-  { text: "\u062E\u0648\u0627\u0628", color: "#4f46e5" },
-  { text: "\u0627\u0631\u062F\u0648", color: "#4f46e5" },
-  // Extra
   { text: "Ruhi", color: "#d97706" },
-  { text: "Dream", color: "#3b82f6" },
-  { text: "\u0926\u094B\u0938\u094D\u0924", color: "#f97316" },
-  { text: "\u0907\u0936\u094D\u0915", color: "#ef4444" },
 ];
 
 function FireflyBackground() {
@@ -1367,7 +1313,7 @@ function FireflyBackground() {
         opacity: 0,
         pointerEvents: "none",
         userSelect: "none",
-        textShadow: `0 0 10px ${fw.color}aa, 0 0 25px ${fw.color}60, 0 0 45px ${fw.color}30`,
+        textShadow: `0 0 8px ${fw.color}40, 0 0 20px ${fw.color}20`,
         animation: `fireflyDrift ${dur}s ${delay}s ease-in-out infinite`,
         "--dx": `${dx}px`,
         "--dy": `${dy}px`,
