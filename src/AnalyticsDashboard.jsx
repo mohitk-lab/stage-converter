@@ -216,17 +216,6 @@ export default function AnalyticsDashboard({ darkMode }) {
         color: textColor,
       }}
     >
-      <h2
-        style={{
-          fontSize: "28px",
-          fontWeight: 700,
-          marginBottom: "8px",
-          color: accent,
-          ...fadeUpDelay(0),
-        }}
-      >
-        Analytics Dashboard
-      </h2>
       <p style={{ color: subColor, marginBottom: "28px", ...fadeUpDelay(0) }}>
         Insights from your RUHI conversion history
       </p>

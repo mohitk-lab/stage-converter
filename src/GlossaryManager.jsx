@@ -170,7 +170,6 @@ export default function GlossaryManager({ darkMode }) {
   return (
     <div style={{ padding: "24px", color: textColor, fontFamily: "'Inter','Segoe UI',sans-serif" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", flexWrap: "wrap", gap: "12px" }}>
-        <h2 style={{ fontSize: "22px", fontWeight: 700, color: textColor, margin: 0 }}>Glossary Manager</h2>
         <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
           <input ref={fileRef} type="file" accept=".csv" style={{ display: "none" }} onChange={handleImportCSV} />
           <button className="clay-btn" style={btnSecondary} onClick={() => fileRef.current?.click()}>Import CSV</button>
