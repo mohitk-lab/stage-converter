@@ -1444,7 +1444,8 @@ function HistorySidebar({ open, onClose, onLoad }) {
   const [history, setHistory] = useState([]);
   const [expandedId, setExpandedId] = useState(null);
 
-  useState(() => {
+  useEffect(() => {
+    if (!open) return;
     const raw = localStorage.getItem("ruhi_history");
     if (raw) {
       try {
@@ -1804,7 +1805,7 @@ export default function App() {
   // Save/load favorite pairs
   const saveFavorite = () => {
     if (selected.length === 0) return;
-    const key = selected.sort().join(",");
+    const key = [...selected].sort().join(",");
     if (favorites.some(f => f.key === key)) return;
     const name = selected.map(id => LANGUAGES.find(l => l.id === id)?.sub || id).join(", ");
     setFavorites(prev => [...prev, { key, langs: [...selected], name }]);
@@ -1965,7 +1966,7 @@ After writing the converted text in the target script, add a blank line and then
       playError();
     }
     setLoading(false); setStreaming({});
-    if (Object.keys(results).length > 0) playSuccess();
+    if (Object.keys(finalMap).length > 0) playSuccess();
   };
 
   const copy = (text, id) => { navigator.clipboard.writeText(text); setCopied(id); playPop(); setTimeout(() => setCopied(""), 2000); };
@@ -2454,7 +2455,7 @@ After writing the converted text in the target script, add a blank line and then
           <button onClick={() => setHistoryOpen(true)} className="clay-btn" style={{ padding: "6px 14px", fontSize: "11px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#78350f", display: "flex", alignItems: "center", gap: "5px" }}>
             <span style={{ fontSize: "13px" }}>&#128218;</span> History
           </button>
-          <div className="live-dot" style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11.5px", color: "#16a34a", padding: "5px 12px", borderRadius: "14px", background: "linear-gradient(145deg, #f0ebe3, #e4ddd1)", boxShadow: "3px 3px 6px rgba(166,152,130,0.3), -2px -2px 5px rgba(255,255,255,0.7), inset 0 1px 0 rgba(255,255,255,0.4)", border: "1px solid rgba(34,197,94,0.2)" }}>
+          <div className="live-dot clay-btn" style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11.5px", color: "#16a34a", padding: "5px 12px", borderRadius: "14px", border: "1px solid rgba(34,197,94,0.2)", cursor: "default" }}>
             <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
             Connected
           </div>
