@@ -1648,6 +1648,7 @@ export default function App() {
   const [importError, setImportError] = useState("");
   const [downloadDropdown, setDownloadDropdown] = useState(false);
   const downloadRef = useRef(null);
+  const themePickerRef = useRef(null);
   const bulkFileRef = useRef(null);
 
   /* --- Voice Input State --- */
@@ -1873,7 +1874,10 @@ export default function App() {
   };
 
   useEffect(() => {
-    const handler = (e) => { if (downloadRef.current && !downloadRef.current.contains(e.target)) setDownloadDropdown(false); };
+    const handler = (e) => {
+      if (downloadRef.current && !downloadRef.current.contains(e.target)) setDownloadDropdown(false);
+      if (themePickerRef.current && !themePickerRef.current.contains(e.target)) setThemePickerOpen(false);
+    };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
@@ -2464,7 +2468,7 @@ After writing the converted text in the target script, add a blank line and then
           <button onClick={() => { playClick(); setThemeSchedule(s => { const next = !s; localStorage.setItem("ruhi_theme_schedule", next ? "1" : "0"); return next; }); }} className="clay-btn" style={{ padding: "6px 10px", fontSize: "12px", lineHeight: 1, background: themeSchedule ? (darkMode ? "rgba(245,158,11,0.15)" : "rgba(245,158,11,0.12)") : undefined }} title={themeSchedule ? "Auto theme ON (7pm-7am dark)" : "Auto theme OFF"}>
             {"\u{1F553}"}
           </button>
-          <div className="theme-picker-wrap">
+          <div className="theme-picker-wrap" ref={themePickerRef}>
             <button onClick={() => { playClick(); setThemePickerOpen(p => !p); }} className="clay-btn" style={{ padding: "6px 10px", fontSize: "12px", lineHeight: 1, display: "flex", alignItems: "center", gap: "5px" }} title="Accent Theme">
               <span style={{ width: "14px", height: "14px", borderRadius: "50%", background: (ACCENT_THEMES[accentColor] || ACCENT_THEMES.amber).primary, display: "inline-block", boxShadow: `0 0 6px ${(ACCENT_THEMES[accentColor] || ACCENT_THEMES.amber).primary}40` }} />
               <span style={{ fontSize: "10px", fontWeight: 700, color: darkMode ? "#b0a090" : "#6b5e50" }}>{"\u25BE"}</span>
@@ -3075,6 +3079,14 @@ After writing the converted text in the target script, add a blank line and then
                       )}
                     </div>
                   )}
+                </div>
+              ) : loading ? (
+                <div key={langId} className="clay" style={{ marginBottom: "14px", borderLeft: `4px solid ${lang?.color || "#f59e0b"}`, overflow: "hidden" }}>
+                  <div style={{ padding: "14px 20px 0", display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ fontSize: "13px" }}>{lang?.label}</span>
+                    <span style={{ fontSize: "10px", color: darkMode ? "#807060" : "#a08060" }}>Loading...</span>
+                  </div>
+                  <SkeletonLoader lines={4} darkMode={darkMode} />
                 </div>
               ) : null;
             })}
