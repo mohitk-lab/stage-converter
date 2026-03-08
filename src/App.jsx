@@ -1,6 +1,9 @@
 import { useState, useRef, useCallback } from "react";
 import ContentStudio from "./ContentStudio.jsx";
 import VideoDub from "./VideoDub.jsx";
+import ChatBot from "./ChatBot.jsx";
+import Notifications from "./Notifications.jsx";
+import { playClick, playSuccess, playPop, playError } from "./sounds.js";
 
 /* --- Streaming fetch helper --- */
 async function streamConvert({ model, system, messages, onChunk }) {
@@ -828,6 +831,9 @@ const CSS = `
     .main-c{padding:20px 12px 70px !important;}
     .ruhi-title{font-size:44px !important;letter-spacing:-2px !important;}
     .lang-grid{grid-template-columns:repeat(2, 1fr) !important;}
+    .converter-cols{flex-direction:column !important;}
+    .top-controls-row{flex-direction:column !important;}
+    .tone-sidebar{width:100% !important;}
   }
   @media(max-width:400px){.ruhi-title{font-size:36px !important;}}
 
@@ -1438,6 +1444,7 @@ export default function App() {
   };
 
   const toggleLang = (id) => {
+    playPop();
     setSelected(prev =>
       prev.includes(id) ? (prev.length > 1 ? prev.filter(x => x !== id) : prev) : [...prev, id]
     );
@@ -1489,11 +1496,13 @@ export default function App() {
       }
     } catch (e) {
       setError(e.message);
+      playError();
     }
     setLoading(false); setStreaming({});
+    if (Object.keys(results).length > 0) playSuccess();
   };
 
-  const copy = (text, id) => { navigator.clipboard.writeText(text); setCopied(id); setTimeout(() => setCopied(""), 2000); };
+  const copy = (text, id) => { navigator.clipboard.writeText(text); setCopied(id); playPop(); setTimeout(() => setCopied(""), 2000); };
 
   /* --- SRT Parser/Formatter --- */
   const parseSrt = (text) => {
@@ -1677,7 +1686,8 @@ export default function App() {
       <div className="topbar-c" style={{ padding: "0 28px", height: "64px", display: "flex", alignItems: "center", justifyContent: "space-between", background: darkMode ? "linear-gradient(145deg, #231e14ee, #1c1810ee)" : "linear-gradient(145deg, #f5f0e8ee, #ece7ddee)", backdropFilter: "blur(20px)", position: "sticky", top: 0, zIndex: 20, borderBottom: `1px solid ${darkMode ? "rgba(60,50,35,0.3)" : "rgba(166,152,130,0.15)"}`, boxShadow: darkMode ? "0 4px 12px rgba(0,0,0,0.3)" : "0 4px 12px rgba(166,152,130,0.15)", transition: "background 0.3s" }}>
         <Logo />
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <button onClick={() => { setDarkMode(d => { localStorage.setItem("ruhi_dark", d ? "0" : "1"); return !d; }); }} className="clay-btn" style={{ padding: "6px 12px", fontSize: "15px", lineHeight: 1 }} title={darkMode ? "Light Mode" : "Dark Mode"}>
+          <Notifications darkMode={darkMode} />
+          <button onClick={() => { playClick(); setDarkMode(d => { localStorage.setItem("ruhi_dark", d ? "0" : "1"); return !d; }); }} className="clay-btn" style={{ padding: "6px 12px", fontSize: "15px", lineHeight: 1 }} title={darkMode ? "Light Mode" : "Dark Mode"}>
             {darkMode ? "\u2600\uFE0F" : "\u{1F319}"}
           </button>
           <button onClick={() => setHistoryOpen(true)} className="clay-btn" style={{ padding: "6px 14px", fontSize: "11px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#78350f", display: "flex", alignItems: "center", gap: "5px" }}>
@@ -1692,21 +1702,21 @@ export default function App() {
 
       {/* Tab Bar */}
       <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "20px 28px 0", display: "flex", gap: "10px", position: "relative", zIndex: 1 }}>
-        <button onClick={() => setActiveTab("converter")} className={activeTab === "converter" ? "clay-btn-primary" : "clay-btn"} style={{
+        <button onClick={() => { playClick(); setActiveTab("converter"); }} className={activeTab === "converter" ? "clay-btn-primary" : "clay-btn"} style={{
           padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
           cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
           ...(activeTab !== "converter" ? { color: darkMode ? "#b0a090" : "#6b5e50" } : {})
         }}>
           {"\u270D\uFE0F"} Script Converter
         </button>
-        <button onClick={() => setActiveTab("studio")} className={activeTab === "studio" ? "clay-btn-primary" : "clay-btn"} style={{
+        <button onClick={() => { playClick(); setActiveTab("studio"); }} className={activeTab === "studio" ? "clay-btn-primary" : "clay-btn"} style={{
           padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
           cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
           ...(activeTab !== "studio" ? { color: darkMode ? "#b0a090" : "#6b5e50" } : {})
         }}>
           {"\uD83C\uDFAC"} Content Studio
         </button>
-        <button onClick={() => setActiveTab("dubbing")} className={activeTab === "dubbing" ? "clay-btn-primary" : "clay-btn"} style={{
+        <button onClick={() => { playClick(); setActiveTab("dubbing"); }} className={activeTab === "dubbing" ? "clay-btn-primary" : "clay-btn"} style={{
           padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
           cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
           ...(activeTab !== "dubbing" ? { color: darkMode ? "#b0a090" : "#6b5e50" } : {})
@@ -1800,7 +1810,7 @@ export default function App() {
           </div>
           <div style={{ padding: "14px 22px", borderTop: "1px solid rgba(166,152,130,0.1)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(166,152,130,0.04)", flexWrap: "wrap", gap: "8px" }}>
             <span className="ctrl-hint" style={{ fontSize: "11px", color: "#a08060", fontWeight: 500 }}>Ctrl + Enter</span>
-            <button onClick={csvMode ? convertBatch : convert} disabled={!can} className={can ? "clay-btn-primary" : "clay-btn-primary"} style={{
+            <button onClick={() => { playClick(); (csvMode ? convertBatch : convert)(); }} disabled={!can} className={can ? "clay-btn-primary" : "clay-btn-primary"} style={{
               padding: "11px 28px", borderRadius: "14px", border: "none",
               cursor: can ? "pointer" : "not-allowed", fontSize: "13px",
               display: "inline-flex", alignItems: "center", gap: "7px",
@@ -2105,6 +2115,9 @@ export default function App() {
 
       {/* History Sidebar */}
       <HistorySidebar open={historyOpen} onClose={() => setHistoryOpen(false)} onLoad={loadFromHistory} />
+
+      {/* AI Chatbot */}
+      <ChatBot darkMode={darkMode} />
     </div>
   );
 }
