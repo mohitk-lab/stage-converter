@@ -1,7 +1,5 @@
 import { handleUpload } from "@vercel/blob/client";
 
-export const config = { api: { bodyParser: false } };
-
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -14,8 +12,10 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Pass req.body (Vercel auto-parses JSON in non-Next.js functions)
+    // handleUpload accepts both parsed body objects and raw requests
     const body = await handleUpload({
-      body: req,
+      body: req.body,
       request: req,
       onBeforeGenerateToken: async (pathname) => {
         return {
