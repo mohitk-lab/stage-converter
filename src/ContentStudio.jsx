@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 /* ========================================
    STAGE CONTENT STUDIO
@@ -619,6 +619,77 @@ function downloadContent(content, filename) {
   URL.revokeObjectURL(url);
 }
 
+/* --- Tone Analysis (client-side keyword matching) --- */
+const TONE_KEYWORDS = {
+  dramatic: [
+    "shocking", "heartbreaking", "devastating", "explosive", "unbelievable", "incredible",
+    "dangerous", "destroy", "death", "murder", "revenge", "betray", "sacrifice", "scream",
+    "cry", "tears", "blood", "fire", "storm", "war", "fight", "clash", "rage", "fury",
+    // Hindi/regional dramatic words
+    "\u0906\u0902\u0938\u0942", "\u0930\u094B", "\u091A\u0940\u0916", "\u0926\u0930\u094D\u0926", "\u0924\u092C\u093E\u0939\u0940", "\u092C\u0930\u094D\u092C\u093E\u0926",
+    "\u0916\u0942\u0928", "\u092E\u094C\u0924", "\u0939\u0924\u094D\u092F\u093E", "\u092C\u0926\u0932\u093E", "\u0915\u0941\u0930\u094D\u092C\u093E\u0928\u0940",
+    "\u0927\u094B\u0916\u093E", "\u091C\u0932\u0928", "\u0924\u092C\u093E\u0939", "\u0906\u0917", "\u0924\u0942\u092B\u093E\u0928",
+    "\u091C\u0902\u0917", "\u0932\u0921\u093C\u093E\u0908", "\u091F\u0915\u0930\u093E\u0935", "\u0917\u0941\u0938\u094D\u0938\u093E",
+  ],
+  warm: [
+    "love", "heart", "family", "together", "beautiful", "dream", "hope", "inspire",
+    "smile", "laugh", "joy", "happy", "celebrate", "friend", "hug", "miss", "care",
+    // Hindi/regional warm words
+    "\u092A\u094D\u092F\u093E\u0930", "\u0926\u093F\u0932", "\u092A\u0930\u093F\u0935\u093E\u0930", "\u0916\u0941\u0936\u0940", "\u0938\u092A\u0928\u093E",
+    "\u0909\u092E\u094D\u092E\u0940\u0926", "\u0939\u0902\u0938\u0940", "\u092E\u0941\u0938\u094D\u0915\u0941\u0930\u093E\u0928", "\u091C\u0936\u094D\u0928",
+    "\u0926\u094B\u0938\u094D\u0924", "\u092E\u093E\u0902", "\u092C\u093E\u092A",
+  ],
+  neutral: [
+    "watch", "download", "app", "new", "release", "available", "now", "today",
+    "trial", "subscribe", "click", "link", "platform", "content", "episode",
+    "\u0926\u0947\u0916\u094B", "\u0921\u093E\u0909\u0928\u0932\u094B\u0921", "\u0928\u092F\u093E", "\u0910\u092A",
+  ],
+};
+
+function analyzeTone(text) {
+  if (!text || text.length < 20) return { value: 50, label: "Neutral" };
+  const lower = text.toLowerCase();
+  let dramaticScore = 0;
+  let warmScore = 0;
+  let neutralScore = 0;
+
+  for (const word of TONE_KEYWORDS.dramatic) {
+    const regex = new RegExp(word, "gi");
+    const matches = lower.match(regex);
+    if (matches) dramaticScore += matches.length * 3;
+  }
+  for (const word of TONE_KEYWORDS.warm) {
+    const regex = new RegExp(word, "gi");
+    const matches = lower.match(regex);
+    if (matches) warmScore += matches.length * 2;
+  }
+  for (const word of TONE_KEYWORDS.neutral) {
+    const regex = new RegExp(word, "gi");
+    const matches = lower.match(regex);
+    if (matches) neutralScore += matches.length;
+  }
+
+  const total = dramaticScore + warmScore + neutralScore || 1;
+  // 0 = fully neutral, 100 = fully dramatic, 50 = warm midpoint
+  const ratio = ((warmScore * 0.5 + dramaticScore * 1.0) / total) * 100;
+  const clamped = Math.min(100, Math.max(0, Math.round(ratio)));
+
+  let label = "Neutral";
+  if (clamped > 75) label = "Dramatic";
+  else if (clamped > 55) label = "Emotional";
+  else if (clamped > 35) label = "Warm";
+  else if (clamped > 15) label = "Mild";
+
+  return { value: clamped, label };
+}
+
+const HASHTAG_PLATFORMS = [
+  { value: "instagram", label: "Instagram" },
+  { value: "youtube", label: "YouTube" },
+  { value: "twitter", label: "Twitter" },
+  { value: "whatsapp", label: "WhatsApp" },
+];
+
 /* ========================================
    MAIN COMPONENT
 ======================================== */
@@ -628,6 +699,17 @@ export default function ContentStudio({ darkMode, streamConvert, dialectRules = 
   const [output, setOutput] = useState("");
   const [previousOutput, setPreviousOutput] = useState("");
   const [error, setError] = useState("");
+  const [abMode, setAbMode] = useState(false);
+  const [variantB, setVariantB] = useState("");
+
+  // Hashtag Generator states
+  const [hashtagsResult, setHashtagsResult] = useState("");
+  const [hashtagLoading, setHashtagLoading] = useState(false);
+  const [hashtagPlatform, setHashtagPlatform] = useState("instagram");
+
+  // Tone Meter states
+  const [toneMeterValue, setToneMeterValue] = useState(50);
+  const [toneMeterLabel, setToneMeterLabel] = useState("Neutral");
 
   // Module form states
   const [promoData, setPromoData] = useState({
@@ -703,6 +785,51 @@ export default function ContentStudio({ darkMode, streamConvert, dialectRules = 
     if (previousOutput && previousOutput !== output) {
       setOutput(previousOutput);
       setPreviousOutput("");
+    }
+  };
+
+  // Auto-calculate tone meter when output changes
+  useEffect(() => {
+    if (output && !isGenerating) {
+      const tone = analyzeTone(output);
+      setToneMeterValue(tone.value);
+      setToneMeterLabel(tone.label);
+    }
+  }, [output, isGenerating]);
+
+  // Reset hashtags when output clears or module changes
+  useEffect(() => {
+    setHashtagsResult("");
+  }, [activeModule]);
+
+  const generateHashtags = async () => {
+    if (!output || hashtagLoading) return;
+    setHashtagLoading(true);
+    setHashtagsResult("");
+
+    const platformStyles = {
+      instagram: "Generate 20-25 hashtags optimized for Instagram Reels/Posts discovery. Mix popular high-volume hashtags with niche specific ones. Include a mix of English and regional language hashtags. Format: space-separated hashtags, each starting with #.",
+      youtube: "Generate 15-20 hashtags optimized for YouTube Shorts/Video SEO. Focus on searchable, trending, and descriptive tags. Keep them concise. Format: space-separated hashtags, each starting with #.",
+      twitter: "Generate 5-8 hashtags optimized for Twitter/X. Focus on trending, concise, punchy tags that fit tweet character limits. Mix viral potential with content relevance. Format: space-separated hashtags, each starting with #.",
+      whatsapp: "Generate 8-12 hashtags suitable for WhatsApp Status/forwards. Keep them simple, relatable, and shareable. Focus on emotional and cultural resonance. Format: space-separated hashtags, each starting with #.",
+    };
+
+    try {
+      await streamConvert({
+        model: "anthropic/claude-sonnet-4-5",
+        system: `You are a social media hashtag specialist for Stage OTT platform. Analyze the given content and generate highly relevant, platform-optimized hashtags.\n\n${platformStyles[hashtagPlatform] || platformStyles.instagram}\n\nRULES:\n- Output ONLY the hashtags, nothing else\n- No explanations, no numbering, no categories\n- Each hashtag on the same line separated by spaces\n- Mix of English and regional language hashtags\n- Include #StageApp #StageOTT always`,
+        messages: [{ role: "user", content: `Generate ${hashtagPlatform} hashtags for this content:\n\n${output.slice(0, 1500)}` }],
+        onChunk: (partial) => setHashtagsResult(partial),
+      });
+    } catch (err) {
+      setError("Hashtag generation failed: " + (err.message || "Unknown error"));
+    }
+    setHashtagLoading(false);
+  };
+
+  const copyAllHashtags = () => {
+    if (hashtagsResult) {
+      navigator.clipboard.writeText(hashtagsResult.trim());
     }
   };
 
@@ -819,6 +946,17 @@ ${system}`;
         messages: [{ role: "user", content: userMessage }],
         onChunk: (partial) => setOutput(partial),
       });
+
+      // Generate variant B if A/B mode is on
+      if (abMode && activeModule !== "learning") {
+        setVariantB("");
+        await streamConvert({
+          model: "anthropic/claude-sonnet-4-5",
+          system: system + "\n\nIMPORTANT: Generate a COMPLETELY DIFFERENT version from your previous output. Use a different angle, tone variation, structure, and creative approach. Make it distinctly unique while maintaining quality.",
+          messages: [{ role: "user", content: userMessage }],
+          onChunk: (partial) => setVariantB(partial),
+        });
+      }
 
       // Save persona after learning analysis completes
       if (activeModule === "learning" && result) {
@@ -1060,6 +1198,25 @@ ${system}`;
               )}
             </>)}
 
+            {/* A/B Variant Toggle */}
+            {activeModule !== "learning" && (
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px 0" }}>
+                <div onClick={() => { setAbMode(a => !a); setVariantB(""); }} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div style={{
+                    width: "36px", height: "20px", borderRadius: "10px", position: "relative", transition: "background 0.2s",
+                    background: abMode ? "linear-gradient(135deg, #f59e0b, #d97706)" : (dm ? "#333" : "#d5cdc1"),
+                  }}>
+                    <div style={{
+                      width: "16px", height: "16px", borderRadius: "50%", background: "#fff", position: "absolute", top: "2px",
+                      left: abMode ? "18px" : "2px", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)"
+                    }} />
+                  </div>
+                  <span style={{ fontSize: "11px", fontWeight: 700, color: abMode ? "#d97706" : (dm ? "#b0a090" : "#6b5e50") }}>A/B Variants</span>
+                </div>
+                {abMode && <span style={{ fontSize: "10px", color: dm ? "#807060" : "#a08060" }}>Generates 2 unique versions</span>}
+              </div>
+            )}
+
             {/* Generate Button */}
             <button onClick={generate} disabled={isGenerating} className="clay-btn-primary" style={{
               width: "100%", padding: "13px", borderRadius: "14px", border: "none",
@@ -1149,8 +1306,115 @@ ${system}`;
               </div>
             )}
           </div>
+
+          {/* Tone Meter */}
+          {output && !isGenerating && (
+            <div style={{ marginTop: "14px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "6px" }}>
+                <span style={{ fontSize: "10px", fontWeight: 700, color: dm ? "#b0a090" : "#92400e", textTransform: "uppercase", letterSpacing: "0.8px" }}>Tone Meter</span>
+                <span style={{
+                  fontSize: "10px", fontWeight: 800, padding: "2px 8px", borderRadius: "8px",
+                  background: toneMeterValue > 75 ? "rgba(239,68,68,0.15)" : toneMeterValue > 40 ? "rgba(245,158,11,0.15)" : "rgba(59,130,246,0.15)",
+                  color: toneMeterValue > 75 ? "#ef4444" : toneMeterValue > 40 ? "#d97706" : "#3b82f6",
+                }}>{toneMeterLabel}</span>
+              </div>
+              <div style={{
+                height: "8px", borderRadius: "4px", overflow: "hidden", position: "relative",
+                background: dm ? "rgba(255,255,255,0.06)" : "rgba(166,152,130,0.15)",
+              }}>
+                <div style={{
+                  position: "absolute", top: 0, left: 0, height: "100%", borderRadius: "4px",
+                  width: `${toneMeterValue}%`, transition: "width 0.6s ease, background 0.6s ease",
+                  background: toneMeterValue > 75
+                    ? "linear-gradient(90deg, #f59e0b, #ef4444)"
+                    : toneMeterValue > 40
+                      ? "linear-gradient(90deg, #3b82f6, #f59e0b)"
+                      : "linear-gradient(90deg, #3b82f6, #60a5fa)",
+                }} />
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: "4px" }}>
+                <span style={{ fontSize: "9px", color: "#3b82f6", fontWeight: 600 }}>Neutral</span>
+                <span style={{ fontSize: "9px", color: "#f59e0b", fontWeight: 600 }}>Warm</span>
+                <span style={{ fontSize: "9px", color: "#ef4444", fontWeight: 600 }}>Dramatic</span>
+              </div>
+            </div>
+          )}
+
+          {/* Hashtag Generator */}
+          {output && !isGenerating && activeModule !== "learning" && (
+            <div style={{ marginTop: "14px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px", flexWrap: "wrap" }}>
+                <span style={{ fontSize: "10px", fontWeight: 700, color: dm ? "#b0a090" : "#92400e", textTransform: "uppercase", letterSpacing: "0.8px" }}>Hashtags</span>
+                <div style={{ display: "flex", gap: "4px" }}>
+                  {HASHTAG_PLATFORMS.map(p => (
+                    <button key={p.value} onClick={() => setHashtagPlatform(p.value)} className="clay-btn" style={{
+                      padding: "3px 10px", fontSize: "10px", fontWeight: hashtagPlatform === p.value ? 800 : 600,
+                      color: hashtagPlatform === p.value ? "#d97706" : (dm ? "#b0a090" : "#6b5e50"),
+                      background: hashtagPlatform === p.value
+                        ? (dm ? "rgba(217,119,6,0.15)" : "rgba(245,158,11,0.12)")
+                        : undefined,
+                      border: hashtagPlatform === p.value ? "1px solid rgba(245,158,11,0.3)" : undefined,
+                    }}>{p.label}</button>
+                  ))}
+                </div>
+                <button onClick={generateHashtags} disabled={hashtagLoading} className="clay-btn" style={{
+                  padding: "5px 14px", fontSize: "10px", fontWeight: 800, marginLeft: "auto",
+                  color: hashtagLoading ? (dm ? "#807060" : "#a08060") : "#d97706",
+                  cursor: hashtagLoading ? "not-allowed" : "pointer",
+                  display: "flex", alignItems: "center", gap: "4px",
+                }}>
+                  {hashtagLoading ? (
+                    <><span style={{ width: "10px", height: "10px", borderRadius: "50%", border: "2px solid rgba(217,119,6,0.3)", borderTopColor: "#d97706", display: "inline-block", animation: "spin 0.7s linear infinite" }} /> Generating...</>
+                  ) : (
+                    <># Generate</>
+                  )}
+                </button>
+              </div>
+
+              {hashtagsResult && (
+                <div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginBottom: "8px" }}>
+                    {hashtagsResult.trim().split(/\s+/).filter(h => h.startsWith("#")).map((tag, i) => (
+                      <span key={i} onClick={() => navigator.clipboard.writeText(tag)} style={{
+                        display: "inline-block", padding: "4px 10px", borderRadius: "10px", fontSize: "11px", fontWeight: 600,
+                        cursor: "pointer", transition: "all 0.15s",
+                        background: dm ? "rgba(217,119,6,0.12)" : "rgba(245,158,11,0.1)",
+                        color: dm ? "#f59e0b" : "#92400e",
+                        border: `1px solid ${dm ? "rgba(217,119,6,0.2)" : "rgba(245,158,11,0.2)"}`,
+                      }} title="Click to copy">{tag}</span>
+                    ))}
+                  </div>
+                  <button onClick={copyAllHashtags} className="clay-btn" style={{
+                    padding: "4px 12px", fontSize: "10px", fontWeight: 700,
+                    color: dm ? "#d4c8b0" : "#78350f", display: "flex", alignItems: "center", gap: "4px",
+                  }}>
+                    {"\uD83D\uDCCB"} Copy All Hashtags
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
+
+      {/* A/B Variant B Output */}
+      {abMode && variantB && (
+        <div className="clay" style={{ padding: "18px", marginTop: "16px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+            <h3 style={{ fontSize: "13px", fontWeight: 800, color: dm ? "#d4c8b0" : "#78350f", display: "flex", alignItems: "center", gap: "8px" }}>
+              <span style={{ fontSize: "10px", padding: "2px 8px", borderRadius: "8px", background: "linear-gradient(135deg, #3b82f6, #2563eb)", color: "#fff", fontWeight: 800 }}>B</span> Variant B
+            </h3>
+            <CopyBtn text={variantB} darkMode={dm} />
+          </div>
+          <div className="clay-inner" style={{
+            minHeight: "200px", maxHeight: "400px", overflowY: "auto",
+            padding: "16px", fontSize: "13px", lineHeight: 1.9,
+            color: dm ? "#e8e0d4" : "#3d3425", whiteSpace: "pre-wrap"
+          }}>
+            {variantB}
+          </div>
+        </div>
+      )}
 
       {/* Responsive override for mobile */}
       <style>{`

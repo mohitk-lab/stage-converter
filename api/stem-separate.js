@@ -11,7 +11,8 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "audioUrl is required" });
     }
 
-    const response = await fetch("https://api.replicate.com/v1/predictions", {
+    // Use model-based API (always uses latest version, resilient to deprecation)
+    const response = await fetch("https://api.replicate.com/v1/models/cjwbw/demucs/predictions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${process.env.REPLICATE_API_TOKEN}`,
@@ -19,7 +20,6 @@ export default async function handler(req, res) {
         Prefer: "respond-async",
       },
       body: JSON.stringify({
-        version: "25a173108cff36ef9f80f854c162d01df9e6528be175794b81571f6e0c0f3d47",
         input: {
           audio: audioUrl,
         },
@@ -28,11 +28,11 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const err = await response.text();
-      return res.status(response.status).json({ error: err });
+      return res.status(response.status).json({ error: `Replicate API error (${response.status}): ${err}` });
     }
 
     const prediction = await response.json();
-    res.json({ predictionId: prediction.id, status: prediction.status });
+    res.json({ predictionId: prediction.id, status: prediction.status, urls: prediction.urls || null });
   } catch (e) {
     res.status(500).json({ error: e.message || "Internal server error" });
   }

@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import ContentStudio from "./ContentStudio.jsx";
 import VideoDub from "./VideoDub.jsx";
 import ChatBot from "./ChatBot.jsx";
@@ -9,6 +9,7 @@ import TemplateLibrary from "./TemplateLibrary.jsx";
 import SubtitleStudio from "./SubtitleStudio.jsx";
 import ScriptDiff from "./ScriptDiff.jsx";
 import TTSPreview from "./TTSPreview.jsx";
+import GlossaryManager from "./GlossaryManager.jsx";
 import { playClick, playSuccess, playPop, playError } from "./sounds.js";
 
 /* --- Streaming fetch helper --- */
@@ -871,7 +872,15 @@ STEP 3 \u2014 REWRITE in ${id === "hindi" ? "standard Hindi" : id === "english" 
 - Output ONLY the converted text. No explanation, no labels, nothing else.
 ${needsContrastive ? "\n" + CONTRASTIVE_TABLE : ""}
 ${DIALECT_RULES[id]}
-${checklist}`;
+${checklist}
+
+\u2605\u2605\u2605 CRITICAL OUTPUT RULES \u2605\u2605\u2605
+1. Output ONLY the converted version of the user's EXACT input text. Nothing more, nothing less.
+2. Do NOT add any extra sentences, phrases, or content that was not in the original input.
+3. Do NOT prepend or append any example text, greetings, or filler sentences.
+4. The number of sentences in your output must match the number of sentences in the input.
+5. If the input has 3 sentences, your output must have exactly 3 sentences (converted).
+6. NEVER add content from training examples or previous context into the output.`;
 };
 
 /* ============================================
@@ -1180,7 +1189,66 @@ const CSS = `
     .tts-options { grid-template-columns: 1fr; }
     .tts-advanced { grid-template-columns: 1fr; }
   }
+
+  /* Skeleton shimmer animation */
+  @keyframes skeletonShimmer {
+    0% { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+  }
+  .skeleton-line {
+    height: 14px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, rgba(166,152,130,0.12) 25%, rgba(166,152,130,0.24) 50%, rgba(166,152,130,0.12) 75%);
+    background-size: 400px 100%;
+    animation: skeletonShimmer 1.8s ease-in-out infinite;
+    margin-bottom: 12px;
+  }
+  .dark .skeleton-line {
+    background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.04) 75%);
+    background-size: 400px 100%;
+  }
+
+  /* Theme picker */
+  .theme-picker-wrap { position: relative; display: inline-block; }
+  .theme-picker-dropdown {
+    position: absolute; top: 100%; right: 0; margin-top: 6px;
+    border-radius: 14px; padding: 8px; z-index: 50;
+    display: flex; flex-wrap: wrap; gap: 6px; width: 170px;
+  }
+  .theme-dot {
+    width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
+    border: 2px solid transparent; transition: all 0.15s ease;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.15), -1px -1px 3px rgba(255,255,255,0.3);
+  }
+  .theme-dot:hover { transform: scale(1.15); }
+  .theme-dot.active { border-color: #fff; box-shadow: 0 0 0 2px currentColor, 2px 2px 5px rgba(0,0,0,0.2); }
 `;
+
+/* --- Accent Themes --- */
+const ACCENT_THEMES = {
+  amber:   { label: "Amber",   primary: "#f59e0b", dark: "#d97706" },
+  rose:    { label: "Rose",    primary: "#f43f5e", dark: "#e11d48" },
+  violet:  { label: "Violet",  primary: "#8b5cf6", dark: "#7c3aed" },
+  emerald: { label: "Emerald", primary: "#10b981", dark: "#059669" },
+  ocean:   { label: "Ocean",   primary: "#0ea5e9", dark: "#0284c7" },
+  sunset:  { label: "Sunset",  primary: "#f97316", dark: "#ea580c" },
+};
+
+/* --- Skeleton Loader --- */
+function SkeletonLoader({ lines = 5, darkMode }) {
+  const widths = ["100%", "85%", "92%", "70%", "60%"];
+  return (
+    <div style={{ padding: "28px 24px" }}>
+      {widths.slice(0, lines).map((w, i) => (
+        <div
+          key={i}
+          className="skeleton-line"
+          style={{ width: w, animationDelay: `${i * 0.12}s` }}
+        />
+      ))}
+    </div>
+  );
+}
 
 /* --- Logo --- */
 function Logo() {
@@ -1588,6 +1656,7 @@ export default function App() {
   const [importError, setImportError] = useState("");
   const [downloadDropdown, setDownloadDropdown] = useState(false);
   const downloadRef = useRef(null);
+  const themePickerRef = useRef(null);
   const bulkFileRef = useRef(null);
 
   /* --- Voice Input State --- */
@@ -1602,6 +1671,54 @@ export default function App() {
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [cmdPaletteOpen, setCmdPaletteOpen] = useState(false);
   const [detectedLang, setDetectedLang] = useState(null);
+  const [onboardingStep, setOnboardingStep] = useState(() => localStorage.getItem("ruhi_onboarding_done") ? -1 : 0);
+  const [accentColor, setAccentColor] = useState(() => localStorage.getItem("ruhi_accent") || "amber");
+  const [themePickerOpen, setThemePickerOpen] = useState(false);
+
+  /* --- Find & Replace State --- */
+  const [findReplaceOpen, setFindReplaceOpen] = useState(false);
+  const [findText, setFindText] = useState("");
+  const [replaceText, setReplaceText] = useState("");
+  const [findCaseInsensitive, setFindCaseInsensitive] = useState(true);
+  const [findRegex, setFindRegex] = useState(false);
+
+  /* --- Transliteration Mode --- */
+  const [translitMode, setTranslitMode] = useState(false);
+
+  // Find & Replace helpers
+  const findMatchCount = useMemo(() => {
+    if (!findText || !script) return 0;
+    try {
+      if (findRegex) {
+        const re = new RegExp(findText, findCaseInsensitive ? "gi" : "g");
+        return (script.match(re) || []).length;
+      }
+      const search = findCaseInsensitive ? findText.toLowerCase() : findText;
+      const hay = findCaseInsensitive ? script.toLowerCase() : script;
+      let count = 0, idx = 0;
+      while ((idx = hay.indexOf(search, idx)) !== -1) { count++; idx += search.length; }
+      return count;
+    } catch { return 0; }
+  }, [findText, script, findCaseInsensitive, findRegex]);
+
+  const doReplace = (all) => {
+    if (!findText) return;
+    try {
+      if (findRegex) {
+        const flags = findCaseInsensitive ? "gi" : "g";
+        const re = new RegExp(findText, all ? flags : (findCaseInsensitive ? "i" : ""));
+        setScript(prev => prev.replace(re, replaceText));
+      } else {
+        if (all) {
+          const re = new RegExp(findText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), findCaseInsensitive ? "gi" : "g");
+          setScript(prev => prev.replace(re, replaceText));
+        } else {
+          const idx = findCaseInsensitive ? script.toLowerCase().indexOf(findText.toLowerCase()) : script.indexOf(findText);
+          if (idx !== -1) setScript(prev => prev.slice(0, idx) + replaceText + prev.slice(idx + findText.length));
+        }
+      }
+    } catch { /* invalid regex */ }
+  };
 
   // Theme auto-scheduling
   useEffect(() => {
@@ -1624,6 +1741,18 @@ export default function App() {
 
   // Favorites persistence
   useEffect(() => { localStorage.setItem("ruhi_favorites", JSON.stringify(favorites)); }, [favorites]);
+
+  // Apply accent theme CSS variables
+  useEffect(() => {
+    const theme = ACCENT_THEMES[accentColor] || ACCENT_THEMES.amber;
+    const root = document.documentElement;
+    root.style.setProperty("--accent-primary", theme.primary);
+    root.style.setProperty("--accent-dark", theme.dark);
+    root.style.setProperty("--accent-primary-12", theme.primary + "1f");
+    root.style.setProperty("--accent-primary-30", theme.primary + "4d");
+    root.style.setProperty("--accent-dark-30", theme.dark + "4d");
+    localStorage.setItem("ruhi_accent", accentColor);
+  }, [accentColor]);
 
   // Auto-detect input language
   useEffect(() => {
@@ -1753,7 +1882,10 @@ export default function App() {
   };
 
   useEffect(() => {
-    const handler = (e) => { if (downloadRef.current && !downloadRef.current.contains(e.target)) setDownloadDropdown(false); };
+    const handler = (e) => {
+      if (downloadRef.current && !downloadRef.current.contains(e.target)) setDownloadDropdown(false);
+      if (themePickerRef.current && !themePickerRef.current.contains(e.target)) setThemePickerOpen(false);
+    };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
@@ -1844,9 +1976,13 @@ export default function App() {
           streamingSet[langId] = true;
           setStreaming(s => ({ ...s, [langId]: true }));
           const examples = FEW_SHOT_EXAMPLES[langId] || [];
+          const sysPrompt = buildSingleConverterSystem(langId, tone) + (translitMode ? `
+
+TRANSLITERATION MODE (IMPORTANT):
+After writing the converted text in the target script, add a blank line and then provide a full Roman script (Latin alphabet) transliteration of your output. Label it "Transliteration:" on its own line. The transliteration should be natural Hinglish-style romanization (e.g. "Kaise ho bhai?" not "Kaisē hō bhāī?"). Use simple English letters, no diacritics. This applies to all non-English outputs.` : "");
           const raw = await streamConvert({
             model: "anthropic/claude-sonnet-4-5",
-            system: buildSingleConverterSystem(langId, tone),
+            system: sysPrompt,
             messages: [...examples, { role: "user", content: script }],
             onChunk: (partial) => {
               setResults(prev => ({ ...prev, [langId]: partial }));
@@ -2259,6 +2395,7 @@ export default function App() {
       case "tabAnalytics": setActiveTab("analytics"); break;
       case "tabSubtitle": setActiveTab("subtitle"); break;
       case "tabTemplates": setActiveTab("templates"); break;
+      case "tabGlossary": setActiveTab("glossary"); break;
       case "tabTTS": setActiveTab("ttsPreview"); break;
       case "tabDiff": setActiveTab("diff"); break;
       default: break;
@@ -2282,7 +2419,10 @@ export default function App() {
   return (
     <div className={darkMode ? "dark" : ""} style={{ fontFamily: "'Inter','Segoe UI',sans-serif", background: darkMode ? "#000000" : "#f0ebe3", minHeight: "100vh", color: darkMode ? "#e8e0d4" : "#1e1b18", position: "relative", transition: "background 0.3s, color 0.3s" }}>
       <style>{CSS}</style>
-      <FireflyBackground />
+      {activeTab === "converter" && <FireflyBackground />}
+
+      {/* Command Palette */}
+      <CommandPalette open={cmdPaletteOpen} onClose={() => setCmdPaletteOpen(false)} darkMode={darkMode} onAction={handleCmdAction} />
 
       {/* Command Palette */}
       <CommandPalette open={cmdPaletteOpen} onClose={() => setCmdPaletteOpen(false)} darkMode={darkMode} onAction={handleCmdAction} />
@@ -2339,6 +2479,29 @@ export default function App() {
           <button onClick={() => { playClick(); setThemeSchedule(s => { const next = !s; localStorage.setItem("ruhi_theme_schedule", next ? "1" : "0"); return next; }); }} className="clay-btn" style={{ padding: "6px 10px", fontSize: "12px", lineHeight: 1, background: themeSchedule ? (darkMode ? "rgba(245,158,11,0.15)" : "rgba(245,158,11,0.12)") : undefined }} title={themeSchedule ? "Auto theme ON (7pm-7am dark)" : "Auto theme OFF"}>
             {"\u{1F553}"}
           </button>
+          <div className="theme-picker-wrap" ref={themePickerRef}>
+            <button onClick={() => { playClick(); setThemePickerOpen(p => !p); }} className="clay-btn" style={{ padding: "6px 10px", fontSize: "12px", lineHeight: 1, display: "flex", alignItems: "center", gap: "5px" }} title="Accent Theme">
+              <span style={{ width: "14px", height: "14px", borderRadius: "50%", background: (ACCENT_THEMES[accentColor] || ACCENT_THEMES.amber).primary, display: "inline-block", boxShadow: `0 0 6px ${(ACCENT_THEMES[accentColor] || ACCENT_THEMES.amber).primary}40` }} />
+              <span style={{ fontSize: "10px", fontWeight: 700, color: darkMode ? "#b0a090" : "#6b5e50" }}>{"\u25BE"}</span>
+            </button>
+            {themePickerOpen && (
+              <div className="theme-picker-dropdown" style={{
+                background: darkMode ? "linear-gradient(145deg, #0d0d0d, #080808)" : "linear-gradient(145deg, #f5f0e8, #ece7dd)",
+                border: `1px solid ${darkMode ? "rgba(255,255,255,0.08)" : "rgba(166,152,130,0.2)"}`,
+                boxShadow: darkMode ? "0 8px 24px rgba(0,0,0,0.5)" : "6px 6px 18px rgba(166,152,130,0.3), -4px -4px 12px rgba(255,255,255,0.6)",
+              }}>
+                {Object.entries(ACCENT_THEMES).map(([key, theme]) => (
+                  <div
+                    key={key}
+                    className={`theme-dot${accentColor === key ? " active" : ""}`}
+                    style={{ background: theme.primary, color: theme.primary }}
+                    title={theme.label}
+                    onClick={() => { playClick(); setAccentColor(key); setThemePickerOpen(false); }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
           <button onClick={() => { playClick(); setDarkMode(d => { localStorage.setItem("ruhi_dark", d ? "0" : "1"); return !d; }); }} className="clay-btn" style={{ padding: "6px 12px", fontSize: "15px", lineHeight: 1 }} title={darkMode ? "Light Mode" : "Dark Mode"}>
             {darkMode ? "\u2600\uFE0F" : "\u{1F319}"}
           </button>
@@ -2410,13 +2573,32 @@ export default function App() {
         }}>
           {"📊"} Analytics
         </button>
+        <button onClick={() => { playClick(); setActiveTab("glossary"); }} className={activeTab === "glossary" ? "clay-btn-primary" : "clay-btn"} style={{
+          padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
+          cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
+          ...(activeTab !== "glossary" ? { color: darkMode ? "#b0a090" : "#6b5e50" } : {})
+        }}>
+          {"📖"} Glossary
+        </button>
       </div>
 
-      {/* Content Studio Tab */}
-      {activeTab === "studio" && <ContentStudio darkMode={darkMode} streamConvert={streamConvert} dialectRules={DIALECT_RULES} />}
-
-      {/* Dubbing Studio Tab */}
-      {activeTab === "dubbing" && <VideoDub darkMode={darkMode} streamConvert={streamConvert} />}
+      {/* Non-converter tabs — solid background to prevent firefly bleed-through */}
+      {activeTab !== "converter" && (
+        <div style={{ position: "relative", zIndex: 1, minHeight: "calc(100vh - 160px)", background: darkMode ? "#000000" : "#f0ebe3" }}>
+          {activeTab === "studio" && <ContentStudio darkMode={darkMode} streamConvert={streamConvert} dialectRules={DIALECT_RULES} />}
+          {activeTab === "dubbing" && <VideoDub darkMode={darkMode} streamConvert={streamConvert} />}
+          {activeTab === "ttsPreview" && <TTSPreview darkMode={darkMode} />}
+          {activeTab === "subtitle" && <SubtitleStudio darkMode={darkMode} streamConvert={streamConvert} />}
+          {activeTab === "diff" && (
+            <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "28px 22px 80px" }}>
+              <ScriptDiff original={script} results={results} languages={LANGUAGES} darkMode={darkMode} />
+            </div>
+          )}
+          {activeTab === "templates" && <TemplateLibrary darkMode={darkMode} onUseTemplate={handleUseTemplate} />}
+          {activeTab === "analytics" && <AnalyticsDashboard darkMode={darkMode} />}
+          {activeTab === "glossary" && <GlossaryManager darkMode={darkMode} />}
+        </div>
+      )}
 
       {/* TTS Preview Tab */}
       {activeTab === "ttsPreview" && <TTSPreview darkMode={darkMode} />}
@@ -2520,6 +2702,9 @@ export default function App() {
               <button onClick={saveFavorite} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#78350f" }} title="Save current languages as favorite">
                 {"\u2B50"} Save Fav
               </button>
+              <button onClick={() => { setFindReplaceOpen(v => !v); playClick(); }} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: findReplaceOpen ? "#f59e0b" : (darkMode ? "#d4c8b0" : "#78350f"), background: findReplaceOpen ? "rgba(245,158,11,0.12)" : undefined }} title="Find & Replace">
+                {"\uD83D\uDD0D"} Find
+              </button>
               {detectedLang && (
                 <span style={{ fontSize: "9px", fontWeight: 700, color: "#d97706", background: "rgba(245,158,11,0.1)", padding: "2px 8px", borderRadius: "6px", display: "flex", alignItems: "center", gap: "3px" }}>
                   {"🌐"} {detectedLang.label} ({detectedLang.confidence}%)
@@ -2535,6 +2720,22 @@ export default function App() {
             <input type="range" min="11" max="22" value={fontSize} onChange={e => setFontSize(+e.target.value)} style={{ flex: 1, accentColor: "#f59e0b", height: "3px", maxWidth: "140px" }} />
             <span style={{ fontSize: "10px", fontWeight: 700, color: darkMode ? "#807060" : "#a08060", minWidth: "22px" }}>{fontSize}</span>
           </div>
+          {/* Find & Replace Panel */}
+          {findReplaceOpen && (
+            <div style={{ padding: "10px 22px", borderBottom: "1px solid rgba(166,152,130,0.1)", background: darkMode ? "rgba(255,255,255,0.03)" : "rgba(166,152,130,0.04)" }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", alignItems: "center", marginBottom: "8px" }}>
+                <input value={findText} onChange={e => setFindText(e.target.value)} placeholder="Find..." style={{ flex: "1 1 120px", padding: "6px 10px", fontSize: "12px", borderRadius: "8px", border: `1px solid ${darkMode ? "rgba(255,255,255,0.1)" : "rgba(166,152,130,0.25)"}`, background: darkMode ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.7)", color: "inherit", outline: "none", minWidth: "100px" }} />
+                <input value={replaceText} onChange={e => setReplaceText(e.target.value)} placeholder="Replace..." style={{ flex: "1 1 120px", padding: "6px 10px", fontSize: "12px", borderRadius: "8px", border: `1px solid ${darkMode ? "rgba(255,255,255,0.1)" : "rgba(166,152,130,0.25)"}`, background: darkMode ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.7)", color: "inherit", outline: "none", minWidth: "100px" }} />
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", alignItems: "center" }}>
+                <button onClick={() => doReplace(false)} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#78350f" }}>Replace</button>
+                <button onClick={() => doReplace(true)} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#78350f" }}>Replace All</button>
+                <button onClick={() => setFindCaseInsensitive(v => !v)} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: findCaseInsensitive ? "#f59e0b" : (darkMode ? "#d4c8b0" : "#78350f"), background: findCaseInsensitive ? "rgba(245,158,11,0.12)" : undefined }} title="Case insensitive">Aa</button>
+                <button onClick={() => setFindRegex(v => !v)} className="clay-btn" style={{ padding: "4px 10px", fontSize: "10px", fontWeight: 700, color: findRegex ? "#f59e0b" : (darkMode ? "#d4c8b0" : "#78350f"), background: findRegex ? "rgba(245,158,11,0.12)" : undefined }} title="Regex mode">.*</button>
+                {findText && <span style={{ fontSize: "10px", fontWeight: 700, color: findMatchCount > 0 ? "#16a34a" : "#dc2626" }}>{findMatchCount} match{findMatchCount !== 1 ? "es" : ""}</span>}
+              </div>
+            </div>
+          )}
           <div style={{ padding: "18px 22px" }}>
             <textarea value={script} onChange={e => setScript(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && e.ctrlKey) convert(); }}
               placeholder={"Kisi bhi bhasha mein script paste karo...\n\nHindi, English, Bhojpuri, Gujarati, Haryanvi, Rajasthani, ya koi bhi mix.\n\nMultiple languages select karke ek saath convert karo!"}
@@ -2548,6 +2749,9 @@ export default function App() {
           </div>
           <div style={{ padding: "14px 22px", borderTop: "1px solid rgba(166,152,130,0.1)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(166,152,130,0.04)", flexWrap: "wrap", gap: "8px" }}>
             <span className="ctrl-hint" style={{ fontSize: "11px", color: "#a08060", fontWeight: 500 }}>Ctrl + Enter</span>
+            <button onClick={() => { setTranslitMode(v => !v); playClick(); }} className="clay-btn" style={{ padding: "6px 14px", fontSize: "10px", fontWeight: 700, borderRadius: "10px", color: translitMode ? "#fff" : (darkMode ? "#d4c8b0" : "#78350f"), background: translitMode ? "linear-gradient(135deg,#f59e0b,#d97706)" : undefined, boxShadow: translitMode ? "0 2px 8px rgba(245,158,11,0.3)" : undefined, transition: "all 0.2s" }} title="Transliterate Devanagari to Roman script (Hinglish)">
+              {translitMode ? "Aa" : "Aa"} Translit {translitMode ? "ON" : "OFF"}
+            </button>
             <button onClick={() => { playClick(); (csvMode ? convertBatch : convert)(); }} disabled={!can} className={can ? "clay-btn-primary" : "clay-btn-primary"} style={{
               padding: "11px 28px", borderRadius: "14px", border: "none",
               cursor: can ? "pointer" : "not-allowed", fontSize: "13px",
@@ -2663,18 +2867,21 @@ export default function App() {
           </div>
         )}
 
-        {/* Loading indicator (only when no streaming results yet) */}
+        {/* Loading indicator with skeleton UI (only when no streaming results yet) */}
         {loading && Object.keys(results).length === 0 && (
-          <div className="clay" style={{ padding: "40px 24px", textAlign: "center", marginBottom: "14px" }}>
-            <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "18px" }}>
-              {[0, 1, 2].map(i => <div key={i} style={{ width: "12px", height: "12px", borderRadius: "50%", background: "linear-gradient(135deg,#f59e0b,#d97706)", boxShadow: "3px 3px 6px rgba(200,130,20,0.3), -2px -2px 4px rgba(255,220,150,0.4)", animation: `pulse 1.3s ${i * 0.22}s ease-in-out infinite` }} />)}
+          <div className="clay" style={{ marginBottom: "14px", overflow: "hidden" }}>
+            <div style={{ padding: "18px 24px 0", textAlign: "center" }}>
+              <div style={{ display: "flex", justifyContent: "center", gap: "10px", marginBottom: "12px" }}>
+                {[0, 1, 2].map(i => <div key={i} style={{ width: "10px", height: "10px", borderRadius: "50%", background: `linear-gradient(135deg, var(--accent-primary, #f59e0b), var(--accent-dark, #d97706))`, boxShadow: `3px 3px 6px var(--accent-dark-30, rgba(200,130,20,0.3)), -2px -2px 4px rgba(255,220,150,0.4)`, animation: `pulse 1.3s ${i * 0.22}s ease-in-out infinite` }} />)}
+              </div>
+              <div className="loading-text" style={{ fontSize: "13px", color: darkMode ? "#d4c8b0" : "#78350f", fontWeight: 700, marginBottom: "4px" }}>
+                Converting to {selected.length} language{selected.length > 1 ? "s" : ""}...
+              </div>
+              <div className="loading-sub" style={{ fontSize: "10.5px", color: darkMode ? "#807060" : "#a08060", marginBottom: "6px" }}>
+                {selected.map(id => LANGUAGES.find(l => l.id === id)?.label).join(", ")}
+              </div>
             </div>
-            <div className="loading-text" style={{ fontSize: "14px", color: "#78350f", fontWeight: 700, marginBottom: "6px" }}>
-              Converting to {selected.length} language{selected.length > 1 ? "s" : ""}...
-            </div>
-            <div className="loading-sub" style={{ fontSize: "11px", color: "#a08060" }}>
-              {selected.map(id => LANGUAGES.find(l => l.id === id)?.label).join(", ")}
-            </div>
+            <SkeletonLoader lines={5} darkMode={darkMode} />
           </div>
         )}
 
@@ -2893,6 +3100,14 @@ export default function App() {
                     </div>
                   )}
                 </div>
+              ) : loading ? (
+                <div key={langId} className="clay" style={{ marginBottom: "14px", borderLeft: `4px solid ${lang?.color || "#f59e0b"}`, overflow: "hidden" }}>
+                  <div style={{ padding: "14px 20px 0", display: "flex", alignItems: "center", gap: "8px" }}>
+                    <span style={{ fontSize: "13px" }}>{lang?.label}</span>
+                    <span style={{ fontSize: "10px", color: darkMode ? "#807060" : "#a08060" }}>Loading...</span>
+                  </div>
+                  <SkeletonLoader lines={4} darkMode={darkMode} />
+                </div>
               ) : null;
             })}
           </>
@@ -2984,8 +3199,60 @@ export default function App() {
       {/* History Sidebar */}
       <HistorySidebar open={historyOpen} onClose={() => setHistoryOpen(false)} onLoad={loadFromHistory} />
 
+      {/* Onboarding Wizard */}
+      {onboardingStep >= 0 && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", animation: "fadeUp 0.3s ease" }}>
+          <div className="clay" style={{ width: "420px", maxWidth: "92vw", padding: "28px", textAlign: "center", background: darkMode ? "linear-gradient(145deg, #111, #0a0a0a)" : "linear-gradient(145deg, #f5f0e8, #ece7dd)" }}>
+            {onboardingStep === 0 && (<>
+              <div style={{ fontSize: "40px", marginBottom: "12px" }}>{"🙏"}</div>
+              <div style={{ fontSize: "18px", fontWeight: 800, color: darkMode ? "#e8e0d4" : "#1e1b18", marginBottom: "8px" }}>Namaste! Welcome to RUHI</div>
+              <div style={{ fontSize: "13px", color: darkMode ? "#b0a090" : "#6b5e50", lineHeight: 1.7, marginBottom: "20px" }}>
+                RUHI Multilingual Studio lets you convert scripts between 16 Indian languages, dub videos, generate voiceovers, and much more.
+              </div>
+            </>)}
+            {onboardingStep === 1 && (<>
+              <div style={{ fontSize: "40px", marginBottom: "12px" }}>{"✍️"}</div>
+              <div style={{ fontSize: "18px", fontWeight: 800, color: darkMode ? "#e8e0d4" : "#1e1b18", marginBottom: "8px" }}>Script Converter</div>
+              <div style={{ fontSize: "13px", color: darkMode ? "#b0a090" : "#6b5e50", lineHeight: 1.7, marginBottom: "20px" }}>
+                Paste your script, select target languages, and click Convert. Supports SRT subtitles, CSV batch processing, voice input, and multiple export formats.
+              </div>
+            </>)}
+            {onboardingStep === 2 && (<>
+              <div style={{ fontSize: "40px", marginBottom: "12px" }}>{"🎥"}</div>
+              <div style={{ fontSize: "18px", fontWeight: 800, color: darkMode ? "#e8e0d4" : "#1e1b18", marginBottom: "8px" }}>Video Dub & TTS</div>
+              <div style={{ fontSize: "13px", color: darkMode ? "#b0a090" : "#6b5e50", lineHeight: 1.7, marginBottom: "20px" }}>
+                Upload a video and RUHI will extract audio, separate stems, transcribe, translate, clone the voice, and create a dubbed version — all automatically!
+              </div>
+            </>)}
+            {onboardingStep === 3 && (<>
+              <div style={{ fontSize: "40px", marginBottom: "12px" }}>{"⌨️"}</div>
+              <div style={{ fontSize: "18px", fontWeight: 800, color: darkMode ? "#e8e0d4" : "#1e1b18", marginBottom: "8px" }}>Pro Tips</div>
+              <div style={{ fontSize: "13px", color: darkMode ? "#b0a090" : "#6b5e50", lineHeight: 1.7, marginBottom: "20px" }}>
+                Press <b>Ctrl+K</b> for quick actions. Use <b>Ctrl+Enter</b> to convert. Chat with <b>RUHI Assistant</b> (bottom-right) for help anytime. Check out the <b>Glossary Manager</b> to create custom dictionaries!
+              </div>
+            </>)}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+              <div style={{ display: "flex", gap: "6px" }}>
+                {[0,1,2,3].map(i => (
+                  <span key={i} style={{ width: "8px", height: "8px", borderRadius: "50%", background: i === onboardingStep ? "#f59e0b" : (darkMode ? "#333" : "#d5cdc1"), transition: "background 0.2s" }} />
+                ))}
+              </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button onClick={() => { setOnboardingStep(-1); localStorage.setItem("ruhi_onboarding_done", "1"); }} className="clay-btn" style={{ padding: "8px 16px", fontSize: "12px", fontWeight: 700, color: darkMode ? "#b0a090" : "#6b5e50" }}>Skip</button>
+                <button onClick={() => {
+                  if (onboardingStep < 3) setOnboardingStep(s => s + 1);
+                  else { setOnboardingStep(-1); localStorage.setItem("ruhi_onboarding_done", "1"); playSuccess(); }
+                }} className="clay-btn-primary" style={{ padding: "8px 20px", borderRadius: "12px", border: "none", fontSize: "12px", fontWeight: 800, cursor: "pointer" }}>
+                  {onboardingStep < 3 ? "Next" : "Get Started!"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* AI Chatbot */}
-      <ChatBot darkMode={darkMode} />
+      <ChatBot darkMode={darkMode} streamConvert={streamConvert} />
     </div>
   );
 }
