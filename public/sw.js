@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ruhi-studio-v1';
+const CACHE_NAME = 'ruhi-studio-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -25,18 +25,16 @@ self.addEventListener('fetch', (event) => {
   // Skip API calls — always go to network
   if (request.url.includes('/api/')) return;
 
+  // Network-first strategy: always try network, fall back to cache
   event.respondWith(
-    caches.match(request).then((cached) => {
-      const fetchPromise = fetch(request)
-        .then((response) => {
-          if (response && response.status === 200 && response.type === 'basic') {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-          }
-          return response;
-        })
-        .catch(() => cached);
-      return cached || fetchPromise;
-    })
+    fetch(request)
+      .then((response) => {
+        if (response && response.status === 200 && response.type === 'basic') {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+        }
+        return response;
+      })
+      .catch(() => caches.match(request))
   );
 });
