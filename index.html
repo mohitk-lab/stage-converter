@@ -8,7 +8,7 @@
     <meta name="theme-color" content="#f59e0b" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <link rel="manifest" href="/manifest.json" />
+    <!-- manifest removed to prevent PWA caching -->
     <link rel="apple-touch-icon" href="/icon-192.svg" />
     <link rel="icon" type="image/svg+xml" href="/icon-192.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -33,14 +33,13 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <script>
+      // Kill all service workers and purge caches — no more stale content
       if ('serviceWorker' in navigator) {
-        // Purge all old caches and re-register fresh SW
-        navigator.serviceWorker.getRegistrations().then(regs => {
-          regs.forEach(r => r.unregister());
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          for (var i = 0; i < regs.length; i++) regs[i].unregister();
         });
-        caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        if (window.caches) caches.keys().then(function(keys) {
+          for (var i = 0; i < keys.length; i++) caches.delete(keys[i]);
         });
       }
     </script>
