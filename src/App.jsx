@@ -2419,7 +2419,7 @@ After writing the converted text in the target script, add a blank line and then
   return (
     <div className={darkMode ? "dark" : ""} style={{ fontFamily: "'Inter','Segoe UI',sans-serif", background: darkMode ? "#000000" : "#f0ebe3", minHeight: "100vh", color: darkMode ? "#e8e0d4" : "#1e1b18", position: "relative", transition: "background 0.3s, color 0.3s" }}>
       <style>{CSS}</style>
-      {activeTab === "converter" && <FireflyBackground />}
+      <FireflyBackground />
 
       {/* Command Palette */}
       <CommandPalette open={cmdPaletteOpen} onClose={() => setCmdPaletteOpen(false)} darkMode={darkMode} onAction={handleCmdAction} />
