@@ -9,6 +9,7 @@ import TemplateLibrary from "./TemplateLibrary.jsx";
 import SubtitleStudio from "./SubtitleStudio.jsx";
 import ScriptDiff from "./ScriptDiff.jsx";
 import TTSPreview from "./TTSPreview.jsx";
+import GlossaryManager from "./GlossaryManager.jsx";
 import { playClick, playSuccess, playPop, playError } from "./sounds.js";
 
 /* --- Streaming fetch helper --- */
@@ -1602,6 +1603,8 @@ export default function App() {
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [cmdPaletteOpen, setCmdPaletteOpen] = useState(false);
   const [detectedLang, setDetectedLang] = useState(null);
+  const [onboardingStep, setOnboardingStep] = useState(() => localStorage.getItem("ruhi_onboarding_done") ? -1 : 0);
+  const [accentColor, setAccentColor] = useState(() => localStorage.getItem("ruhi_accent") || "amber");
 
   // Theme auto-scheduling
   useEffect(() => {
@@ -2259,6 +2262,7 @@ export default function App() {
       case "tabAnalytics": setActiveTab("analytics"); break;
       case "tabSubtitle": setActiveTab("subtitle"); break;
       case "tabTemplates": setActiveTab("templates"); break;
+      case "tabGlossary": setActiveTab("glossary"); break;
       case "tabTTS": setActiveTab("ttsPreview"); break;
       case "tabDiff": setActiveTab("diff"); break;
       default: break;
@@ -2410,6 +2414,13 @@ export default function App() {
         }}>
           {"📊"} Analytics
         </button>
+        <button onClick={() => { playClick(); setActiveTab("glossary"); }} className={activeTab === "glossary" ? "clay-btn-primary" : "clay-btn"} style={{
+          padding: "10px 22px", borderRadius: "14px", border: "none", fontSize: "12px", fontWeight: 800,
+          cursor: "pointer", display: "flex", alignItems: "center", gap: "6px",
+          ...(activeTab !== "glossary" ? { color: darkMode ? "#b0a090" : "#6b5e50" } : {})
+        }}>
+          {"📖"} Glossary
+        </button>
       </div>
 
       {/* Content Studio Tab */}
@@ -2436,6 +2447,9 @@ export default function App() {
 
       {/* Analytics Dashboard Tab */}
       {activeTab === "analytics" && <AnalyticsDashboard darkMode={darkMode} />}
+
+      {/* Glossary Manager Tab */}
+      {activeTab === "glossary" && <GlossaryManager darkMode={darkMode} />}
 
       {/* Script Converter Tab */}
       {activeTab === "converter" && <div className="main-c" style={{ maxWidth: "1400px", margin: "0 auto", padding: "28px 22px 80px", position: "relative", zIndex: 1 }}>
@@ -2984,8 +2998,60 @@ export default function App() {
       {/* History Sidebar */}
       <HistorySidebar open={historyOpen} onClose={() => setHistoryOpen(false)} onLoad={loadFromHistory} />
 
+      {/* Onboarding Wizard */}
+      {onboardingStep >= 0 && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", animation: "fadeUp 0.3s ease" }}>
+          <div className="clay" style={{ width: "420px", maxWidth: "92vw", padding: "28px", textAlign: "center", background: darkMode ? "linear-gradient(145deg, #111, #0a0a0a)" : "linear-gradient(145deg, #f5f0e8, #ece7dd)" }}>
+            {onboardingStep === 0 && (<>
+              <div style={{ fontSize: "40px", marginBottom: "12px" }}>{"🙏"}</div>
+              <div style={{ fontSize: "18px", fontWeight: 800, color: darkMode ? "#e8e0d4" : "#1e1b18", marginBottom: "8px" }}>Namaste! Welcome to RUHI</div>
+              <div style={{ fontSize: "13px", color: darkMode ? "#b0a090" : "#6b5e50", lineHeight: 1.7, marginBottom: "20px" }}>
+                RUHI Multilingual Studio lets you convert scripts between 16 Indian languages, dub videos, generate voiceovers, and much more.
+              </div>
+            </>)}
+            {onboardingStep === 1 && (<>
+              <div style={{ fontSize: "40px", marginBottom: "12px" }}>{"✍️"}</div>
+              <div style={{ fontSize: "18px", fontWeight: 800, color: darkMode ? "#e8e0d4" : "#1e1b18", marginBottom: "8px" }}>Script Converter</div>
+              <div style={{ fontSize: "13px", color: darkMode ? "#b0a090" : "#6b5e50", lineHeight: 1.7, marginBottom: "20px" }}>
+                Paste your script, select target languages, and click Convert. Supports SRT subtitles, CSV batch processing, voice input, and multiple export formats.
+              </div>
+            </>)}
+            {onboardingStep === 2 && (<>
+              <div style={{ fontSize: "40px", marginBottom: "12px" }}>{"🎥"}</div>
+              <div style={{ fontSize: "18px", fontWeight: 800, color: darkMode ? "#e8e0d4" : "#1e1b18", marginBottom: "8px" }}>Video Dub & TTS</div>
+              <div style={{ fontSize: "13px", color: darkMode ? "#b0a090" : "#6b5e50", lineHeight: 1.7, marginBottom: "20px" }}>
+                Upload a video and RUHI will extract audio, separate stems, transcribe, translate, clone the voice, and create a dubbed version — all automatically!
+              </div>
+            </>)}
+            {onboardingStep === 3 && (<>
+              <div style={{ fontSize: "40px", marginBottom: "12px" }}>{"⌨️"}</div>
+              <div style={{ fontSize: "18px", fontWeight: 800, color: darkMode ? "#e8e0d4" : "#1e1b18", marginBottom: "8px" }}>Pro Tips</div>
+              <div style={{ fontSize: "13px", color: darkMode ? "#b0a090" : "#6b5e50", lineHeight: 1.7, marginBottom: "20px" }}>
+                Press <b>Ctrl+K</b> for quick actions. Use <b>Ctrl+Enter</b> to convert. Chat with <b>RUHI Assistant</b> (bottom-right) for help anytime. Check out the <b>Glossary Manager</b> to create custom dictionaries!
+              </div>
+            </>)}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+              <div style={{ display: "flex", gap: "6px" }}>
+                {[0,1,2,3].map(i => (
+                  <span key={i} style={{ width: "8px", height: "8px", borderRadius: "50%", background: i === onboardingStep ? "#f59e0b" : (darkMode ? "#333" : "#d5cdc1"), transition: "background 0.2s" }} />
+                ))}
+              </div>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button onClick={() => { setOnboardingStep(-1); localStorage.setItem("ruhi_onboarding_done", "1"); }} className="clay-btn" style={{ padding: "8px 16px", fontSize: "12px", fontWeight: 700, color: darkMode ? "#b0a090" : "#6b5e50" }}>Skip</button>
+                <button onClick={() => {
+                  if (onboardingStep < 3) setOnboardingStep(s => s + 1);
+                  else { setOnboardingStep(-1); localStorage.setItem("ruhi_onboarding_done", "1"); playSuccess(); }
+                }} className="clay-btn-primary" style={{ padding: "8px 20px", borderRadius: "12px", border: "none", fontSize: "12px", fontWeight: 800, cursor: "pointer" }}>
+                  {onboardingStep < 3 ? "Next" : "Get Started!"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* AI Chatbot */}
-      <ChatBot darkMode={darkMode} />
+      <ChatBot darkMode={darkMode} streamConvert={streamConvert} />
     </div>
   );
 }

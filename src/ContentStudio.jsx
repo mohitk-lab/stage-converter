@@ -628,6 +628,8 @@ export default function ContentStudio({ darkMode, streamConvert, dialectRules = 
   const [output, setOutput] = useState("");
   const [previousOutput, setPreviousOutput] = useState("");
   const [error, setError] = useState("");
+  const [abMode, setAbMode] = useState(false);
+  const [variantB, setVariantB] = useState("");
 
   // Module form states
   const [promoData, setPromoData] = useState({
@@ -819,6 +821,17 @@ ${system}`;
         messages: [{ role: "user", content: userMessage }],
         onChunk: (partial) => setOutput(partial),
       });
+
+      // Generate variant B if A/B mode is on
+      if (abMode && activeModule !== "learning") {
+        setVariantB("");
+        await streamConvert({
+          model: "anthropic/claude-sonnet-4-5",
+          system: system + "\n\nIMPORTANT: Generate a COMPLETELY DIFFERENT version from your previous output. Use a different angle, tone variation, structure, and creative approach. Make it distinctly unique while maintaining quality.",
+          messages: [{ role: "user", content: userMessage }],
+          onChunk: (partial) => setVariantB(partial),
+        });
+      }
 
       // Save persona after learning analysis completes
       if (activeModule === "learning" && result) {
@@ -1060,6 +1073,25 @@ ${system}`;
               )}
             </>)}
 
+            {/* A/B Variant Toggle */}
+            {activeModule !== "learning" && (
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", padding: "8px 0" }}>
+                <div onClick={() => { setAbMode(a => !a); setVariantB(""); }} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div style={{
+                    width: "36px", height: "20px", borderRadius: "10px", position: "relative", transition: "background 0.2s",
+                    background: abMode ? "linear-gradient(135deg, #f59e0b, #d97706)" : (dm ? "#333" : "#d5cdc1"),
+                  }}>
+                    <div style={{
+                      width: "16px", height: "16px", borderRadius: "50%", background: "#fff", position: "absolute", top: "2px",
+                      left: abMode ? "18px" : "2px", transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)"
+                    }} />
+                  </div>
+                  <span style={{ fontSize: "11px", fontWeight: 700, color: abMode ? "#d97706" : (dm ? "#b0a090" : "#6b5e50") }}>A/B Variants</span>
+                </div>
+                {abMode && <span style={{ fontSize: "10px", color: dm ? "#807060" : "#a08060" }}>Generates 2 unique versions</span>}
+              </div>
+            )}
+
             {/* Generate Button */}
             <button onClick={generate} disabled={isGenerating} className="clay-btn-primary" style={{
               width: "100%", padding: "13px", borderRadius: "14px", border: "none",
@@ -1151,6 +1183,25 @@ ${system}`;
           </div>
         </div>
       </div>
+
+      {/* A/B Variant B Output */}
+      {abMode && variantB && (
+        <div className="clay" style={{ padding: "18px", marginTop: "16px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+            <h3 style={{ fontSize: "13px", fontWeight: 800, color: dm ? "#d4c8b0" : "#78350f", display: "flex", alignItems: "center", gap: "8px" }}>
+              <span style={{ fontSize: "10px", padding: "2px 8px", borderRadius: "8px", background: "linear-gradient(135deg, #3b82f6, #2563eb)", color: "#fff", fontWeight: 800 }}>B</span> Variant B
+            </h3>
+            <CopyBtn text={variantB} darkMode={dm} />
+          </div>
+          <div className="clay-inner" style={{
+            minHeight: "200px", maxHeight: "400px", overflowY: "auto",
+            padding: "16px", fontSize: "13px", lineHeight: 1.9,
+            color: dm ? "#e8e0d4" : "#3d3425", whiteSpace: "pre-wrap"
+          }}>
+            {variantB}
+          </div>
+        </div>
+      )}
 
       {/* Responsive override for mobile */}
       <style>{`

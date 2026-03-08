@@ -121,29 +121,127 @@ function formatTimeAgo(dateStr) {
   return `${Math.floor(diff / 86400000)}d ago`;
 }
 
-export default function ChatBot({ darkMode }) {
+const AI_SYSTEM_PROMPT = `You are RUHI, the AI assistant for RUHI Multilingual Studio — a tool for converting scripts between 16 Indian languages.
+You respond in the same language the user writes in. If they write in Hindi, respond in Hindi. If English, respond in English.
+Keep responses concise (2-3 sentences max). Be friendly and helpful.
+You know about: script conversion, 16 Indian languages, video dubbing, TTS, subtitle editing, templates, analytics.`;
+
+const LANG_PREF_OPTIONS = ["Auto", "Hindi", "English"];
+
+export default function ChatBot({ darkMode, streamConvert }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
     { from: "bot", text: "Namaste! I'm RUHI Assistant. Ask me about languages, scripts, shortcuts, or anything else!" }
   ]);
   const [input, setInput] = useState("");
+  const [useAI, setUseAI] = useState(true);
+  const [langPref, setLangPref] = useState("Auto");
+  const [isStreaming, setIsStreaming] = useState(false);
   const scrollRef = useRef(null);
+  const streamAbortRef = useRef(null);
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages]);
 
+  const sendAIQuery = async (msg) => {
+    setIsStreaming(true);
+    // Add a placeholder bot message for streaming
+    const botIdx = { current: -1 };
+    setMessages(prev => {
+      botIdx.current = prev.length;
+      return [...prev, { from: "bot", text: "", streaming: true }];
+    });
+
+    let langInstruction = "";
+    if (langPref === "Hindi") langInstruction = "\nIMPORTANT: Respond in Hindi (Devanagari script) regardless of the user's language.";
+    else if (langPref === "English") langInstruction = "\nIMPORTANT: Respond in English regardless of the user's language.";
+
+    const systemPrompt = AI_SYSTEM_PROMPT + langInstruction;
+
+    try {
+      if (streamConvert) {
+        let accumulated = "";
+        await streamConvert(
+          msg,
+          systemPrompt,
+          (chunk) => {
+            accumulated += chunk;
+            const current = accumulated;
+            setMessages(prev => {
+              const updated = [...prev];
+              if (botIdx.current >= 0 && botIdx.current < updated.length) {
+                updated[botIdx.current] = { from: "bot", text: current, streaming: true };
+              }
+              return updated;
+            });
+          },
+          () => {
+            playPop();
+            setMessages(prev => {
+              const updated = [...prev];
+              if (botIdx.current >= 0 && botIdx.current < updated.length) {
+                updated[botIdx.current] = { ...updated[botIdx.current], streaming: false };
+              }
+              return updated;
+            });
+            setIsStreaming(false);
+          },
+          (error) => {
+            console.error("RUHI AI error:", error);
+            setMessages(prev => {
+              const updated = [...prev];
+              if (botIdx.current >= 0 && botIdx.current < updated.length) {
+                updated[botIdx.current] = { from: "bot", text: "Sorry, I couldn't reach the AI service. Here's what I know: " + ANSWERS.default, streaming: false };
+              }
+              return updated;
+            });
+            setIsStreaming(false);
+          }
+        );
+      } else {
+        // No streamConvert available, fall back to default
+        setMessages(prev => {
+          const updated = [...prev];
+          if (botIdx.current >= 0 && botIdx.current < updated.length) {
+            updated[botIdx.current] = { from: "bot", text: ANSWERS.default, streaming: false };
+          }
+          return updated;
+        });
+        playPop();
+        setIsStreaming(false);
+      }
+    } catch (err) {
+      console.error("RUHI AI error:", err);
+      setMessages(prev => {
+        const updated = [...prev];
+        if (botIdx.current >= 0 && botIdx.current < updated.length) {
+          updated[botIdx.current] = { from: "bot", text: "Sorry, something went wrong. " + ANSWERS.default, streaming: false };
+        }
+        return updated;
+      });
+      setIsStreaming(false);
+    }
+  };
+
   const send = (text) => {
     const msg = text || input.trim();
-    if (!msg) return;
+    if (!msg || isStreaming) return;
     playSend();
     setMessages(prev => [...prev, { from: "user", text: msg }]);
     setInput("");
-    setTimeout(() => {
-      const answer = getAnswer(msg);
-      playPop();
-      setMessages(prev => [...prev, { from: "bot", text: answer }]);
-    }, 600);
+
+    const answer = getAnswer(msg);
+    if (answer !== ANSWERS.default || !useAI) {
+      // FAQ match found or AI disabled — use static answer
+      setTimeout(() => {
+        playPop();
+        setMessages(prev => [...prev, { from: "bot", text: answer }]);
+      }, 600);
+    } else {
+      // No FAQ match and AI enabled — call Claude
+      sendAIQuery(msg);
+    }
   };
 
   const bg = darkMode ? "#0a0a0a" : "#f5f0e8";
@@ -153,6 +251,9 @@ export default function ChatBot({ darkMode }) {
 
   return (
     <>
+      {/* Blink animation for streaming cursor */}
+      <style>{`@keyframes cursorBlink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }`}</style>
+
       {/* Floating Button */}
       <button
         onClick={() => { setOpen(o => !o); playClick(); }}
@@ -204,13 +305,55 @@ export default function ChatBot({ darkMode }) {
               display: "flex", alignItems: "center", justifyContent: "center",
               fontSize: "16px", color: "#fff", fontWeight: 800,
             }}>R</div>
-            <div>
+            <div style={{ flex: 1 }}>
               <div style={{ fontSize: "13px", fontWeight: 700, color: textCol }}>RUHI Assistant</div>
               <div style={{ fontSize: "10px", color: subCol, display: "flex", alignItems: "center", gap: "4px" }}>
                 <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e", display: "inline-block" }} />
-                Online &middot; 16 languages
+                Online &middot; {useAI ? "AI Mode" : "FAQ Mode"} &middot; 16 languages
               </div>
             </div>
+            {/* AI Toggle */}
+            <button
+              onClick={() => setUseAI(a => !a)}
+              title={useAI ? "AI mode ON — click to use FAQ only" : "FAQ mode — click to enable AI"}
+              style={{
+                padding: "3px 8px", fontSize: "9px", fontWeight: 700,
+                borderRadius: "8px", border: `1px solid ${border}`, cursor: "pointer",
+                background: useAI ? "linear-gradient(135deg, #f59e0b, #d97706)" : (darkMode ? "rgba(255,255,255,0.06)" : "rgba(166,152,130,0.12)"),
+                color: useAI ? "#fff" : subCol,
+                transition: "all 0.2s",
+              }}
+            >
+              {useAI ? "AI" : "FAQ"}
+            </button>
+          </div>
+
+          {/* Language Preference Bar */}
+          <div style={{
+            padding: "6px 14px",
+            borderBottom: `1px solid ${border}`,
+            display: "flex", alignItems: "center", gap: "6px",
+            background: darkMode ? "rgba(255,255,255,0.02)" : "rgba(166,152,130,0.04)",
+          }}>
+            <span style={{ fontSize: "9px", color: subCol, fontWeight: 600, whiteSpace: "nowrap" }}>Respond in:</span>
+            {LANG_PREF_OPTIONS.map(opt => (
+              <button
+                key={opt}
+                onClick={() => setLangPref(opt)}
+                style={{
+                  padding: "2px 8px", fontSize: "9px", fontWeight: 600,
+                  borderRadius: "8px", cursor: "pointer",
+                  border: langPref === opt ? "1px solid #d97706" : `1px solid ${border}`,
+                  background: langPref === opt
+                    ? (darkMode ? "rgba(217,119,6,0.2)" : "rgba(245,158,11,0.15)")
+                    : "transparent",
+                  color: langPref === opt ? "#d97706" : subCol,
+                  transition: "all 0.15s",
+                }}
+              >
+                {opt}
+              </button>
+            ))}
           </div>
 
           {/* Messages */}
@@ -236,14 +379,19 @@ export default function ChatBot({ darkMode }) {
                     ? "0 2px 8px rgba(200,130,20,0.3)"
                     : (darkMode ? "2px 2px 6px rgba(0,0,0,0.3)" : "2px 2px 6px rgba(166,152,130,0.2)"),
                 }}>
-                  {m.text}
+                  {m.text}{m.streaming && <span style={{
+                    display: "inline-block", width: "2px", height: "13px",
+                    background: m.from === "user" ? "#fff" : (darkMode ? "#f59e0b" : "#d97706"),
+                    marginLeft: "2px", verticalAlign: "middle",
+                    animation: "cursorBlink 0.8s step-end infinite",
+                  }} />}
                 </div>
               </div>
             ))}
           </div>
 
           {/* Suggestions */}
-          {messages.length > 0 && messages[messages.length - 1].from === "bot" && (
+          {messages.length > 0 && messages[messages.length - 1].from === "bot" && !isStreaming && (
             <div style={{ padding: "0 14px 8px", display: "flex", flexWrap: "wrap", gap: "6px" }}>
               {SUGGESTIONS.map((s, i) => (
                 <button key={i} onClick={() => send(s)} style={{
@@ -269,7 +417,8 @@ export default function ChatBot({ darkMode }) {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === "Enter") send(); }}
-              placeholder="Ask about languages, scripts, tips..."
+              disabled={isStreaming}
+              placeholder={isStreaming ? "RUHI is thinking..." : "Ask about languages, scripts, tips..."}
               style={{
                 flex: 1, padding: "10px 14px", borderRadius: "12px",
                 border: `1px solid ${border}`,
