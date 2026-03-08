@@ -322,11 +322,33 @@ export default function TemplateLibrary({ darkMode, onUseTemplate }) {
 
   return (
     <div style={containerStyle}>
-      <div style={headerStyle}>
+      {/* Header + Search & Filter — single bar */}
+      <div style={{ ...headerStyle, marginBottom: "20px" }}>
         <h2 style={titleStyle}>Template Library</h2>
-        <button style={btnStyle} onClick={() => setShowForm((v) => !v)}>
-          {showForm ? "Cancel" : "+ Save Template"}
-        </button>
+        <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+          <input
+            style={{ ...inputStyle, maxWidth: "220px", width: "auto" }}
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search templates..."
+          />
+          <select
+            style={{ ...selectStyle, maxWidth: "160px", width: "auto" }}
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+          >
+            <option value="All">All Categories</option>
+            {CATEGORIES.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+          <button style={btnStyle} onClick={() => setShowForm((v) => !v)}>
+            {showForm ? "Cancel" : "+ Save Template"}
+          </button>
+        </div>
       </div>
 
       {/* Save Template Form */}
@@ -389,29 +411,6 @@ export default function TemplateLibrary({ darkMode, onUseTemplate }) {
           </form>
         </div>
       )}
-
-      {/* Search & Filter */}
-      <div style={filtersStyle}>
-        <input
-          style={{ ...inputStyle, maxWidth: "300px" }}
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search templates..."
-        />
-        <select
-          style={{ ...selectStyle, maxWidth: "180px" }}
-          value={filterCategory}
-          onChange={(e) => setFilterCategory(e.target.value)}
-        >
-          <option value="All">All Categories</option>
-          {CATEGORIES.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
-      </div>
 
       {/* Templates Grid */}
       {filtered.length === 0 ? (
