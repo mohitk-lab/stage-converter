@@ -2,6 +2,9 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
+  if (!process.env.ELEVENLABS_API_KEY) {
+    return res.status(500).json({ error: "ELEVENLABS_API_KEY is not configured. Please add it to your Vercel project environment variables." });
+  }
   try {
     const { text, voice_id, model_id, voice_settings, output_format, speed } = req.body;
     if (!text || !voice_id) {
