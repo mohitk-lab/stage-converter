@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import ContentStudio from "./ContentStudio.jsx";
 import VideoDub from "./VideoDub.jsx";
 import ChatBot from "./ChatBot.jsx";
@@ -1374,6 +1374,21 @@ export default function App() {
   const [ttsEditingLang, setTtsEditingLang] = useState(null);
   const ttsTextareaRef = useRef(null);
 
+  /* --- Import & Download State --- */
+  const [importTab, setImportTab] = useState("link");
+  const [importLink, setImportLink] = useState("");
+  const [importLoading, setImportLoading] = useState(false);
+  const [importError, setImportError] = useState("");
+  const [downloadDropdown, setDownloadDropdown] = useState(false);
+  const downloadRef = useRef(null);
+  const bulkFileRef = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => { if (downloadRef.current && !downloadRef.current.contains(e.target)) setDownloadDropdown(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
   const fetchVoices = async () => {
     try {
       const res = await fetch("/api/voices");
@@ -1646,6 +1661,186 @@ export default function App() {
     e.target.value = "";
   };
 
+  /* --- Bulk File Upload Handler --- */
+  const handleBulkUpload = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    setImportError("");
+    const textExts = [".txt", ".text", ".srt", ".csv"];
+    const supported = [];
+    const unsupported = [];
+    files.forEach(f => {
+      const ext = "." + f.name.split(".").pop().toLowerCase();
+      if (textExts.includes(ext)) supported.push(f);
+      else unsupported.push(f.name);
+    });
+    if (unsupported.length > 0) {
+      setImportError(`Cannot parse binary files: ${unsupported.join(", ")}. Please copy-paste content or convert to .txt first.`);
+      playError();
+    }
+    if (supported.length === 0) { e.target.value = ""; return; }
+    let loaded = 0;
+    const parts = [];
+    supported.forEach((file, idx) => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const text = ev.target.result;
+        if (supported.length > 1) {
+          parts[idx] = `--- ${file.name} ---\n${text}`;
+        } else {
+          // Single file — use existing logic for srt/csv
+          if (file.name.endsWith(".srt")) {
+            const blocks = parseSrt(text);
+            if (blocks.length > 0) {
+              setSrtMode({ blocks, fileName: file.name });
+              setCsvMode(null); setBatchResults(null);
+              setScript(blocks.map(b => b.text).join("\n"));
+              playSuccess();
+              return;
+            }
+          } else if (file.name.endsWith(".csv")) {
+            const parsed = parseCsv(text);
+            if (parsed && parsed.rows.length > 0) {
+              setCsvMode({ ...parsed, fileName: file.name });
+              setSrtMode(null); setBatchResults(null);
+              setScript(`[CSV: ${parsed.rows.length} rows loaded from ${file.name}]`);
+              playSuccess();
+              return;
+            }
+          }
+          parts[idx] = text;
+        }
+        loaded++;
+        if (loaded === supported.length) {
+          setScript(parts.filter(Boolean).join("\n\n"));
+          setSrtMode(null); setCsvMode(null);
+          playSuccess();
+        }
+      };
+      reader.readAsText(file);
+    });
+    e.target.value = "";
+  };
+
+  /* --- Link Import Handler --- */
+  const handleLinkImport = async () => {
+    if (!importLink.trim()) return;
+    setImportLoading(true);
+    setImportError("");
+    try {
+      let url = importLink.trim();
+      if (url.includes("docs.google.com/document")) {
+        const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (match) url = `https://docs.google.com/document/d/${match[1]}/export?format=txt`;
+      }
+      if (url.includes("sheets.google.com")) {
+        const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+        if (match) url = `https://docs.google.com/spreadsheets/d/${match[1]}/export?format=csv`;
+      }
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Failed to fetch (${res.status}). For Google Docs, try File > Download as .txt and upload instead.`);
+      const text = await res.text();
+      if (!text.trim()) throw new Error("Document appears empty");
+      setScript(text);
+      setSrtMode(null); setCsvMode(null);
+      setImportLink("");
+      playSuccess();
+    } catch (err) {
+      setImportError(err.message || "Failed to fetch document. Try uploading the file instead.");
+      playError();
+    }
+    setImportLoading(false);
+  };
+
+  /* --- Download Format Helpers --- */
+  const generatePdfBlob = (text) => {
+    const lines = text.split("\n");
+    const pageHeight = 792; const pageWidth = 612;
+    const margin = 50; const lineH = 14; const fontSize = 10;
+    const usable = pageHeight - 2 * margin;
+    const linesPerPage = Math.floor(usable / lineH);
+    const pages = [];
+    for (let i = 0; i < lines.length; i += linesPerPage) {
+      pages.push(lines.slice(i, i + linesPerPage));
+    }
+    if (pages.length === 0) pages.push([""]);
+    const esc = (s) => s.replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
+    let objCount = 0;
+    const objs = [];
+    const addObj = (content) => { objCount++; objs.push({ id: objCount, content }); return objCount; };
+
+    addObj("<< /Type /Catalog /Pages 2 0 R >>");
+    const pagesObjId = addObj("PAGES_PLACEHOLDER");
+    const fontId = addObj("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>");
+
+    const pageObjIds = [];
+    const contentObjIds = [];
+    pages.forEach((pageLines, pi) => {
+      const streamLines = [`BT`, `/F1 ${fontSize} Tf`, `${margin} ${pageHeight - margin} Td`, `${lineH} TL`];
+      pageLines.forEach(l => { streamLines.push(`(${esc(l)}) Tj T*`); });
+      streamLines.push("ET");
+      const stream = streamLines.join("\n");
+      const contentId = addObj(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`);
+      contentObjIds.push(contentId);
+      const pageId = addObj(`<< /Type /Page /Parent ${pagesObjId} 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Contents ${contentId} 0 R /Resources << /Font << /F1 ${fontId} 0 R >> >> >>`);
+      pageObjIds.push(pageId);
+    });
+
+    objs[pagesObjId - 1].content = `<< /Type /Pages /Kids [${pageObjIds.map(id => `${id} 0 R`).join(" ")}] /Count ${pages.length} >>`;
+
+    let pdf = "%PDF-1.4\n";
+    const offsets = [];
+    objs.forEach(obj => {
+      offsets.push(pdf.length);
+      pdf += `${obj.id} 0 obj\n${obj.content}\nendobj\n`;
+    });
+    const xrefOff = pdf.length;
+    pdf += `xref\n0 ${objCount + 1}\n0000000000 65535 f \n`;
+    offsets.forEach(off => { pdf += `${String(off).padStart(10, "0")} 00000 n \n`; });
+    pdf += `trailer\n<< /Size ${objCount + 1} /Root 1 0 R >>\nstartxref\n${xrefOff}\n%%EOF`;
+    return new Blob([pdf], { type: "application/pdf" });
+  };
+
+  const generateRtfBlob = (text) => {
+    const escRtf = (s) => s.replace(/\\/g, "\\\\").replace(/\{/g, "\\{").replace(/\}/g, "\\}").replace(/[^\x00-\x7F]/g, (c) => `\\u${c.charCodeAt(0)}?`);
+    let rtf = "{\\rtf1\\ansi\\deff0{\\fonttbl{\\f0 Helvetica;}}\n\\f0\\fs22\n";
+    text.split("\n").forEach(line => { rtf += escRtf(line) + "\\par\n"; });
+    rtf += "}";
+    return new Blob([rtf], { type: "application/rtf" });
+  };
+
+  const downloadAs = (format) => {
+    const text = formatAllResults();
+    if (!text) return;
+    const dateSuffix = new Date().toISOString().slice(0, 10);
+    let blob, ext;
+    switch (format) {
+      case "pdf":
+        blob = generatePdfBlob(text); ext = "pdf"; break;
+      case "rtf":
+        blob = generateRtfBlob(text); ext = "rtf"; break;
+      case "each": {
+        selected.filter(id => results[id]).forEach(id => {
+          const lang = LANGUAGES.find(l => l.id === id);
+          const b = new Blob([results[id]], { type: "text/plain;charset=utf-8" });
+          const u = URL.createObjectURL(b);
+          const a = document.createElement("a");
+          a.href = u; a.download = `ruhi-${lang?.sub || id}-${dateSuffix}.txt`; a.click();
+          URL.revokeObjectURL(u);
+        });
+        setDownloadDropdown(false);
+        return;
+      }
+      default:
+        blob = new Blob([text], { type: "text/plain;charset=utf-8" }); ext = "txt"; break;
+    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = `ruhi-conversion-${dateSuffix}.${ext}`; a.click();
+    URL.revokeObjectURL(url);
+    setDownloadDropdown(false);
+  };
+
   const formatAllResults = () => {
     return selected
       .filter(id => results[id])
@@ -1821,6 +2016,98 @@ export default function App() {
             </button>
           </div>
         </div>
+
+        {/* Import From Section */}
+        <div className="clay" style={{ overflow: "hidden" }}>
+          <div style={{ padding: "10px 18px", borderBottom: `1px solid ${darkMode ? "rgba(255,255,255,0.06)" : "rgba(166,152,130,0.12)"}`, display: "flex", alignItems: "center", gap: "6px" }}>
+            <span style={{ fontSize: "13px" }}>{"\uD83D\uDCE5"}</span>
+            <span style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "1px", textTransform: "uppercase", color: darkMode ? "#d4c8b0" : "#78350f" }}>Import From</span>
+            <div style={{ marginLeft: "auto", display: "flex", gap: "4px" }}>
+              {["link", "upload"].map(tab => (
+                <button key={tab} onClick={() => { setImportTab(tab); setImportError(""); playClick(); }}
+                  style={{
+                    padding: "4px 12px", fontSize: "10px", fontWeight: 700, borderRadius: "8px", border: "none", cursor: "pointer",
+                    background: importTab === tab
+                      ? (darkMode ? "rgba(245,158,11,0.15)" : "rgba(245,158,11,0.12)")
+                      : "transparent",
+                    color: importTab === tab
+                      ? "#f59e0b"
+                      : (darkMode ? "#807060" : "#92400e"),
+                    transition: "all 0.15s",
+                  }}>
+                  {tab === "link" ? "\uD83D\uDD17 Link" : "\uD83D\uDCC2 Upload"}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div style={{ padding: "14px 18px" }}>
+            {importTab === "link" ? (
+              <div>
+                <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                  <input
+                    value={importLink}
+                    onChange={e => setImportLink(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter") handleLinkImport(); }}
+                    placeholder="Paste Google Docs, Pastebin, or any public text URL..."
+                    style={{
+                      flex: 1, padding: "9px 14px", borderRadius: "10px", fontSize: "12px",
+                      border: `1px solid ${darkMode ? "rgba(255,255,255,0.08)" : "rgba(166,152,130,0.2)"}`,
+                      background: darkMode ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.6)",
+                      color: darkMode ? "#e8e0d4" : "#1e1b18", outline: "none",
+                      fontFamily: "'Inter','Segoe UI',sans-serif",
+                    }}
+                  />
+                  <button onClick={handleLinkImport} disabled={importLoading || !importLink.trim()} className="clay-btn"
+                    style={{ padding: "8px 16px", fontSize: "11px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#78350f", opacity: importLoading || !importLink.trim() ? 0.5 : 1, cursor: importLoading ? "wait" : "pointer" }}>
+                    {importLoading ? (
+                      <span style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                        <span style={{ width: "10px", height: "10px", borderRadius: "50%", border: "2px solid rgba(120,53,15,0.3)", borderTopColor: "#78350f", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
+                        Fetching...
+                      </span>
+                    ) : "Fetch"}
+                  </button>
+                </div>
+                <div style={{ fontSize: "10px", color: darkMode ? "#605040" : "#a08060", marginTop: "6px" }}>
+                  Works with raw text URLs, Pastebin, GitHub raw files. Google Docs may require CORS — use File &gt; Download as .txt if fetch fails.
+                </div>
+              </div>
+            ) : (
+              <div>
+                <input ref={bulkFileRef} type="file" multiple accept=".txt,.srt,.csv,.text,.pdf,.docx" onChange={handleBulkUpload} style={{ display: "none" }} />
+                <div
+                  onClick={() => bulkFileRef.current?.click()}
+                  style={{
+                    padding: "20px", borderRadius: "12px", textAlign: "center", cursor: "pointer",
+                    border: `2px dashed ${darkMode ? "rgba(255,255,255,0.1)" : "rgba(166,152,130,0.25)"}`,
+                    background: darkMode ? "rgba(255,255,255,0.02)" : "rgba(166,152,130,0.04)",
+                    transition: "border-color 0.2s, background 0.2s",
+                  }}
+                  onDragOver={(e) => { e.preventDefault(); e.currentTarget.style.borderColor = "#f59e0b"; e.currentTarget.style.background = darkMode ? "rgba(245,158,11,0.05)" : "rgba(245,158,11,0.05)"; }}
+                  onDragLeave={(e) => { e.currentTarget.style.borderColor = darkMode ? "rgba(255,255,255,0.1)" : "rgba(166,152,130,0.25)"; e.currentTarget.style.background = darkMode ? "rgba(255,255,255,0.02)" : "rgba(166,152,130,0.04)"; }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    e.currentTarget.style.borderColor = darkMode ? "rgba(255,255,255,0.1)" : "rgba(166,152,130,0.25)";
+                    e.currentTarget.style.background = darkMode ? "rgba(255,255,255,0.02)" : "rgba(166,152,130,0.04)";
+                    if (e.dataTransfer.files?.length) handleBulkUpload({ target: { files: e.dataTransfer.files }, value: "" });
+                  }}
+                >
+                  <div style={{ fontSize: "24px", marginBottom: "6px" }}>{"\uD83D\uDCC2"}</div>
+                  <div style={{ fontSize: "12px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#78350f", marginBottom: "4px" }}>
+                    Drop files here or click to browse
+                  </div>
+                  <div style={{ fontSize: "10px", color: darkMode ? "#605040" : "#a08060" }}>
+                    Supports TXT, SRT, CSV &middot; Select multiple files for bulk import
+                  </div>
+                </div>
+              </div>
+            )}
+            {importError && (
+              <div style={{ marginTop: "8px", padding: "8px 12px", borderRadius: "8px", fontSize: "11px", color: "#dc2626", background: "rgba(220,38,38,0.06)", border: "1px solid rgba(220,38,38,0.12)" }}>
+                {importError}
+              </div>
+            )}
+          </div>
+        </div>
         </div>{/* end left column */}
 
         {/* Right Column — Output */}
@@ -1872,9 +2159,47 @@ export default function App() {
                   <button onClick={copyAll} className="clay-btn results-btn" style={{ padding: "6px 14px", fontSize: "11px", fontWeight: 700, color: copied === "__all__" ? "#16a34a" : "#78350f" }}>
                     {copied === "__all__" ? "\u2713 Copied All" : "\u{1F4CB} Copy All"}
                   </button>
-                  <button onClick={downloadAll} className="clay-btn results-btn" style={{ padding: "6px 14px", fontSize: "11px", fontWeight: 700, color: "#78350f" }}>
-                    {"\u2B07"} Download
-                  </button>
+                  <div ref={downloadRef} style={{ position: "relative" }}>
+                    <button onClick={() => setDownloadDropdown(d => !d)} className="clay-btn results-btn" style={{ padding: "6px 14px", fontSize: "11px", fontWeight: 700, color: "#78350f", display: "flex", alignItems: "center", gap: "4px" }}>
+                      {"\u2B07"} Download
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    {downloadDropdown && (
+                      <div style={{
+                        position: "absolute", top: "calc(100% + 6px)", right: 0, zIndex: 50,
+                        minWidth: "180px", borderRadius: "14px", overflow: "hidden",
+                        background: darkMode ? "linear-gradient(145deg, #0d0d0d, #080808)" : "linear-gradient(145deg, #f5f0e8, #ece7dd)",
+                        border: `1px solid ${darkMode ? "rgba(255,255,255,0.08)" : "rgba(166,152,130,0.2)"}`,
+                        boxShadow: darkMode
+                          ? "0 8px 24px rgba(0,0,0,0.5)"
+                          : "6px 6px 18px rgba(166,152,130,0.3), -4px -4px 12px rgba(255,255,255,0.6)",
+                        animation: "fadeUp 0.15s ease",
+                      }}>
+                        {[
+                          { fmt: "txt", icon: "\uD83D\uDCC4", label: "Text (.txt)" },
+                          { fmt: "pdf", icon: "\uD83D\uDCD5", label: "PDF (.pdf)" },
+                          { fmt: "rtf", icon: "\uD83D\uDCC3", label: "Word/RTF (.rtf)" },
+                          { fmt: "each", icon: "\uD83D\uDCC1", label: "Each Language (.txt)" },
+                        ].map(opt => (
+                          <button key={opt.fmt} onClick={() => { playClick(); downloadAs(opt.fmt); }}
+                            style={{
+                              display: "flex", alignItems: "center", gap: "10px", width: "100%",
+                              padding: "10px 16px", border: "none", cursor: "pointer",
+                              background: "transparent", color: darkMode ? "#e8e0d4" : "#1e1b18",
+                              fontSize: "12px", fontWeight: 600, textAlign: "left",
+                              transition: "background 0.12s",
+                              borderBottom: opt.fmt !== "each" ? `1px solid ${darkMode ? "rgba(255,255,255,0.04)" : "rgba(166,152,130,0.08)"}` : "none",
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.background = darkMode ? "rgba(255,255,255,0.05)" : "rgba(245,158,11,0.08)"}
+                            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                          >
+                            <span style={{ fontSize: "15px" }}>{opt.icon}</span>
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                   <button onClick={() => { setResults({}); setScript(""); }} className="clay-btn" style={{ padding: "6px 14px", fontSize: "11px", fontWeight: 700, color: "#6b5e50" }}>New Script</button>
                 </div>
               )}
