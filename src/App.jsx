@@ -2116,7 +2116,7 @@ export default function App() {
   const [ttsEnabled, setTtsEnabled] = useState(false);
   const [voices, setVoices] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState("");
-  const [ttsModel, setTtsModel] = useState("eleven_v3");
+  const [ttsModel, setTtsModel] = useState("eleven_multilingual_v2");
   const [ttsSettings, setTtsSettings] = useState({ stability: 0.5, similarity_boost: 0.75, style: 0, speed: 1.0, use_speaker_boost: true });
   const [ttsGenerating, setTtsGenerating] = useState({});
   const [audioUrls, setAudioUrls] = useState({});
@@ -2407,7 +2407,7 @@ export default function App() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          text: ttsText.substring(0, ttsModel === "eleven_v3" ? 3000 : 5000),
+          text: ttsText.substring(0, 5000),
           voice_id: selectedVoice,
           model_id: ttsModel,
           voice_settings: {
@@ -3415,11 +3415,9 @@ After writing the converted text in the target script, add a blank line and then
                     <div className="tts-field">
                       <label>Model</label>
                       <select className="clay-inner" value={ttsModel} onChange={e => setTtsModel(e.target.value)}>
-                        <option value="eleven_v3">Eleven v3 (Best)</option>
-                        <option value="eleven_multilingual_v2">Multilingual v2</option>
-                        <option value="eleven_turbo_v2_5">Turbo v2.5 (Fast)</option>
-                        <option value="eleven_flash_v2_5">Flash v2.5 (Lowest Latency)</option>
-                        <option value="eleven_monolingual_v1">English v1</option>
+                        <option value="eleven_multilingual_v2">Multilingual v2 (Best for All Languages)</option>
+                        <option value="eleven_turbo_v2_5">Turbo v2.5 (Fast, Multilingual)</option>
+                        <option value="eleven_flash_v2_5">Flash v2.5 (Lowest Latency, Multilingual)</option>
                       </select>
                     </div>
                     <button className="tts-advanced-toggle" onClick={() => setTtsAdvanced(p => !p)}>

@@ -6,7 +6,7 @@ export default function TTSPreview({ darkMode }) {
   const [text, setText] = useState("");
   const [voices, setVoices] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState("");
-  const [model, setModel] = useState("eleven_multilingual_v3");
+  const [model, setModel] = useState("eleven_multilingual_v2");
   const [speed, setSpeed] = useState(1.0);
   const [stability, setStability] = useState(0.5);
   const [similarity, setSimilarity] = useState(0.75);
@@ -224,10 +224,9 @@ export default function TTSPreview({ darkMode }) {
                   fontSize: 12, fontWeight: 600, color: textColor, cursor: "pointer",
                   background: innerBg, boxShadow: innerShadow,
                 }}>
-                  <option value="eleven_multilingual_v3">Multilingual v3 (Latest)</option>
-                  <option value="eleven_flash_v3">Flash v3 (Fast)</option>
-                  <option value="eleven_multilingual_v2">Multilingual v2</option>
-                  <option value="eleven_flash_v2_5">Flash v2.5</option>
+                  <option value="eleven_multilingual_v2">Multilingual v2 (Best for All Languages)</option>
+                  <option value="eleven_turbo_v2_5">Turbo v2.5 (Fast, Multilingual)</option>
+                  <option value="eleven_flash_v2_5">Flash v2.5 (Lowest Latency)</option>
                 </select>
               </div>
 
