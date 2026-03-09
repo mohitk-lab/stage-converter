@@ -796,8 +796,324 @@ const TONE_INSTRUCTIONS = {
   romantic: "\nTONE: Write in a tender, poetic, emotionally intimate style. Use soft, evocative language with warmth and affection. Emphasize feelings of love and connection.",
 };
 
+/* --- Cultural Adaptation Rules per Language --- */
+const CULTURAL_RULES = {
+  hindi: `CULTURAL ADAPTATION (Hindi):
+- Use culturally appropriate Hindi idioms and muhavare (e.g. "piece of cake" → "बाएँ हाथ का खेल", not literal translation)
+- Adapt greetings to Indian context (e.g. "Hey guys" → "अरे यारों" / "दोस्तों", "Good morning" → "सुप्रभात" or "नमस्ते")
+- Convert Western cultural references to Indian equivalents where natural (e.g. "Thanksgiving dinner" → "त्योहार की दावत", "prom night" → "कॉलेज फेयरवेल")
+- Use Hindi honorifics naturally: जी, भाई, बहन, अंकल, आंटी based on context
+- Adapt measurements/currency references if contextually appropriate (dollars → rupees, miles → kilometers)
+- Food references: adapt to Indian equivalents where meaning is preserved (e.g. "apple pie" → "गरमा गरम जलेबी" if the point is comfort food)
+- Expressions of surprise/emotion: use Hindi natural exclamations (अरे वाह!, ओह हो!, बाप रे!)
+- Relationship terms: use Indian family/social terms (buddy → यार, dude → भाई, ma'am → मैडम/दीदी)`,
+
+  english: `CULTURAL ADAPTATION (English):
+- Convert Hindi/regional idioms to natural English equivalents (e.g. "नौ दो ग्यारह होना" → "to run away", "दाल में कुछ काला" → "something fishy")
+- Adapt Indian cultural references for global audience where needed (explain or find equivalent)
+- Convert honorifics naturally: जी → Mr./Ms. or drop if informal, भाई/यार → bro/dude/mate
+- Rephrase Indian-specific expressions into natural English (e.g. "चार लोग क्या कहेंगे" → "what will people think")
+- Adapt greetings: "नमस्ते" → "Hey" / "Hello" based on tone
+- Preserve Indian proper nouns and culturally untranslatable terms (Diwali, chai, etc.)
+- Sentence structure: use English-natural SVO order, not Hindi SOV patterns`,
+
+  haryanvi: `CULTURAL ADAPTATION (Haryanvi):
+DIALECT GRAMMAR (MANDATORY when culturalMode is ON):
+- म्ह/म्हं = "में" (in): "अपणी बोली म्ह" (in our language), "गाम म्ह" (in the village)
+- पै = "पर" (on): "STAGE ऐप पै", "चिता पै"
+- तै = "से" (from): "माटी तै उठकै" (rising from the soil), "श्मशान तै"
+- नै = object marker (को): "सबनै", "अपणे बेट्टे नै"
+- सै = "है" (is): "चा तो खुराक सै म्हारी" (tea is my sustenance)
+- कोनी = "नहीं" (not): "मैं सुमित्रा कोनी" (I am not Sumitra)
+- इब्बै = "अभी" (right now): "इब्बै डाउनलोड करो"
+- खात्तर = "के लिए" (for): "देखण खात्तर" (for watching)
+- आळी/आळा = suffix "-वाला": "आँसू ल्याण आळी कहानी" (story that brings tears)
+
+RELATIONSHIP TERMS:
+- ताऊ (elder uncle), फूफा, भाभी, बहू, प्रधान जी (village head), गुरुजी
+- छोरा/छोरी/छोरे (boy/girl/boys), घरआली/बीबी (wife), लाडो (beloved daughter)
+- अपणी/अपणा/अपणे (own), म्हारी/म्हारा (our), थम/थमनै (you)
+
+CULTURAL SETTINGS & REFERENCES:
+- Village life: गाम (village), पंचायत (village council), अखाड़ा (wrestling arena), खेत (farm), चौकीदार (watchman)
+- Occupations: लोहार (blacksmith), सोनार (goldsmith), नाई/कालू नाई (barber -- village secret keeper)
+- कबड्डी as Haryanvi pride sport, माटी (soil) as metaphor for roots
+- Rituals: करवा चौथ, बियाह (wedding), तांत्रिक (tantric), डायन (witch)
+- श्मशान/चिता/अर्थी (cremation ground/pyre/bier) as dramatic settings
+- "राम नाम सत्य" (funeral chant)
+
+EXCLAMATIONS & IDIOMS:
+- "हवाईयां उड़गी" (was terrified), "रौंगटे खड़े" (goosebumps)
+- "दिल दहलाना" (heart-shaking), "खून के रिश्ते" (blood relations)
+- "बावळा" (crazy/obsessed -- positive: passionate dreamer)
+- "राड दाली" (caused a ruckus), "भोळी शक्ल" (innocent face -- deceptive)
+- "सपने देखणा तो अपणा हक है" (Dreaming is our right)
+- "कुछ ठाण लिया तो पूरा ही करो फेर चाहे कोए बावळा कहदे" (Once you decide, finish it)
+
+HEADLINE STYLE PATTERNS:
+- Sensational horror: "चिता पै उठी मरी लाश!", "अर्थी म्हं जागी मुर्दा औरत!"
+- Emotional poetic: "प्यार में हारे दो दिल, ज़िंदगी में जीते दो फ़कीर"
+- Social drama: "ज़मीन के दाम बढ़े और रिश्ते नीलाम हुए"
+- Comedy: "चा तो खुराक सै म्हारी", "50 गामां का मौजिज़ सै यो बेवड़ा"
+- Pride: "है नै स्वाद अपणी बोली म्ह?", "अपणी माँ-बोली म्ह", "देसी कलाकारां की देसी फ़िल्में"
+
+FOOD: रोटी-दूध, बाजरे की खिचड़ी, लस्सी, घी, चा (tea as identity marker)
+GREETINGS: "राम राम भाई", "राम राम ताऊ"
+VERB FORMS: देखो/देखण (watch), होरया/होया (happening), बणज्या (became), भाजगी (ran away)`,
+
+  rajasthani: `CULTURAL ADAPTATION (Rajasthani):
+DIALECT GRAMMAR (MANDATORY when culturalMode is ON):
+- कोनि = "नहीं" (not): "मैं सुमित्रा कोनि" -- THE most pervasive Rajasthani marker
+- माथै = "पर/ऊपर" (on): "STAGE माथै" (on STAGE), "चिता माथै"
+- स्यूं = "से" (from/with): "हुक़ुम स्यूं टक्कर" (clash with Hukum)
+- रो/री/रै = "का/की/के" (possessive): "बेटी री खरोच" (daughter's scratch), "हुक़ुम रो खौफ" (Hukum's terror)
+- वास्तै/सारू = "के लिए" (for): "जाणबा वास्तै" (in order to know)
+- कांई = "क्या" (what): "कांई होवैलो" (what will happen)
+- कुण = "कौन" (who): "कुण है हुक़ुम?"
+- अबार = "अब" (now): "अबार ही देखो"
+- घणा/घणी = "बहुत" (very/much): "घणा लंबा", "घणी मजेदार"
+- कठै = "कहाँ" (where), कीकर = "कैसे" (how)
+- आपणी/आपरी = "अपनी" (own): cultural pride usage
+- छोरा/छोरी = "लड़का/लड़की" (boy/girl)
+- ब्याव = "शादी" (wedding), चोखी = "अच्छी" (good)
+- आळो = "वाला" (one who): "राज करबा आळो" (the one who rules)
+
+VERB CONJUGATIONS:
+- देखो/देखज्यो (watch -- emphatic imperative)
+- होवै/होवैलो/होवैली (happens -- masc/fem future)
+- बोलैलो (will say), मरैलो (will die), जीवैलो (will live)
+- सुलजैली (will be solved), निकळैलो (will come out)
+- बण्यो (became), हुयो (happened), आयो (came)
+
+CULTURAL REFERENCES:
+- Desert/royalty: रेत, धोरे, महल, राजा-रानी, मारवाड़, राजकुमारी
+- ब्याव (wedding), सुहागरात, दुल्हन, घूंघट (veil) as cultural settings
+- पंचायत, ताऊ अर भतीजा dynamics, माथा फोठी (head-cracking feuds)
+- गणगौर, तीज, पुष्कर festivals
+
+FATHER-DAUGHTER SENTIMENT (very strong in Rajasthani culture):
+- "बेटी रै तो पैर पै लागैड़ी धूल भी चोखी कोनि" (Even dust on my daughter's feet isn't acceptable)
+- "बाप नै आपणी जाण स्यूं भी ज्यादा प्यारी होवै है आपरी बेटी री जाण" (A father loves his daughter's life more than his own)
+- "दिल को टुकड़ो होवै है बेटी" (A daughter is a piece of one's heart)
+
+PROVERBS & IDIOMS:
+- "घर को बेदी ही ढायो लंका" (The insider destroyed Lanka -- betrayal from Ramayana)
+- "जद बुराई रो घड़ो भर जावै है तो उ को अंत होणो जरुरी होवै है" (When evil's pot overflows, its end is inevitable)
+- "सही अर गलत म्ह बस एक पतली सी लाइन होवै है" (Between right and wrong there's just a thin line)
+- "हर कांड दबाया जा सकता है… हर सच्चाई नहीं" (Every scandal can be suppressed... not every truth)
+
+EXCLAMATIONS: "अरे बापू!", "म्हारी तो!", "घणो बढ़िया!", "बच'र रिहज्यो" (beware!)
+GREETINGS: "खम्मा घणी", "पधारो म्हारे देस"
+FOOD: दाल-बाटी-चूरमा, केर-सांगरी, गट्टे की सब्जी, मावा कचोरी
+
+HEADLINE PATTERNS:
+- Question hooks: "कुण है हुक़ुम❓", "कांई होवैलो अब❓"
+- Shocking reveals: "घूंघट उठा तो निकला किन्नर😱", "सुहाग रात पर खुला राज…😳"
+- Paradox: "दुल्हन थी… पर औरत नहीं!", "एक शरीर, दो ज़िंदगी"
+- Warnings: "सावधान- हुक़ुम ना सुणलै", "बच'र रिहज्यो, आ रियो है हुक़ुम😳"
+- Comedy register: "दो दोस्त अर वाकी जीप, कहाणी है घणी मजेदार!", "हँसता-हँसता पेट दुःख जावैलो"`,
+
+  bhojpuri: `CULTURAL ADAPTATION (Bhojpuri):
+DIALECT VOCABULARY (MANDATORY when culturalMode is ON):
+- बा = "है" (is): "का राज बा" (what's the secret)
+- नइखे = "नहीं है" (is not)
+- रउआ = "आप" (you -- respectful), तोहर = "तुम्हारा" (your)
+- पतोह/पुतोह = "बहू" (daughter-in-law -- distinctly Bhojpuri)
+- मेहरारू = "पत्नी/औरत" (wife/woman), मरद = "पति" (husband)
+- लइका = "लड़का" (boy), देयादिन = "देवरानी-जेठानी" (co-sisters-in-law)
+- अभहीं/अबहीं = "अभी" (right now), इहे/इहाँ = "यहाँ" (here), ओहिजा = "वहाँ" (there)
+
+VERB FORMS:
+- "-ीं" imperative: "देखीं" (watch), "डाउनलोड करीं", "शुरू करीं"
+- "-एला/-ला" habitual: "होला" (happens), "रोवेला" (weeps), "बूझेला" (understands)
+- "-इबS" future: "हो जइबS" (you will become), "हैरान हो जइबS"
+- "-ल बा/-रहल बा" continuous: "पक रहल बा" (is cooking), "चल रहल बा" (is going on)
+- "-ली/-लस/-लक" past: "दिहलस" (gave), "फस गईल" (got trapped)
+
+RHETORICAL "का..." QUESTION PATTERN (dominant headline style):
+- "का होई...?" (What will happen?), "का सचो में होला पुनर्जन्म?" (Does rebirth truly happen?)
+- "का कोई मर के वापस आ सकेला?" (Can someone come back after dying?)
+- "का अब सास के दिन लद गइल?" (Are the mother-in-law's days over?)
+- "का इश्क़ में रिस्क भारी पड़ी?" (Will risk weigh heavy in love?)
+
+EMOTIONAL EXPRESSIONS:
+- Surprise: "अरे बाप रे", "आँख फाटल रह जाई" (eyes will pop), "दंग रह जाएम" (stunned), "रोंगटा खड़ा हो जाई" (goosebumps)
+- Sorrow: "फुट-फुट के रोवेला" (weeping bitterly), "दिलवा दहला देवे वाला" (heart-shaking), "दिल के छुई" (touched the heart)
+- Laughter: "हँसा-हँसा के लोट-पोट कर दी" (roll on floor laughing), "हँसत-हँसत पेट दुखा जाई", "ठहाका लगाए के बा"
+
+IDIOMS & PROVERBS:
+- "दाल में काला बुझाता" (something fishy), "दू नाव पर सवारी" (riding two boats -- playing both sides)
+- "भीगी बिल्ली बन जाई" (will become a wet cat -- meek), "इहाँ का खिचड़ी पक रहल बा" (what's cooking here?)
+- "घर में जीरो, ससुराल में हीरो" (zero at home, hero at in-laws')
+- "सास शेर, पतोह सवा शेर" (mother-in-law is lion, daughter-in-law bigger lion)
+- "सासो कबो पतोह रहली" (the mother-in-law was once a daughter-in-law too)
+
+SAAS-BAHU (mother-in-law / daughter-in-law) CULTURE:
+- सास, पतोह, ससुर, नयकी पतोह (new daughter-in-law)
+- "सास-पतोह के नोंक-झोंक" (MIL-DIL bickering), "3 पतोह बनाम 1 सास"
+
+CULTURAL REFERENCES:
+- छठ पूजा, बिहार/पूर्वांचल गाँव life, migration themes
+- "आपन संस्कृति, आपन STAGE", "तोहर भोजपुरी हीरो"
+- "देसी मसाला, गाँव के माटी आ भोजपुरी स्वैग" (village soil and Bhojpuri swagger)
+- Supernatural: पुनर्जन्म, टोना-टोटका, भगवान के माया, भूतनी
+
+SLANG: छवल (vibrant/cool), धमाकेदार (explosive), फुर्र हो गइल (vanished/eloped), मुँहजोर (outspoken woman), खुराफात (mischief), हंगामा (uproar)
+GREETINGS: "प्रणाम", "चरण स्पर्श", "का हाल बा भाई"
+FOOD: लिट्टी-चोखा, सत्तू, ठेकुआ, पूआ-पूड़ी`,
+
+  gujarati: `CULTURAL ADAPTATION (Gujarati):
+HEADLINE PATTERNS (from real Gujarati content):
+- Rhetorical questions with શું (Shu/What), કોણ (Kon/Who), ક્યાં (Kyaan/Where):
+  "શું થયું છે આયુષ સાથે?" (What happened to Ayush?), "કોણ જીતશે, પોલીસ કે ક્રાઇમ?" (Who will win?)
+  "શું છે આ કેસનો રહસ્ય?" (What is this case's mystery?), "શું સત્ય બહાર આવશે?" (Will truth come out?)
+- Suspense with ellipsis: "રાત પૂરી થઈ ગઈ, પણ સવાલ..." (The night ended, but questions...)
+- Parallel structure: "એક રાત, અનેક રહસ્યો!" (One night, many mysteries!)
+- Exclamation hooks: "જોરદાર ગુજરાતી ક્રાઇમ થ્રિલર!" (Powerful Gujarati crime thriller!)
+
+URGENCY/CTA VOCABULARY:
+- અત્યારેજ (attyaarej) = "right now" with emphatic જ suffix
+- આજેજ (aajeej) = "today itself" with emphatic જ
+- જુઓ (juo) = "watch" (imperative), જાણવા (jaanvaa) = "to know"
+- માત્ર (maatr) = "only" (exclusivity marker), હવે (have) = "now"
+- આવી જાઓ (aavi jao) = "come over" (casual/inviting)
+
+DRAMATIC INTENSIFIERS:
+- જોરદાર (jordaar -- powerful), ધમાકેદાર (dhamakedaar -- explosive/blockbuster)
+- રોમાંચક (romaanchak -- thrilling), અદભુત (adbhut -- amazing)
+- સુપરહિટ (superhit), જબરદસ્ત (jabardast -- tremendous), ગજબ (gajab -- extraordinary)
+
+IDIOMS & EXPRESSIONS:
+- "હોંશ ઉડાડી દેશે" (honsh udaadi deshe -- "will blow your senses" / will shock you)
+- "ભૂલાય એવી નથી" (not one to be forgotten)
+- "અજબ રાતની ગજબ કહાની" (ajab-gajab rhyming pair -- strange night's extraordinary story)
+- "દરેક ચહેરા પાછળ છે એક રાઝ" (behind every face is a secret)
+- "દરેક જવાબ ઊભો કરશે એક નવો સવાલ" (every answer raises a new question)
+
+MYSTERY/CRIME VOCABULARY:
+- રહસ્ય (rahasya -- mystery, Sanskrit-derived), રાઝ (raaz -- secret, Urdu loanword -- both used)
+- સત્ય (satya -- truth), દોશી (doshi -- culprit), છુપાયેલો (chhupaayelo -- hidden)
+- પૂછપરછ (poochhparchh -- interrogation), ઉકેલી (ukeli -- to solve)
+
+GUJARATI GRAMMAR IN CAPTIONS:
+- Future tense with શકશે (shakshe -- "will be able to") for suspense
+- Question marker શું (shu) at sentence start for yes/no questions
+- Emphatic particle જ (j) attached to time words for urgency
+
+CULTURAL REFERENCES:
+- Business/trade metaphors natural to Gujarati culture
+- Navratri/Garba, Uttarayan (kite festival), Janmashtami
+- Film genres: crime thriller, family drama, comedy (Jagat, 31st, Popaat, Gajab Thai Gayo)
+- Code-mixing Gujarati + English for modern contexts
+
+GREETINGS: "કેમ છો?" / "જય શ્રી કૃષ્ણ" / "નમસ્કાર"
+RELATIONSHIP TERMS: ભાઈ, બેન, કાકા, કાકી, ફોઈ, મામા, માસી
+FOOD: ઢોકળા, થેપલા, ખાખરા, ઊંધિયું, શ્રીખંડ, ફાફડા-જલેબી
+EXCLAMATIONS: "અરે વાહ!", "બસ બસ!", "શું વાત છે!", "કમાલ!"
+HOSPITALITY: મેહમાન નવાજી, "જમવા ચાલો" (come eat)`,
+
+  marathi: `CULTURAL ADAPTATION (Marathi):
+- Use Marathi mhani (proverbs) and folk expressions
+- Cultural pride references: शिवाजी, मराठी माणूस, सह्याद्री
+- Greetings: "नमस्कार" / "कसे आहात?" style
+- Relationship terms: दादा, ताई, काका, काकू, मावशी, आत्या
+- Food references: वडा पाव, पोहे, मिसळ पाव, पुरण पोळी, श्रीखंड
+- Exclamations: "अरे वा!", "बास!", "काय सांगू!", "भारीच!"
+- Mumbai/Pune urban culture mixed with traditional Maharashtrian values
+- Ganpati, गुढीपाडवा references where natural`,
+
+  bengali: `CULTURAL ADAPTATION (Bengali):
+- Use Bengali proshongsha (expressions) and folk wisdom
+- Cultural/intellectual references: রবীন্দ্রনাথ, আড্ডা culture, বাংলার মাটি
+- Greetings: "নমস্কার" / "কেমন আছো/আছেন?" style
+- Relationship terms: দাদা, দিদি, কাকু, মাসি, পিসি, জেঠু
+- Food references: মাছ-ভাত, রসগোল্লা, সন্দেশ, মিষ্টি দই, লুচি-আলুর দম
+- Exclamations: "আরে বাহ!", "কী বলো!", "দারুণ!", "বাপরে বাপ!"
+- Durga Puja, আড্ডা, চা references where natural
+- Bengali emotional expressiveness and poetic sensibility`,
+
+  punjabi: `CULTURAL ADAPTATION (Punjabi):
+- Use Punjabi akhaan (proverbs) and folk expressions
+- Cultural references: ਭੰਗੜਾ, ਲੱਸੀ, ਖੇਤੀ, ਪੰਜ ਦਰਿਆ
+- Greetings: "ਸਤ ਸ੍ਰੀ ਅਕਾਲ" / "ਕਿੱਦਾਂ?" / "ਕੀ ਹਾਲ ਐ?" style
+- Relationship terms: ਵੀਰੇ, ਭੈਣੇ, ਪਾਪਾ ਜੀ, ਬੀਜੀ, ਚਾਚਾ, ਤਾਇਆ
+- Food references: ਮੱਕੀ ਦੀ ਰੋਟੀ-ਸਰ੍ਹੋਂ ਦਾ ਸਾਗ, ਲੱਸੀ, ਛੋਲੇ-ਭਟੂਰੇ, ਪਿੰਨੀ
+- Exclamations: "ਓਏ ਹੋਏ!", "ਬੱਲੇ ਬੱਲੇ!", "ਕਮਾਲ ਐ!", "ਵਾਹ ਜੀ ਵਾਹ!"
+- Punjabi warmth, hospitality, and larger-than-life expression style
+- Lohri, Baisakhi, ਗੁਰੂਦੁਆਰਾ references where natural`,
+
+  tamil: `CULTURAL ADAPTATION (Tamil):
+- Use Tamil pazhamozhigal (proverbs) and folk wisdom
+- Cultural pride: தமிழ் பண்பாடு, திருக்குறள் references
+- Greetings: "வணக்கம்" / "எப்படி இருக்கீங்க?" style
+- Relationship terms: அண்ணா, அக்கா, அத்தை, மாமா, பெரியப்பா, சித்தி
+- Food references: இட்லி-சாம்பார், தோசை, பொங்கல், பாயசம், சிக்கன் சுக்கா
+- Exclamations: "அட!", "சூப்பர்!", "அய்யோ!", "என்ன ஒரு!"
+- Pongal, temple culture, cinema references where natural
+- Tamil respectful speech patterns (நீங்க vs நீ based on context)`,
+
+  telugu: `CULTURAL ADAPTATION (Telugu):
+- Use Telugu saamethalu (proverbs) and folk expressions
+- Cultural references: తెలుగు వైభవం, cinema culture
+- Greetings: "నమస్కారం" / "ఎలా ఉన్నారు?" style
+- Relationship terms: అన్నయ్య, అక్కయ్య, మామయ్య, అత్తయ్య, బాబాయ్, పిన్ని
+- Food references: బిర్యానీ, పులిహోర, గోంగూర, పప్పు-చారు, గారెలు
+- Exclamations: "అరే వాహ్!", "భలే!", "అబ్బా!", "సూపర్!"
+- Sankranti, Bathukamma references where natural
+- Telugu dramatic/cinematic expression style`,
+
+  kannada: `CULTURAL ADAPTATION (Kannada):
+- Use Kannada gadegalu (proverbs) and folk expressions
+- Cultural references: ಕರ್ನಾಟಕ ಸಂಸ್ಕೃತಿ, ಮೈಸೂರು heritage
+- Greetings: "ನಮಸ್ಕಾರ" / "ಹೇಗಿದ್ದೀರಿ?" style
+- Relationship terms: ಅಣ್ಣ, ಅಕ್ಕ, ಮಾಮ, ಅತ್ತೆ, ಚಿಕ್ಕಪ್ಪ, ದೊಡ್ಡಮ್ಮ
+- Food references: ಬಿಸಿ ಬೇಳೆ ಬಾತ್, ಮೈಸೂರ್ ಪಾಕ್, ರಾಗಿ ಮುದ್ದೆ, ದೋಸೆ
+- Exclamations: "ಅಬ್ಬಾ!", "ಸೂಪರ್!", "ಏನ್ ಮಾರಾಯ!"
+- Dasara, Ugadi references where natural`,
+
+  malayalam: `CULTURAL ADAPTATION (Malayalam):
+- Use Malayalam pazhamchollukal (proverbs) and folk expressions
+- Cultural references: കേരള സംസ്കാരം, backwaters, God's own country
+- Greetings: "നമസ്കാരം" / "സുഖമാണോ?" style
+- Relationship terms: ചേട്ടൻ, ചേച്ചി, അമ്മാവൻ, അമ്മായി, കുഞ്ഞ്
+- Food references: സദ്യ, പുട്ട്-കടല, അപ്പം-സ്റ്റൂ, പായസം, ബിരിയാണി
+- Exclamations: "അയ്യോ!", "കൊള്ളാം!", "കിടു!", "പൊളിച്ചു!"
+- Onam, temple festivals references where natural
+- Kerala's characteristic wit and understated humor`,
+
+  odia: `CULTURAL ADAPTATION (Odia):
+- Use Odia proverbs and folk expressions
+- Cultural references: ଓଡ଼ିଶା ସଂସ୍କୃତି, ଜଗନ୍ନାଥ ସଂସ୍କୃତି
+- Greetings: "ନମସ୍କାର" / "କେମିତି ଅଛନ୍ତି?" style
+- Relationship terms: ଭାଇ, ଭଉଣୀ, ମାମୁଁ, ମାଉସୀ, କାକା
+- Food references: ଦାଲମା, ଛେନା ପୋଡ଼, ରସଗୋଲା, ପଖାଳ ଭାତ
+- Exclamations: "ବାହା!", "କଣ କହୁଛ!", "ବେଶ୍!"
+- Rath Yatra, Raja festival references where natural`,
+
+  assamese: `CULTURAL ADAPTATION (Assamese):
+- Use Assamese proverbs and folk expressions
+- Cultural references: অসমীয়া সংস্কৃতি, চাহ বাগান, ব্ৰহ্মপুত্ৰ
+- Greetings: "নমস্কাৰ" / "কেনে আছা?" style
+- Relationship terms: দাদা, বাইদেউ, খুৰা, মাহী, পেহী
+- Food references: মাছ-ভাত, পিঠা, লাৰু, খাৰ, আলু পিটিকা
+- Exclamations: "বাঃ!", "কি কথা!", "অ' বাপৰে!"
+- Bihu, Majuli, গামোচা references where natural
+- Assamese gentle, poetic expression style`,
+
+  urdu: `CULTURAL ADAPTATION (Urdu):
+- Use Urdu muhavare (idioms) and zarb-ul-misal (proverbs) extensively
+- Shayari/poetry sensibility: use poetic and refined Urdu expressions
+- Greetings: "السلام علیکم" / "آداب" / "کیا حال ہے?" style
+- Relationship terms: بھائی جان, آپا, ابو, امی, خالہ, پھوپھو, چاچا
+- Food references: بریانی, نہاری, حلیم, شیر خرمہ, سویاں
+- Exclamations: "سبحان اللہ!", "ماشاءاللہ!", "واہ واہ!", "کیا بات ہے!"
+- Lucknowi/Hyderabadi tehzeeb (refinement/etiquette) in expression
+- Eid, mehfil, mushaira cultural references where natural
+- Prefer Persianized/Arabicized vocabulary over Sanskritized where natural`,
+};
+
 /* --- System prompt builder --- */
-const buildSingleConverterSystem = (id, selectedTone) => {
+const buildSingleConverterSystem = (id, selectedTone, culturalAdapt = false) => {
   const checklist = id === "haryanvi" ? `
 HARYANVI FINAL CHECKLIST:
 - \u0939\u0942\u0901 \u2192 \u0938\u0942\u0902 (MANDATORY)
@@ -858,13 +1174,16 @@ The input may be in ANY language: Hindi, English, Hinglish, Bhojpuri, Haryanvi, 
 Silently identify the source language. Do NOT mention it in your output.
 
 STEP 2 \u2014 UNDERSTAND THE MEANING:
-First mentally translate the input to standard Hindi to normalize it. Then extract the MEANING, story, emotion, and intent. Do NOT just swap words.
+First mentally translate the input to standard Hindi to normalize it. Then extract the MEANING, story, emotion, and intent. Do NOT just swap words.${culturalAdapt ? `
+IMPORTANT — CULTURAL ADAPTATION MODE IS ON:
+Go BEYOND literal conversion. Adapt idioms, proverbs, cultural references, greetings, exclamations, food references, and relationship terms to what a NATIVE ${id === "hindi" ? "Hindi" : id === "english" ? "English" : id} speaker would NATURALLY say in their own cultural context. Replace foreign cultural references with local equivalents where it preserves the meaning. The output should feel like it was ORIGINALLY WRITTEN in the target language/culture, not translated.` : ""}
 
 STEP 3 \u2014 REWRITE in ${id === "hindi" ? "standard Hindi" : id === "english" ? "natural English" : "authentic " + id + " dialect"}:
 - Write as a NATIVE SPEAKER would naturally speak \u2014 not a word-for-word swap.
 - Preserve the original meaning, emotion, and structure.
 - All names and proper nouns: preserve exactly as given.
 - Output ONLY the converted text. No explanation, no labels, nothing else.
+${culturalAdapt && CULTURAL_RULES[id] ? "\n" + CULTURAL_RULES[id] + "\n" : ""}
 ${needsContrastive ? "\n" + CONTRASTIVE_TABLE : ""}
 ${DIALECT_RULES[id]}
 ${checklist}
@@ -1356,69 +1675,149 @@ function FireflyBackground() {
 }
 
 /* --- Language Cards (multi-select) --- */
-function LanguageCards({ selected, onToggle, onSelectAll, onDeselectAll }) {
+function LanguageCards({ selected, onToggle, onSelectAll, onDeselectAll, darkMode }) {
+  const [open, setOpen] = useState(false);
+  const dropRef = useRef(null);
   const allSelected = selected.length === LANGUAGES.length;
+
+  useEffect(() => {
+    const handler = (e) => { if (dropRef.current && !dropRef.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
   return (
-    <div className="clay" style={{ padding: 0, overflow: "hidden", height: "100%" }}>
-      <div style={{ padding: "14px 22px", borderBottom: "1px solid rgba(166,152,130,0.15)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+    <div ref={dropRef} className="clay" style={{ padding: 0, overflow: "visible", position: "relative" }}>
+      {/* Dropdown trigger */}
+      <div onClick={() => setOpen(o => !o)} style={{
+        padding: "12px 18px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between",
+        borderBottom: open ? `1px solid ${darkMode ? "rgba(255,255,255,0.08)" : "rgba(166,152,130,0.15)"}` : "none",
+        userSelect: "none",
+      }}>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <span style={{ fontSize: "14px" }}>&#127760;</span>
-          <span className="lang-header-text" style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "1.2px", textTransform: "uppercase", color: "#78350f" }}>Convert To</span>
+          <span className="lang-header-text" style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "1.2px", textTransform: "uppercase", color: darkMode ? "#d4c8b0" : "#78350f" }}>Convert To</span>
+          <span style={{ fontSize: "10px", fontWeight: 700, color: "#fff", background: "linear-gradient(135deg, #f59e0b, #d97706)", borderRadius: "10px", padding: "2px 8px", minWidth: "22px", textAlign: "center" }}>{selected.length}</span>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <span className="lang-header-count" style={{ fontSize: "10px", color: "#92400e", fontWeight: 600 }}>{selected.length}/{LANGUAGES.length}</span>
-          <button onClick={allSelected ? onDeselectAll : onSelectAll} className="clay-btn lang-header-btn" style={{ padding: "4px 12px", fontSize: "10px", fontWeight: 700, color: "#78350f" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <button onClick={(e) => { e.stopPropagation(); allSelected ? onDeselectAll() : onSelectAll(); }} className="clay-btn lang-header-btn" style={{ padding: "4px 12px", fontSize: "10px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#78350f" }}>
             {allSelected ? "Deselect All" : "Select All"}
           </button>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={darkMode ? "#d4c8b0" : "#78350f"} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "transform 0.2s", transform: open ? "rotate(180deg)" : "rotate(0)" }}><polyline points="6 9 12 15 18 9"/></svg>
         </div>
       </div>
-      <div className="lang-grid" style={{ padding: "16px 18px", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(155px, 1fr))", gap: "12px" }}>
-        {LANGUAGES.map(d => {
-          const on = selected.includes(d.id);
+
+      {/* Selected tags row */}
+      <div style={{ padding: "8px 14px", display: "flex", flexWrap: "wrap", gap: "6px", minHeight: "36px", alignItems: "center" }}>
+        {selected.length === 0 && <span style={{ fontSize: "11px", color: darkMode ? "#807060" : "#a08060", fontStyle: "italic" }}>Select languages...</span>}
+        {selected.map(id => {
+          const d = LANGUAGES.find(l => l.id === id);
+          if (!d) return null;
           return (
-            <div key={d.id} onClick={() => onToggle(d.id)} className="lang-chip" style={{
-              padding: "14px 16px", borderRadius: "18px",
-              background: on
-                ? `linear-gradient(145deg, ${d.color}20, ${d.color}10)`
-                : "linear-gradient(145deg, #f5f0e8, #e8e0d4)",
-              border: on ? `2px solid ${d.color}60` : "1px solid rgba(255,255,255,0.4)",
-              transition: "all 0.25s cubic-bezier(0.4,0,0.2,1), transform 0.2s ease",
-              animation: "fadeInScale 0.2s ease",
-              boxShadow: on
-                ? `4px 4px 10px ${d.color}25, -3px -3px 8px rgba(255,255,255,0.6), inset 0 1px 0 rgba(255,255,255,0.4)`
-                : "4px 4px 10px rgba(166,152,130,0.3), -3px -3px 8px rgba(255,255,255,0.7), inset 0 1px 0 rgba(255,255,255,0.5)",
-              position: "relative", overflow: "hidden"
+            <span key={id} style={{
+              display: "inline-flex", alignItems: "center", gap: "5px",
+              padding: "4px 10px 4px 8px", borderRadius: "10px", fontSize: "11px", fontWeight: 700,
+              background: `linear-gradient(135deg, ${d.color}18, ${d.color}08)`,
+              border: `1.5px solid ${d.color}40`, color: darkMode ? "#e8e0d4" : "#1e1b18",
+              animation: "fadeInScale 0.15s ease",
             }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <div style={{
-                  width: "40px", height: "40px", borderRadius: "14px", flexShrink: 0,
-                  background: on ? `linear-gradient(135deg, ${d.color}30, ${d.color}15)` : "linear-gradient(145deg, #ece7dd, #ddd5c9)",
-                  boxShadow: on
-                    ? `inset 2px 2px 4px ${d.color}15, inset -2px -2px 4px rgba(255,255,255,0.5)`
-                    : "inset 2px 2px 4px rgba(166,152,130,0.2), inset -2px -2px 4px rgba(255,255,255,0.5)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: "18px", fontWeight: 900, color: on ? d.color : "#8b7355",
-                  border: `1px solid ${on ? d.color + "30" : "rgba(255,255,255,0.3)"}`,
-                  transition: "all 0.2s"
-                }}>{d.label.charAt(0)}</div>
-                <div>
-                  <div className={on ? "lang-name" : "lang-name-off"} style={{ fontSize: "13.5px", fontWeight: 800, color: on ? "#1e1b18" : "#6b5e50", lineHeight: 1.2, transition: "color 0.2s" }}>{d.label}</div>
-                  <div className="lang-sub" style={{ fontSize: "10px", color: on ? "#78350f" : "#a09080", marginTop: "2px" }}>{d.sub} &middot; {d.region}</div>
-                </div>
-              </div>
-              {on && <div style={{ position: "absolute", bottom: "8px", right: "10px", width: "20px", height: "20px", borderRadius: "50%", background: `linear-gradient(135deg, ${d.color}, ${d.color}cc)`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "11px", color: "#fff", fontWeight: 900, boxShadow: `2px 2px 4px ${d.color}40, -1px -1px 3px rgba(255,255,255,0.3)` }}>&#10003;</div>}
-            </div>
+              <span style={{ fontSize: "12px", fontWeight: 900, color: d.color }}>{d.label.charAt(0)}</span>
+              {d.sub}
+              <span onClick={(e) => { e.stopPropagation(); onToggle(id); }} style={{
+                cursor: "pointer", marginLeft: "2px", fontSize: "9px", color: darkMode ? "#a09080" : "#6b5e50",
+                width: "14px", height: "14px", borderRadius: "50%", display: "inline-flex", alignItems: "center", justifyContent: "center",
+                background: darkMode ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)",
+              }}>{"\u2715"}</span>
+            </span>
           );
         })}
       </div>
+
+      {/* Dropdown panel */}
+      {open && (
+        <div style={{
+          position: "absolute", top: "100%", left: 0, right: 0, zIndex: 100,
+          maxHeight: "340px", overflowY: "auto",
+          borderRadius: "0 0 18px 18px",
+          background: darkMode ? "linear-gradient(145deg, #141210, #0d0d0b)" : "linear-gradient(145deg, #f5f0e8, #ece7dd)",
+          border: `1px solid ${darkMode ? "rgba(255,255,255,0.08)" : "rgba(166,152,130,0.2)"}`,
+          borderTop: "none",
+          boxShadow: darkMode ? "0 12px 32px rgba(0,0,0,0.5)" : "0 12px 32px rgba(166,152,130,0.25), 0 4px 12px rgba(166,152,130,0.15)",
+          animation: "fadeUp 0.15s ease",
+        }}>
+          {LANGUAGES.map(d => {
+            const on = selected.includes(d.id);
+            return (
+              <div key={d.id} onClick={() => onToggle(d.id)} style={{
+                padding: "10px 18px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between",
+                borderBottom: `1px solid ${darkMode ? "rgba(255,255,255,0.04)" : "rgba(166,152,130,0.08)"}`,
+                background: on ? (darkMode ? `${d.color}12` : `${d.color}08`) : "transparent",
+                transition: "background 0.15s",
+              }}
+              onMouseEnter={e => { if (!on) e.currentTarget.style.background = darkMode ? "rgba(255,255,255,0.04)" : "rgba(166,152,130,0.06)"; }}
+              onMouseLeave={e => { if (!on) e.currentTarget.style.background = "transparent"; else e.currentTarget.style.background = darkMode ? `${d.color}12` : `${d.color}08`; }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                  <div style={{
+                    width: "32px", height: "32px", borderRadius: "10px", flexShrink: 0,
+                    background: on ? `linear-gradient(135deg, ${d.color}30, ${d.color}15)` : (darkMode ? "rgba(255,255,255,0.06)" : "linear-gradient(145deg, #ece7dd, #ddd5c9)"),
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: "15px", fontWeight: 900, color: on ? d.color : (darkMode ? "#8b7355" : "#8b7355"),
+                    border: `1px solid ${on ? d.color + "30" : (darkMode ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.3)")}`,
+                    transition: "all 0.15s"
+                  }}>{d.label.charAt(0)}</div>
+                  <div>
+                    <div style={{ fontSize: "13px", fontWeight: 700, color: on ? (darkMode ? "#f0ebe3" : "#1e1b18") : (darkMode ? "#b0a090" : "#6b5e50"), lineHeight: 1.2 }}>{d.label}</div>
+                    <div style={{ fontSize: "9.5px", color: darkMode ? "#807060" : "#a09080", marginTop: "1px" }}>{d.sub} &middot; {d.region}</div>
+                  </div>
+                </div>
+                <div style={{
+                  width: "20px", height: "20px", borderRadius: "6px", flexShrink: 0,
+                  border: on ? `2px solid ${d.color}` : `2px solid ${darkMode ? "rgba(255,255,255,0.15)" : "rgba(166,152,130,0.3)"}`,
+                  background: on ? `linear-gradient(135deg, ${d.color}, ${d.color}cc)` : "transparent",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  transition: "all 0.15s",
+                }}>
+                  {on && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
 
 /* --- Result Card --- */
-function ResultCard({ result, lang, copied, onCopy, isStreaming, srtMode, onDownloadSrt, onShare }) {
+function ResultCard({ result, lang, copied, onCopy, isStreaming, srtMode, onDownloadSrt, onShare, onEdit, darkMode, onFeedback, inputText }) {
+  const [editing, setEditing] = useState(false);
+  const [editText, setEditText] = useState(result);
+  const editRef = useRef(null);
+  const [fbOpen, setFbOpen] = useState(false);
+  const [fbText, setFbText] = useState("");
+  const [fbSent, setFbSent] = useState(false);
+
+  useEffect(() => { setEditText(result); }, [result]);
+  useEffect(() => {
+    if (editing && editRef.current) {
+      editRef.current.focus();
+      editRef.current.style.height = "auto";
+      editRef.current.style.height = editRef.current.scrollHeight + "px";
+    }
+  }, [editing]);
+
   if (!result) return null;
-  const wc = result.trim() ? result.trim().split(/\s+/).length : 0;
+  const displayText = editing ? editText : result;
+  const wc = displayText.trim() ? displayText.trim().split(/\s+/).length : 0;
+  const isEdited = editText !== result;
+
+  const handleSave = () => {
+    if (onEdit && editText !== result) onEdit(lang.id, editText);
+    setEditing(false);
+  };
+  const handleCancel = () => { setEditText(result); setEditing(false); };
+
   return (
     <div className="clay" style={{
       borderLeft: `4px solid ${lang.color}`, padding: "18px", marginBottom: "14px",
@@ -1429,37 +1828,129 @@ function ResultCard({ result, lang, copied, onCopy, isStreaming, srtMode, onDown
           <div style={{ width: "38px", height: "38px", borderRadius: "12px", background: `linear-gradient(135deg, ${lang.color}25, ${lang.color}10)`, border: `1px solid ${lang.color}30`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "16px", fontWeight: 900, color: lang.color, flexShrink: 0, boxShadow: `inset 2px 2px 4px ${lang.color}10, inset -2px -2px 3px rgba(255,255,255,0.5)` }}>{lang.label.charAt(0)}</div>
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <span className="result-lang-name" style={{ fontSize: "15px", fontWeight: 800, color: "#1e1b18" }}>{lang.label}</span>
+              <span className="result-lang-name" style={{ fontSize: "15px", fontWeight: 800, color: darkMode ? "#f0ebe3" : "#1e1b18" }}>{lang.label}</span>
               {isStreaming && <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: lang.color, display: "inline-block", animation: "pulse 1s ease-in-out infinite" }} />}
+              {editing && <span style={{ fontSize: "9px", fontWeight: 700, color: "#f59e0b", background: "rgba(245,158,11,0.1)", borderRadius: "6px", padding: "2px 7px", textTransform: "uppercase", letterSpacing: "0.5px" }}>Editing</span>}
+              {isEdited && !editing && <span style={{ fontSize: "9px", fontWeight: 700, color: "#16a34a", background: "rgba(22,163,74,0.1)", borderRadius: "6px", padding: "2px 7px" }}>Edited</span>}
             </div>
-            <div className="result-sub" style={{ fontSize: "10.5px", color: "#78350f" }}>{lang.sub} &middot; {lang.region}</div>
+            <div className="result-sub" style={{ fontSize: "10.5px", color: darkMode ? "#a08060" : "#78350f" }}>{lang.sub} &middot; {lang.region}</div>
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-          <span className="lang-wc" style={{ fontSize: "10px", color: "#78350f", background: "rgba(245,158,11,0.08)", borderRadius: "8px", padding: "3px 10px", fontWeight: 600 }}>{wc} words</span>
+          <span className="lang-wc" style={{ fontSize: "10px", color: darkMode ? "#a08060" : "#78350f", background: darkMode ? "rgba(245,158,11,0.06)" : "rgba(245,158,11,0.08)", borderRadius: "8px", padding: "3px 10px", fontWeight: 600 }}>{wc} words</span>
           {!isStreaming && (
             <div style={{ display: "flex", gap: "6px" }}>
-              {srtMode && onDownloadSrt && (
+              {!editing && (
+                <button onClick={() => setEditing(true)} className="clay-btn" style={{ padding: "6px 10px", fontSize: "11px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#6b5e50" }} title="Edit output">
+                  {"\u270E"}
+                </button>
+              )}
+              {editing && (
+                <>
+                  <button onClick={handleSave} className="clay-btn" style={{ padding: "6px 12px", fontSize: "10.5px", fontWeight: 700, color: "#16a34a", background: "rgba(22,163,74,0.08)" }}>
+                    {"\u2713"} Save
+                  </button>
+                  <button onClick={handleCancel} className="clay-btn" style={{ padding: "6px 12px", fontSize: "10.5px", fontWeight: 700, color: "#dc2626" }}>
+                    {"\u2715"} Cancel
+                  </button>
+                </>
+              )}
+              {srtMode && onDownloadSrt && !editing && (
                 <button onClick={() => onDownloadSrt(lang.id)} className="clay-btn" style={{ padding: "6px 10px", fontSize: "10px", fontWeight: 700, color: "#16a34a" }}>
                   .srt
                 </button>
               )}
-              <button onClick={() => onCopy(result, lang.id)} className="clay-btn" style={{ padding: "6px 14px", fontSize: "11.5px", fontWeight: 700, color: copied === lang.id ? lang.color : "#6b5e50", background: copied === lang.id ? `linear-gradient(145deg, ${lang.color}15, ${lang.color}08)` : undefined }}>
-                {copied === lang.id ? "Copied!" : "Copy"}
-              </button>
-              {onShare && (
-                <button onClick={() => onShare(lang.id)} className="clay-btn" style={{ padding: "6px 10px", fontSize: "11px", fontWeight: 700, color: "#6b5e50" }} title="Share via WhatsApp or native share">
+              {!editing && (
+                <button onClick={() => onCopy(displayText, lang.id)} className="clay-btn" style={{ padding: "6px 14px", fontSize: "11.5px", fontWeight: 700, color: copied === lang.id ? lang.color : (darkMode ? "#d4c8b0" : "#6b5e50"), background: copied === lang.id ? `linear-gradient(145deg, ${lang.color}15, ${lang.color}08)` : undefined }}>
+                  {copied === lang.id ? "Copied!" : "Copy"}
+                </button>
+              )}
+              {onShare && !editing && (
+                <button onClick={() => onShare(lang.id)} className="clay-btn" style={{ padding: "6px 10px", fontSize: "11px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#6b5e50" }} title="Share via WhatsApp or native share">
                   {"\uD83D\uDD17"}
+                </button>
+              )}
+              {!editing && onFeedback && (
+                <button onClick={() => { setFbOpen(o => !o); setFbSent(false); setFbText(""); }} className="clay-btn" style={{
+                  padding: "6px 10px", fontSize: "11px", fontWeight: 700,
+                  color: fbOpen ? "#f59e0b" : (darkMode ? "#d4c8b0" : "#6b5e50"),
+                  background: fbOpen ? "rgba(245,158,11,0.1)" : undefined,
+                }} title="Report wrong conversion / give feedback">
+                  {"\uD83D\uDCAC"}
                 </button>
               )}
             </div>
           )}
         </div>
       </div>
-      <div className="clay-inner" style={{ fontSize: "13.5px", lineHeight: 1.9, color: "#3d3425", padding: "14px 16px", whiteSpace: "pre-wrap" }}>
-        {result}
-        {isStreaming && <span style={{ display: "inline-block", width: "2px", height: "16px", background: lang.color, marginLeft: "2px", verticalAlign: "text-bottom", animation: "pulse 0.8s ease-in-out infinite" }} />}
-      </div>
+      {/* Feedback Panel */}
+      {fbOpen && !isStreaming && (
+        <div style={{
+          marginBottom: "12px", padding: "12px 14px", borderRadius: "12px",
+          background: darkMode ? "rgba(245,158,11,0.06)" : "rgba(245,158,11,0.05)",
+          border: `1.5px solid ${darkMode ? "rgba(245,158,11,0.15)" : "rgba(245,158,11,0.2)"}`,
+          animation: "fadeUp 0.2s ease",
+        }}>
+          {fbSent ? (
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "4px 0" }}>
+              <span style={{ fontSize: "16px" }}>{"\u2705"}</span>
+              <span style={{ fontSize: "12px", fontWeight: 700, color: "#16a34a" }}>Feedback saved! Future conversions for {lang.sub} will learn from this.</span>
+            </div>
+          ) : (
+            <>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
+                <span style={{ fontSize: "12px" }}>{"\uD83D\uDCAC"}</span>
+                <span style={{ fontSize: "11px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#78350f" }}>What went wrong with this {lang.sub} conversion?</span>
+              </div>
+              <textarea value={fbText} onChange={e => setFbText(e.target.value)} placeholder={"e.g. \"Used \u0938\u0948 instead of \u092C\u093E\", \"Wrong verb form\", \"Not natural sounding\", \"Mixed up dialect markers\"..."} style={{
+                width: "100%", minHeight: "60px", fontSize: "12px", lineHeight: 1.7, padding: "10px 12px",
+                borderRadius: "10px", border: `1px solid ${darkMode ? "rgba(255,255,255,0.1)" : "rgba(166,152,130,0.2)"}`,
+                background: darkMode ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.6)",
+                color: darkMode ? "#e8e0d4" : "#3d3425", resize: "vertical", outline: "none",
+                fontFamily: "'Inter','Segoe UI',sans-serif", boxSizing: "border-box",
+              }} />
+              <div style={{ display: "flex", gap: "8px", marginTop: "8px", justifyContent: "flex-end" }}>
+                <button onClick={() => setFbOpen(false)} className="clay-btn" style={{ padding: "5px 12px", fontSize: "10px", fontWeight: 700, color: darkMode ? "#a09080" : "#6b5e50" }}>
+                  Cancel
+                </button>
+                <button onClick={() => {
+                  if (fbText.trim()) {
+                    onFeedback(lang.id, { feedback: fbText.trim(), input: inputText, output: result, timestamp: Date.now() });
+                    setFbSent(true);
+                    setTimeout(() => { setFbOpen(false); setFbSent(false); }, 2500);
+                  }
+                }} disabled={!fbText.trim()} className="clay-btn" style={{
+                  padding: "5px 14px", fontSize: "10px", fontWeight: 700,
+                  color: fbText.trim() ? "#fff" : (darkMode ? "#605040" : "#a09080"),
+                  background: fbText.trim() ? "linear-gradient(135deg, #f59e0b, #d97706)" : undefined,
+                  cursor: fbText.trim() ? "pointer" : "not-allowed",
+                  borderRadius: "8px",
+                }}>
+                  Submit Feedback
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+      {editing ? (
+        <textarea ref={editRef} value={editText} onChange={(e) => { setEditText(e.target.value); e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; }}
+          className="clay-inner" style={{
+            width: "100%", fontSize: "13.5px", lineHeight: 1.9, color: darkMode ? "#e8e0d4" : "#3d3425",
+            padding: "14px 16px", border: `2px solid ${lang.color}40`, borderRadius: "14px",
+            background: darkMode ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.5)",
+            resize: "none", outline: "none", fontFamily: "'Inter','Segoe UI',sans-serif",
+            minHeight: "80px", boxSizing: "border-box", transition: "border-color 0.2s",
+          }}
+          onFocus={e => e.target.style.borderColor = lang.color + "80"}
+          onBlur={e => e.target.style.borderColor = lang.color + "40"}
+        />
+      ) : (
+        <div className="clay-inner" style={{ fontSize: "13.5px", lineHeight: 1.9, color: darkMode ? "#e8e0d4" : "#3d3425", padding: "14px 16px", whiteSpace: "pre-wrap" }}>
+          {displayText}
+          {isStreaming && <span style={{ display: "inline-block", width: "2px", height: "16px", background: lang.color, marginLeft: "2px", verticalAlign: "text-bottom", animation: "pulse 0.8s ease-in-out infinite" }} />}
+        </div>
+      )}
     </div>
   );
 }
@@ -1639,6 +2130,7 @@ export default function App() {
   const [fontSize, setFontSize] = useState(() => parseInt(localStorage.getItem("ruhi_fontsize") || "14"));
   const [fullscreen, setFullscreen] = useState(false);
   const [favorites, setFavorites] = useState(() => { try { return JSON.parse(localStorage.getItem("ruhi_favorites") || "[]"); } catch { return []; } });
+  const [feedbackStore, setFeedbackStore] = useState(() => { try { return JSON.parse(localStorage.getItem("ruhi_feedback") || "{}"); } catch { return {}; } });
   const [themeSchedule, setThemeSchedule] = useState(() => localStorage.getItem("ruhi_theme_schedule") === "1");
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [cmdPaletteOpen, setCmdPaletteOpen] = useState(false);
@@ -1656,6 +2148,7 @@ export default function App() {
 
   /* --- Transliteration Mode --- */
   const [translitMode, setTranslitMode] = useState(false);
+  const [culturalMode, setCulturalMode] = useState(false);
 
   // Find & Replace helpers
   const findMatchCount = useMemo(() => {
@@ -1839,6 +2332,18 @@ export default function App() {
   const loadFavorite = (fav) => { setSelected(fav.langs); playPop(); };
   const removeFavorite = (key) => { setFavorites(prev => prev.filter(f => f.key !== key)); };
 
+  // Feedback system: save per-language feedback to localStorage and inject into future prompts
+  const handleFeedback = (langId, entry) => {
+    setFeedbackStore(prev => {
+      const langFb = prev[langId] || [];
+      // Keep last 10 feedback entries per language
+      const updated = [...langFb, entry].slice(-10);
+      const next = { ...prev, [langId]: updated };
+      localStorage.setItem("ruhi_feedback", JSON.stringify(next));
+      return next;
+    });
+  };
+
   // Share functionality
   const shareResult = async (langId) => {
     const text = results[langId];
@@ -1951,7 +2456,16 @@ export default function App() {
           streamingSet[langId] = true;
           setStreaming(s => ({ ...s, [langId]: true }));
           const examples = FEW_SHOT_EXAMPLES[langId] || [];
-          const sysPrompt = buildSingleConverterSystem(langId, tone) + (translitMode ? `
+          // Build feedback context from stored corrections
+          const langFeedback = feedbackStore[langId] || [];
+          const fbPrompt = langFeedback.length > 0 ? `
+
+★★★ USER CORRECTIONS (LEARN FROM THESE — DO NOT REPEAT THESE MISTAKES) ★★★
+The user has previously reported these issues with ${langId} conversions. Study them carefully and AVOID making the same errors:
+${langFeedback.slice(-5).map((fb, i) => `${i + 1}. MISTAKE REPORTED: "${fb.feedback}"${fb.input ? `\n   Input was: "${fb.input.substring(0, 100)}..."` : ""}${fb.output ? `\n   Wrong output was: "${fb.output.substring(0, 100)}..."` : ""}`).join("\n")}
+★★★ END USER CORRECTIONS ★★★` : "";
+
+          const sysPrompt = buildSingleConverterSystem(langId, tone, culturalMode) + fbPrompt + (translitMode ? `
 
 TRANSLITERATION MODE (IMPORTANT):
 After writing the converted text in the target script, add a blank line and then provide a full Roman script (Latin alphabet) transliteration of your output. Label it "Transliteration:" on its own line. The transliteration should be natural Hinglish-style romanization (e.g. "Kaise ho bhai?" not "Kaisē hō bhāī?"). Use simple English letters, no diacritics. This applies to all non-English outputs.` : "");
@@ -2089,7 +2603,7 @@ After writing the converted text in the target script, add a blank line and then
         try {
           const raw = await streamConvert({
             model: "anthropic/claude-sonnet-4-5",
-            system: buildSingleConverterSystem(langId, tone),
+            system: buildSingleConverterSystem(langId, tone, culturalMode) + ((feedbackStore[langId] || []).length > 0 ? `\n\n★★★ USER CORRECTIONS ★★★\n${(feedbackStore[langId] || []).slice(-5).map((fb, j) => `${j + 1}. "${fb.feedback}"`).join("\n")}\n★★★ END ★★★` : ""),
             messages: [...examples, { role: "user", content: csvMode.rows[i] }],
           });
           res[langId].push(raw.trim());
@@ -2552,7 +3066,7 @@ After writing the converted text in the target script, add a blank line and then
         <div className="top-controls-row" style={{ display: "flex", gap: "16px", marginBottom: "20px", alignItems: "stretch" }}>
           {/* Language Cards */}
           <div style={{ flex: "1 1 0", minWidth: 0 }}>
-            <LanguageCards selected={selected} onToggle={toggleLang} onSelectAll={() => setSelected(LANGUAGES.map(l => l.id))} onDeselectAll={() => setSelected([LANGUAGES[0].id])} />
+            <LanguageCards selected={selected} onToggle={toggleLang} onSelectAll={() => setSelected(LANGUAGES.map(l => l.id))} onDeselectAll={() => setSelected([LANGUAGES[0].id])} darkMode={darkMode} />
           </div>
 
           {/* Tone Selector */}
@@ -2675,6 +3189,9 @@ After writing the converted text in the target script, add a blank line and then
           </div>
           <div style={{ padding: "14px 22px", borderTop: "1px solid rgba(166,152,130,0.1)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(166,152,130,0.04)", flexWrap: "wrap", gap: "8px" }}>
             <span className="ctrl-hint" style={{ fontSize: "11px", color: "#a08060", fontWeight: 500 }}>Ctrl + Enter</span>
+            <button onClick={() => { setCulturalMode(v => !v); playClick(); }} className="clay-btn" style={{ padding: "6px 14px", fontSize: "10px", fontWeight: 700, borderRadius: "10px", color: culturalMode ? "#fff" : (darkMode ? "#d4c8b0" : "#78350f"), background: culturalMode ? "linear-gradient(135deg,#8b5cf6,#6d28d9)" : undefined, boxShadow: culturalMode ? "0 2px 8px rgba(139,92,246,0.3)" : undefined, transition: "all 0.2s" }} title="Adapt idioms, proverbs, greetings & cultural references to target language culture">
+              {"\uD83C\uDF0D"} Cultural {culturalMode ? "ON" : "OFF"}
+            </button>
             <button onClick={() => { setTranslitMode(v => !v); playClick(); }} className="clay-btn" style={{ padding: "6px 14px", fontSize: "10px", fontWeight: 700, borderRadius: "10px", color: translitMode ? "#fff" : (darkMode ? "#d4c8b0" : "#78350f"), background: translitMode ? "linear-gradient(135deg,#f59e0b,#d97706)" : undefined, boxShadow: translitMode ? "0 2px 8px rgba(245,158,11,0.3)" : undefined, transition: "all 0.2s" }} title="Transliterate Devanagari to Roman script (Hinglish)">
               {translitMode ? "Aa" : "Aa"} Translit {translitMode ? "ON" : "OFF"}
             </button>
@@ -2958,7 +3475,7 @@ After writing the converted text in the target script, add a blank line and then
               const lang = LANGUAGES.find(l => l.id === langId);
               return results[langId] ? (
                 <div key={langId}>
-                  <ResultCard result={results[langId]} lang={lang} copied={copied} onCopy={copy} isStreaming={!!streaming[langId]} srtMode={srtMode} onDownloadSrt={downloadSrt} onShare={shareResult} />
+                  <ResultCard result={results[langId]} lang={lang} copied={copied} onCopy={copy} isStreaming={!!streaming[langId]} srtMode={srtMode} onDownloadSrt={downloadSrt} onShare={shareResult} onEdit={(id, text) => setResults(prev => ({ ...prev, [id]: text }))} darkMode={darkMode} onFeedback={handleFeedback} inputText={script} />
                   {ttsEnabled && !streaming[langId] && (
                     <div className="clay" style={{ padding: "8px 14px", marginTop: "-10px", marginBottom: "14px", borderLeft: `4px solid ${lang.color}20` }}>
                       <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px" }}>
