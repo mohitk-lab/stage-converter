@@ -818,44 +818,199 @@ const CULTURAL_RULES = {
 - Sentence structure: use English-natural SVO order, not Hindi SOV patterns`,
 
   haryanvi: `CULTURAL ADAPTATION (Haryanvi):
-- Use Haryanvi folk wisdom and kahawatein (proverbs) where fitting
-- Adapt expressions to rural Haryana culture: farming metaphors, khap references, wrestling/sports analogies
-- Greetings: "राम राम भाई" / "राम राम ताऊ" style
-- Relationship terms: ताऊ, भाई, छोरा, छोरी, बहू, जेठ, जेठानी
-- Food references: adapt to Haryanvi staples (रोटी-दूध, बाजरे की खिचड़ी, लस्सी, घी)
-- Exclamations: "बस भाई!", "तेरी कसम!", "मारे बड़े!", "हाँ भाई!"
-- Masculinity/strength metaphors common in Haryanvi speech patterns
-- Village life references where natural (खेत, चौपाल, हुक्का, कुआं)`,
+DIALECT GRAMMAR (MANDATORY when culturalMode is ON):
+- म्ह/म्हं = "में" (in): "अपणी बोली म्ह" (in our language), "गाम म्ह" (in the village)
+- पै = "पर" (on): "STAGE ऐप पै", "चिता पै"
+- तै = "से" (from): "माटी तै उठकै" (rising from the soil), "श्मशान तै"
+- नै = object marker (को): "सबनै", "अपणे बेट्टे नै"
+- सै = "है" (is): "चा तो खुराक सै म्हारी" (tea is my sustenance)
+- कोनी = "नहीं" (not): "मैं सुमित्रा कोनी" (I am not Sumitra)
+- इब्बै = "अभी" (right now): "इब्बै डाउनलोड करो"
+- खात्तर = "के लिए" (for): "देखण खात्तर" (for watching)
+- आळी/आळा = suffix "-वाला": "आँसू ल्याण आळी कहानी" (story that brings tears)
+
+RELATIONSHIP TERMS:
+- ताऊ (elder uncle), फूफा, भाभी, बहू, प्रधान जी (village head), गुरुजी
+- छोरा/छोरी/छोरे (boy/girl/boys), घरआली/बीबी (wife), लाडो (beloved daughter)
+- अपणी/अपणा/अपणे (own), म्हारी/म्हारा (our), थम/थमनै (you)
+
+CULTURAL SETTINGS & REFERENCES:
+- Village life: गाम (village), पंचायत (village council), अखाड़ा (wrestling arena), खेत (farm), चौकीदार (watchman)
+- Occupations: लोहार (blacksmith), सोनार (goldsmith), नाई/कालू नाई (barber -- village secret keeper)
+- कबड्डी as Haryanvi pride sport, माटी (soil) as metaphor for roots
+- Rituals: करवा चौथ, बियाह (wedding), तांत्रिक (tantric), डायन (witch)
+- श्मशान/चिता/अर्थी (cremation ground/pyre/bier) as dramatic settings
+- "राम नाम सत्य" (funeral chant)
+
+EXCLAMATIONS & IDIOMS:
+- "हवाईयां उड़गी" (was terrified), "रौंगटे खड़े" (goosebumps)
+- "दिल दहलाना" (heart-shaking), "खून के रिश्ते" (blood relations)
+- "बावळा" (crazy/obsessed -- positive: passionate dreamer)
+- "राड दाली" (caused a ruckus), "भोळी शक्ल" (innocent face -- deceptive)
+- "सपने देखणा तो अपणा हक है" (Dreaming is our right)
+- "कुछ ठाण लिया तो पूरा ही करो फेर चाहे कोए बावळा कहदे" (Once you decide, finish it)
+
+HEADLINE STYLE PATTERNS:
+- Sensational horror: "चिता पै उठी मरी लाश!", "अर्थी म्हं जागी मुर्दा औरत!"
+- Emotional poetic: "प्यार में हारे दो दिल, ज़िंदगी में जीते दो फ़कीर"
+- Social drama: "ज़मीन के दाम बढ़े और रिश्ते नीलाम हुए"
+- Comedy: "चा तो खुराक सै म्हारी", "50 गामां का मौजिज़ सै यो बेवड़ा"
+- Pride: "है नै स्वाद अपणी बोली म्ह?", "अपणी माँ-बोली म्ह", "देसी कलाकारां की देसी फ़िल्में"
+
+FOOD: रोटी-दूध, बाजरे की खिचड़ी, लस्सी, घी, चा (tea as identity marker)
+GREETINGS: "राम राम भाई", "राम राम ताऊ"
+VERB FORMS: देखो/देखण (watch), होरया/होया (happening), बणज्या (became), भाजगी (ran away)`,
 
   rajasthani: `CULTURAL ADAPTATION (Rajasthani):
-- Use Rajasthani folk sayings and kahawatein naturally
-- Desert/royalty metaphors: रेत, धोरे, महल, राजा-रानी, मारवाड़
-- Greetings: "खम्मा घणी" / "पधारो म्हारे देस" style
-- Relationship terms: बापू, माँ सा, बाई सा, भाई सा, काकोसा
-- Food references: दाल-बाटी-चूरमा, केर-सांगरी, गट्टे की सब्जी, मावा कचोरी
-- Exclamations: "अरे बापू!", "म्हारी तो!", "घणो बढ़िया!"
-- References to Rajasthani pride, hospitality (पाहुणो/मेहमान नवाज़ी)
-- Color and festival imagery (रंग, गणगौर, तीज, पुष्कर)`,
+DIALECT GRAMMAR (MANDATORY when culturalMode is ON):
+- कोनि = "नहीं" (not): "मैं सुमित्रा कोनि" -- THE most pervasive Rajasthani marker
+- माथै = "पर/ऊपर" (on): "STAGE माथै" (on STAGE), "चिता माथै"
+- स्यूं = "से" (from/with): "हुक़ुम स्यूं टक्कर" (clash with Hukum)
+- रो/री/रै = "का/की/के" (possessive): "बेटी री खरोच" (daughter's scratch), "हुक़ुम रो खौफ" (Hukum's terror)
+- वास्तै/सारू = "के लिए" (for): "जाणबा वास्तै" (in order to know)
+- कांई = "क्या" (what): "कांई होवैलो" (what will happen)
+- कुण = "कौन" (who): "कुण है हुक़ुम?"
+- अबार = "अब" (now): "अबार ही देखो"
+- घणा/घणी = "बहुत" (very/much): "घणा लंबा", "घणी मजेदार"
+- कठै = "कहाँ" (where), कीकर = "कैसे" (how)
+- आपणी/आपरी = "अपनी" (own): cultural pride usage
+- छोरा/छोरी = "लड़का/लड़की" (boy/girl)
+- ब्याव = "शादी" (wedding), चोखी = "अच्छी" (good)
+- आळो = "वाला" (one who): "राज करबा आळो" (the one who rules)
+
+VERB CONJUGATIONS:
+- देखो/देखज्यो (watch -- emphatic imperative)
+- होवै/होवैलो/होवैली (happens -- masc/fem future)
+- बोलैलो (will say), मरैलो (will die), जीवैलो (will live)
+- सुलजैली (will be solved), निकळैलो (will come out)
+- बण्यो (became), हुयो (happened), आयो (came)
+
+CULTURAL REFERENCES:
+- Desert/royalty: रेत, धोरे, महल, राजा-रानी, मारवाड़, राजकुमारी
+- ब्याव (wedding), सुहागरात, दुल्हन, घूंघट (veil) as cultural settings
+- पंचायत, ताऊ अर भतीजा dynamics, माथा फोठी (head-cracking feuds)
+- गणगौर, तीज, पुष्कर festivals
+
+FATHER-DAUGHTER SENTIMENT (very strong in Rajasthani culture):
+- "बेटी रै तो पैर पै लागैड़ी धूल भी चोखी कोनि" (Even dust on my daughter's feet isn't acceptable)
+- "बाप नै आपणी जाण स्यूं भी ज्यादा प्यारी होवै है आपरी बेटी री जाण" (A father loves his daughter's life more than his own)
+- "दिल को टुकड़ो होवै है बेटी" (A daughter is a piece of one's heart)
+
+PROVERBS & IDIOMS:
+- "घर को बेदी ही ढायो लंका" (The insider destroyed Lanka -- betrayal from Ramayana)
+- "जद बुराई रो घड़ो भर जावै है तो उ को अंत होणो जरुरी होवै है" (When evil's pot overflows, its end is inevitable)
+- "सही अर गलत म्ह बस एक पतली सी लाइन होवै है" (Between right and wrong there's just a thin line)
+- "हर कांड दबाया जा सकता है… हर सच्चाई नहीं" (Every scandal can be suppressed... not every truth)
+
+EXCLAMATIONS: "अरे बापू!", "म्हारी तो!", "घणो बढ़िया!", "बच'र रिहज्यो" (beware!)
+GREETINGS: "खम्मा घणी", "पधारो म्हारे देस"
+FOOD: दाल-बाटी-चूरमा, केर-सांगरी, गट्टे की सब्जी, मावा कचोरी
+
+HEADLINE PATTERNS:
+- Question hooks: "कुण है हुक़ुम❓", "कांई होवैलो अब❓"
+- Shocking reveals: "घूंघट उठा तो निकला किन्नर😱", "सुहाग रात पर खुला राज…😳"
+- Paradox: "दुल्हन थी… पर औरत नहीं!", "एक शरीर, दो ज़िंदगी"
+- Warnings: "सावधान- हुक़ुम ना सुणलै", "बच'र रिहज्यो, आ रियो है हुक़ुम😳"
+- Comedy register: "दो दोस्त अर वाकी जीप, कहाणी है घणी मजेदार!", "हँसता-हँसता पेट दुःख जावैलो"`,
 
   bhojpuri: `CULTURAL ADAPTATION (Bhojpuri):
-- Use Bhojpuri folk expressions and kahawatein
-- Cultural references: छठ पूजा, बिहार/पूर्वांचल life, गाँव imagery
-- Greetings: "प्रणाम", "चरण स्पर्श", "का हाल बा भाई"
-- Relationship terms: भइया, भौजी, काका, काकी, बाबू, माई
-- Food references: लिट्टी-चोखा, सत्तू, ठेकुआ, पूआ-पूड़ी
-- Exclamations: "बाप रे बाप!", "अरे भइया!", "का बात बा!"
-- Village/migration themes common in Bhojpuri culture
-- Musical/emotional expressiveness typical of Bhojpuri`,
+DIALECT VOCABULARY (MANDATORY when culturalMode is ON):
+- बा = "है" (is): "का राज बा" (what's the secret)
+- नइखे = "नहीं है" (is not)
+- रउआ = "आप" (you -- respectful), तोहर = "तुम्हारा" (your)
+- पतोह/पुतोह = "बहू" (daughter-in-law -- distinctly Bhojpuri)
+- मेहरारू = "पत्नी/औरत" (wife/woman), मरद = "पति" (husband)
+- लइका = "लड़का" (boy), देयादिन = "देवरानी-जेठानी" (co-sisters-in-law)
+- अभहीं/अबहीं = "अभी" (right now), इहे/इहाँ = "यहाँ" (here), ओहिजा = "वहाँ" (there)
+
+VERB FORMS:
+- "-ीं" imperative: "देखीं" (watch), "डाउनलोड करीं", "शुरू करीं"
+- "-एला/-ला" habitual: "होला" (happens), "रोवेला" (weeps), "बूझेला" (understands)
+- "-इबS" future: "हो जइबS" (you will become), "हैरान हो जइबS"
+- "-ल बा/-रहल बा" continuous: "पक रहल बा" (is cooking), "चल रहल बा" (is going on)
+- "-ली/-लस/-लक" past: "दिहलस" (gave), "फस गईल" (got trapped)
+
+RHETORICAL "का..." QUESTION PATTERN (dominant headline style):
+- "का होई...?" (What will happen?), "का सचो में होला पुनर्जन्म?" (Does rebirth truly happen?)
+- "का कोई मर के वापस आ सकेला?" (Can someone come back after dying?)
+- "का अब सास के दिन लद गइल?" (Are the mother-in-law's days over?)
+- "का इश्क़ में रिस्क भारी पड़ी?" (Will risk weigh heavy in love?)
+
+EMOTIONAL EXPRESSIONS:
+- Surprise: "अरे बाप रे", "आँख फाटल रह जाई" (eyes will pop), "दंग रह जाएम" (stunned), "रोंगटा खड़ा हो जाई" (goosebumps)
+- Sorrow: "फुट-फुट के रोवेला" (weeping bitterly), "दिलवा दहला देवे वाला" (heart-shaking), "दिल के छुई" (touched the heart)
+- Laughter: "हँसा-हँसा के लोट-पोट कर दी" (roll on floor laughing), "हँसत-हँसत पेट दुखा जाई", "ठहाका लगाए के बा"
+
+IDIOMS & PROVERBS:
+- "दाल में काला बुझाता" (something fishy), "दू नाव पर सवारी" (riding two boats -- playing both sides)
+- "भीगी बिल्ली बन जाई" (will become a wet cat -- meek), "इहाँ का खिचड़ी पक रहल बा" (what's cooking here?)
+- "घर में जीरो, ससुराल में हीरो" (zero at home, hero at in-laws')
+- "सास शेर, पतोह सवा शेर" (mother-in-law is lion, daughter-in-law bigger lion)
+- "सासो कबो पतोह रहली" (the mother-in-law was once a daughter-in-law too)
+
+SAAS-BAHU (mother-in-law / daughter-in-law) CULTURE:
+- सास, पतोह, ससुर, नयकी पतोह (new daughter-in-law)
+- "सास-पतोह के नोंक-झोंक" (MIL-DIL bickering), "3 पतोह बनाम 1 सास"
+
+CULTURAL REFERENCES:
+- छठ पूजा, बिहार/पूर्वांचल गाँव life, migration themes
+- "आपन संस्कृति, आपन STAGE", "तोहर भोजपुरी हीरो"
+- "देसी मसाला, गाँव के माटी आ भोजपुरी स्वैग" (village soil and Bhojpuri swagger)
+- Supernatural: पुनर्जन्म, टोना-टोटका, भगवान के माया, भूतनी
+
+SLANG: छवल (vibrant/cool), धमाकेदार (explosive), फुर्र हो गइल (vanished/eloped), मुँहजोर (outspoken woman), खुराफात (mischief), हंगामा (uproar)
+GREETINGS: "प्रणाम", "चरण स्पर्श", "का हाल बा भाई"
+FOOD: लिट्टी-चोखा, सत्तू, ठेकुआ, पूआ-पूड़ी`,
 
   gujarati: `CULTURAL ADAPTATION (Gujarati):
-- Use Gujarati kahevato (proverbs) and folk expressions
+HEADLINE PATTERNS (from real Gujarati content):
+- Rhetorical questions with શું (Shu/What), કોણ (Kon/Who), ક્યાં (Kyaan/Where):
+  "શું થયું છે આયુષ સાથે?" (What happened to Ayush?), "કોણ જીતશે, પોલીસ કે ક્રાઇમ?" (Who will win?)
+  "શું છે આ કેસનો રહસ્ય?" (What is this case's mystery?), "શું સત્ય બહાર આવશે?" (Will truth come out?)
+- Suspense with ellipsis: "રાત પૂરી થઈ ગઈ, પણ સવાલ..." (The night ended, but questions...)
+- Parallel structure: "એક રાત, અનેક રહસ્યો!" (One night, many mysteries!)
+- Exclamation hooks: "જોરદાર ગુજરાતી ક્રાઇમ થ્રિલર!" (Powerful Gujarati crime thriller!)
+
+URGENCY/CTA VOCABULARY:
+- અત્યારેજ (attyaarej) = "right now" with emphatic જ suffix
+- આજેજ (aajeej) = "today itself" with emphatic જ
+- જુઓ (juo) = "watch" (imperative), જાણવા (jaanvaa) = "to know"
+- માત્ર (maatr) = "only" (exclusivity marker), હવે (have) = "now"
+- આવી જાઓ (aavi jao) = "come over" (casual/inviting)
+
+DRAMATIC INTENSIFIERS:
+- જોરદાર (jordaar -- powerful), ધમાકેદાર (dhamakedaar -- explosive/blockbuster)
+- રોમાંચક (romaanchak -- thrilling), અદભુત (adbhut -- amazing)
+- સુપરહિટ (superhit), જબરદસ્ત (jabardast -- tremendous), ગજબ (gajab -- extraordinary)
+
+IDIOMS & EXPRESSIONS:
+- "હોંશ ઉડાડી દેશે" (honsh udaadi deshe -- "will blow your senses" / will shock you)
+- "ભૂલાય એવી નથી" (not one to be forgotten)
+- "અજબ રાતની ગજબ કહાની" (ajab-gajab rhyming pair -- strange night's extraordinary story)
+- "દરેક ચહેરા પાછળ છે એક રાઝ" (behind every face is a secret)
+- "દરેક જવાબ ઊભો કરશે એક નવો સવાલ" (every answer raises a new question)
+
+MYSTERY/CRIME VOCABULARY:
+- રહસ્ય (rahasya -- mystery, Sanskrit-derived), રાઝ (raaz -- secret, Urdu loanword -- both used)
+- સત્ય (satya -- truth), દોશી (doshi -- culprit), છુપાયેલો (chhupaayelo -- hidden)
+- પૂછપરછ (poochhparchh -- interrogation), ઉકેલી (ukeli -- to solve)
+
+GUJARATI GRAMMAR IN CAPTIONS:
+- Future tense with શકશે (shakshe -- "will be able to") for suspense
+- Question marker શું (shu) at sentence start for yes/no questions
+- Emphatic particle જ (j) attached to time words for urgency
+
+CULTURAL REFERENCES:
 - Business/trade metaphors natural to Gujarati culture
-- Greetings: "કેમ છો?" / "જય શ્રી કૃષ્ણ" style
-- Relationship terms: ભાઈ, બેન, કાકા, કાકી, ફોઈ, મામા, માસી
-- Food references: ઢોકળા, થેપલા, ખાખરા, ઊંધિયું, શ્રીખંડ, ફાફડા-જલેબી
-- Exclamations: "અરે વાહ!", "બસ બસ!", "શું વાત છે!"
-- Gujarati hospitality references (મેહમાન નવાજી, "જમવા ચાલો")
-- Navratri/Garba cultural context where fitting`,
+- Navratri/Garba, Uttarayan (kite festival), Janmashtami
+- Film genres: crime thriller, family drama, comedy (Jagat, 31st, Popaat, Gajab Thai Gayo)
+- Code-mixing Gujarati + English for modern contexts
+
+GREETINGS: "કેમ છો?" / "જય શ્રી કૃષ્ણ" / "નમસ્કાર"
+RELATIONSHIP TERMS: ભાઈ, બેન, કાકા, કાકી, ફોઈ, મામા, માસી
+FOOD: ઢોકળા, થેપલા, ખાખરા, ઊંધિયું, શ્રીખંડ, ફાફડા-જલેબી
+EXCLAMATIONS: "અરે વાહ!", "બસ બસ!", "શું વાત છે!", "કમાલ!"
+HOSPITALITY: મેહમાન નવાજી, "જમવા ચાલો" (come eat)`,
 
   marathi: `CULTURAL ADAPTATION (Marathi):
 - Use Marathi mhani (proverbs) and folk expressions
