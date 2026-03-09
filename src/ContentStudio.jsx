@@ -767,18 +767,27 @@ export default function ContentStudio({ darkMode, streamConvert, dialectRules = 
     setLearningData({ ...learningData, scriptInput: combined });
   };
 
-  const fetchGoogleSheet = async () => {
+  const [fetchingDoc, setFetchingDoc] = useState(false);
+
+  const fetchDocumentLink = async () => {
+    const link = learningData.googleLink.trim();
+    if (!link) return;
+    setFetchingDoc(true);
+    setError("");
     try {
-      const match = learningData.googleLink.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      if (!match) { setError("Invalid Google Sheets URL"); return; }
-      const csvUrl = `https://docs.google.com/spreadsheets/d/${match[1]}/export?format=csv`;
-      const res = await fetch(csvUrl);
-      if (!res.ok) throw new Error("Could not fetch sheet. Make sure it is publicly accessible.");
-      const text = await res.text();
-      setLearningData({ ...learningData, scriptInput: learningData.scriptInput + (learningData.scriptInput ? "\n\n---\n\n" : "") + text });
+      const res = await fetch("/api/fetch-doc", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: link }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not fetch document");
+      const newText = learningData.scriptInput + (learningData.scriptInput ? "\n\n---\n\n" : "") + data.text;
+      setLearningData({ ...learningData, scriptInput: newText, googleLink: "" });
     } catch (err) {
-      setError(err.message || "Failed to fetch Google Sheet");
+      setError(err.message || "Failed to fetch document");
     }
+    setFetchingDoc(false);
   };
 
   const handleUndo = () => {
@@ -1163,21 +1172,21 @@ ${system}`;
               <StudioInput label="Persona Name *" value={learningData.personaName} onChange={v => setLearningData({ ...learningData, personaName: v })} placeholder="" darkMode={dm} />
               <div>
                 <label style={{ display: "block", fontSize: "10px", fontWeight: 700, color: dm ? "#b0a090" : "#92400e", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.8px" }}>Or Upload Text Files</label>
-                <input type="file" accept=".txt,.csv" multiple onChange={handleFileUpload} style={{ fontSize: "11px", color: dm ? "#b0a090" : "#6b5e50" }} />
+                <input type="file" accept=".txt,.csv,.doc,.docx" multiple onChange={handleFileUpload} style={{ fontSize: "11px", color: dm ? "#b0a090" : "#6b5e50" }} />
               </div>
               <div style={{ display: "flex", gap: "8px", alignItems: "flex-end" }}>
                 <div style={{ flex: 1 }}>
-                  <StudioInput label="Google Sheet Link (Optional)" value={learningData.googleLink} onChange={v => setLearningData({ ...learningData, googleLink: v })} placeholder="" darkMode={dm} />
+                  <StudioInput label="Paste Document Link (Google Docs / Sheets / Drive)" value={learningData.googleLink} onChange={v => setLearningData({ ...learningData, googleLink: v })} placeholder="https://docs.google.com/document/d/..." darkMode={dm} />
                 </div>
                 {learningData.googleLink && (
-                  <button onClick={fetchGoogleSheet} className="clay-btn" style={{ padding: "8px 14px", fontSize: "11px", fontWeight: 700, color: dm ? "#d4c8b0" : "#78350f", whiteSpace: "nowrap" }}>
-                    Fetch
+                  <button onClick={fetchDocumentLink} disabled={fetchingDoc} className="clay-btn" style={{ padding: "8px 14px", fontSize: "11px", fontWeight: 700, color: dm ? "#d4c8b0" : "#78350f", whiteSpace: "nowrap", opacity: fetchingDoc ? 0.6 : 1 }}>
+                    {fetchingDoc ? "Fetching..." : "Fetch"}
                   </button>
                 )}
               </div>
               {learningData.googleLink && (
                 <div className="clay-inner" style={{ padding: "8px 12px", fontSize: "10px", color: dm ? "#b0a090" : "#6b5e50", lineHeight: 1.6 }}>
-                  Tip: Google Sheet public hona chahiye. Ya fir File &rarr; Download &rarr; CSV karke upload karo.
+                  Tip: Document publicly shared hona chahiye ("Anyone with the link"). Google Docs, Sheets, aur Drive links supported hain.
                 </div>
               )}
               {personas.length > 0 && (
