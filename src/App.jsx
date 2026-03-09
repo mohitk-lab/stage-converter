@@ -796,8 +796,169 @@ const TONE_INSTRUCTIONS = {
   romantic: "\nTONE: Write in a tender, poetic, emotionally intimate style. Use soft, evocative language with warmth and affection. Emphasize feelings of love and connection.",
 };
 
+/* --- Cultural Adaptation Rules per Language --- */
+const CULTURAL_RULES = {
+  hindi: `CULTURAL ADAPTATION (Hindi):
+- Use culturally appropriate Hindi idioms and muhavare (e.g. "piece of cake" → "बाएँ हाथ का खेल", not literal translation)
+- Adapt greetings to Indian context (e.g. "Hey guys" → "अरे यारों" / "दोस्तों", "Good morning" → "सुप्रभात" or "नमस्ते")
+- Convert Western cultural references to Indian equivalents where natural (e.g. "Thanksgiving dinner" → "त्योहार की दावत", "prom night" → "कॉलेज फेयरवेल")
+- Use Hindi honorifics naturally: जी, भाई, बहन, अंकल, आंटी based on context
+- Adapt measurements/currency references if contextually appropriate (dollars → rupees, miles → kilometers)
+- Food references: adapt to Indian equivalents where meaning is preserved (e.g. "apple pie" → "गरमा गरम जलेबी" if the point is comfort food)
+- Expressions of surprise/emotion: use Hindi natural exclamations (अरे वाह!, ओह हो!, बाप रे!)
+- Relationship terms: use Indian family/social terms (buddy → यार, dude → भाई, ma'am → मैडम/दीदी)`,
+
+  english: `CULTURAL ADAPTATION (English):
+- Convert Hindi/regional idioms to natural English equivalents (e.g. "नौ दो ग्यारह होना" → "to run away", "दाल में कुछ काला" → "something fishy")
+- Adapt Indian cultural references for global audience where needed (explain or find equivalent)
+- Convert honorifics naturally: जी → Mr./Ms. or drop if informal, भाई/यार → bro/dude/mate
+- Rephrase Indian-specific expressions into natural English (e.g. "चार लोग क्या कहेंगे" → "what will people think")
+- Adapt greetings: "नमस्ते" → "Hey" / "Hello" based on tone
+- Preserve Indian proper nouns and culturally untranslatable terms (Diwali, chai, etc.)
+- Sentence structure: use English-natural SVO order, not Hindi SOV patterns`,
+
+  haryanvi: `CULTURAL ADAPTATION (Haryanvi):
+- Use Haryanvi folk wisdom and kahawatein (proverbs) where fitting
+- Adapt expressions to rural Haryana culture: farming metaphors, khap references, wrestling/sports analogies
+- Greetings: "राम राम भाई" / "राम राम ताऊ" style
+- Relationship terms: ताऊ, भाई, छोरा, छोरी, बहू, जेठ, जेठानी
+- Food references: adapt to Haryanvi staples (रोटी-दूध, बाजरे की खिचड़ी, लस्सी, घी)
+- Exclamations: "बस भाई!", "तेरी कसम!", "मारे बड़े!", "हाँ भाई!"
+- Masculinity/strength metaphors common in Haryanvi speech patterns
+- Village life references where natural (खेत, चौपाल, हुक्का, कुआं)`,
+
+  rajasthani: `CULTURAL ADAPTATION (Rajasthani):
+- Use Rajasthani folk sayings and kahawatein naturally
+- Desert/royalty metaphors: रेत, धोरे, महल, राजा-रानी, मारवाड़
+- Greetings: "खम्मा घणी" / "पधारो म्हारे देस" style
+- Relationship terms: बापू, माँ सा, बाई सा, भाई सा, काकोसा
+- Food references: दाल-बाटी-चूरमा, केर-सांगरी, गट्टे की सब्जी, मावा कचोरी
+- Exclamations: "अरे बापू!", "म्हारी तो!", "घणो बढ़िया!"
+- References to Rajasthani pride, hospitality (पाहुणो/मेहमान नवाज़ी)
+- Color and festival imagery (रंग, गणगौर, तीज, पुष्कर)`,
+
+  bhojpuri: `CULTURAL ADAPTATION (Bhojpuri):
+- Use Bhojpuri folk expressions and kahawatein
+- Cultural references: छठ पूजा, बिहार/पूर्वांचल life, गाँव imagery
+- Greetings: "प्रणाम", "चरण स्पर्श", "का हाल बा भाई"
+- Relationship terms: भइया, भौजी, काका, काकी, बाबू, माई
+- Food references: लिट्टी-चोखा, सत्तू, ठेकुआ, पूआ-पूड़ी
+- Exclamations: "बाप रे बाप!", "अरे भइया!", "का बात बा!"
+- Village/migration themes common in Bhojpuri culture
+- Musical/emotional expressiveness typical of Bhojpuri`,
+
+  gujarati: `CULTURAL ADAPTATION (Gujarati):
+- Use Gujarati kahevato (proverbs) and folk expressions
+- Business/trade metaphors natural to Gujarati culture
+- Greetings: "કેમ છો?" / "જય શ્રી કૃષ્ણ" style
+- Relationship terms: ભાઈ, બેન, કાકા, કાકી, ફોઈ, મામા, માસી
+- Food references: ઢોકળા, થેપલા, ખાખરા, ઊંધિયું, શ્રીખંડ, ફાફડા-જલેબી
+- Exclamations: "અરે વાહ!", "બસ બસ!", "શું વાત છે!"
+- Gujarati hospitality references (મેહમાન નવાજી, "જમવા ચાલો")
+- Navratri/Garba cultural context where fitting`,
+
+  marathi: `CULTURAL ADAPTATION (Marathi):
+- Use Marathi mhani (proverbs) and folk expressions
+- Cultural pride references: शिवाजी, मराठी माणूस, सह्याद्री
+- Greetings: "नमस्कार" / "कसे आहात?" style
+- Relationship terms: दादा, ताई, काका, काकू, मावशी, आत्या
+- Food references: वडा पाव, पोहे, मिसळ पाव, पुरण पोळी, श्रीखंड
+- Exclamations: "अरे वा!", "बास!", "काय सांगू!", "भारीच!"
+- Mumbai/Pune urban culture mixed with traditional Maharashtrian values
+- Ganpati, गुढीपाडवा references where natural`,
+
+  bengali: `CULTURAL ADAPTATION (Bengali):
+- Use Bengali proshongsha (expressions) and folk wisdom
+- Cultural/intellectual references: রবীন্দ্রনাথ, আড্ডা culture, বাংলার মাটি
+- Greetings: "নমস্কার" / "কেমন আছো/আছেন?" style
+- Relationship terms: দাদা, দিদি, কাকু, মাসি, পিসি, জেঠু
+- Food references: মাছ-ভাত, রসগোল্লা, সন্দেশ, মিষ্টি দই, লুচি-আলুর দম
+- Exclamations: "আরে বাহ!", "কী বলো!", "দারুণ!", "বাপরে বাপ!"
+- Durga Puja, আড্ডা, চা references where natural
+- Bengali emotional expressiveness and poetic sensibility`,
+
+  punjabi: `CULTURAL ADAPTATION (Punjabi):
+- Use Punjabi akhaan (proverbs) and folk expressions
+- Cultural references: ਭੰਗੜਾ, ਲੱਸੀ, ਖੇਤੀ, ਪੰਜ ਦਰਿਆ
+- Greetings: "ਸਤ ਸ੍ਰੀ ਅਕਾਲ" / "ਕਿੱਦਾਂ?" / "ਕੀ ਹਾਲ ਐ?" style
+- Relationship terms: ਵੀਰੇ, ਭੈਣੇ, ਪਾਪਾ ਜੀ, ਬੀਜੀ, ਚਾਚਾ, ਤਾਇਆ
+- Food references: ਮੱਕੀ ਦੀ ਰੋਟੀ-ਸਰ੍ਹੋਂ ਦਾ ਸਾਗ, ਲੱਸੀ, ਛੋਲੇ-ਭਟੂਰੇ, ਪਿੰਨੀ
+- Exclamations: "ਓਏ ਹੋਏ!", "ਬੱਲੇ ਬੱਲੇ!", "ਕਮਾਲ ਐ!", "ਵਾਹ ਜੀ ਵਾਹ!"
+- Punjabi warmth, hospitality, and larger-than-life expression style
+- Lohri, Baisakhi, ਗੁਰੂਦੁਆਰਾ references where natural`,
+
+  tamil: `CULTURAL ADAPTATION (Tamil):
+- Use Tamil pazhamozhigal (proverbs) and folk wisdom
+- Cultural pride: தமிழ் பண்பாடு, திருக்குறள் references
+- Greetings: "வணக்கம்" / "எப்படி இருக்கீங்க?" style
+- Relationship terms: அண்ணா, அக்கா, அத்தை, மாமா, பெரியப்பா, சித்தி
+- Food references: இட்லி-சாம்பார், தோசை, பொங்கல், பாயசம், சிக்கன் சுக்கா
+- Exclamations: "அட!", "சூப்பர்!", "அய்யோ!", "என்ன ஒரு!"
+- Pongal, temple culture, cinema references where natural
+- Tamil respectful speech patterns (நீங்க vs நீ based on context)`,
+
+  telugu: `CULTURAL ADAPTATION (Telugu):
+- Use Telugu saamethalu (proverbs) and folk expressions
+- Cultural references: తెలుగు వైభవం, cinema culture
+- Greetings: "నమస్కారం" / "ఎలా ఉన్నారు?" style
+- Relationship terms: అన్నయ్య, అక్కయ్య, మామయ్య, అత్తయ్య, బాబాయ్, పిన్ని
+- Food references: బిర్యానీ, పులిహోర, గోంగూర, పప్పు-చారు, గారెలు
+- Exclamations: "అరే వాహ్!", "భలే!", "అబ్బా!", "సూపర్!"
+- Sankranti, Bathukamma references where natural
+- Telugu dramatic/cinematic expression style`,
+
+  kannada: `CULTURAL ADAPTATION (Kannada):
+- Use Kannada gadegalu (proverbs) and folk expressions
+- Cultural references: ಕರ್ನಾಟಕ ಸಂಸ್ಕೃತಿ, ಮೈಸೂರು heritage
+- Greetings: "ನಮಸ್ಕಾರ" / "ಹೇಗಿದ್ದೀರಿ?" style
+- Relationship terms: ಅಣ್ಣ, ಅಕ್ಕ, ಮಾಮ, ಅತ್ತೆ, ಚಿಕ್ಕಪ್ಪ, ದೊಡ್ಡಮ್ಮ
+- Food references: ಬಿಸಿ ಬೇಳೆ ಬಾತ್, ಮೈಸೂರ್ ಪಾಕ್, ರಾಗಿ ಮುದ್ದೆ, ದೋಸೆ
+- Exclamations: "ಅಬ್ಬಾ!", "ಸೂಪರ್!", "ಏನ್ ಮಾರಾಯ!"
+- Dasara, Ugadi references where natural`,
+
+  malayalam: `CULTURAL ADAPTATION (Malayalam):
+- Use Malayalam pazhamchollukal (proverbs) and folk expressions
+- Cultural references: കേരള സംസ്കാരം, backwaters, God's own country
+- Greetings: "നമസ്കാരം" / "സുഖമാണോ?" style
+- Relationship terms: ചേട്ടൻ, ചേച്ചി, അമ്മാവൻ, അമ്മായി, കുഞ്ഞ്
+- Food references: സദ്യ, പുട്ട്-കടല, അപ്പം-സ്റ്റൂ, പായസം, ബിരിയാണി
+- Exclamations: "അയ്യോ!", "കൊള്ളാം!", "കിടു!", "പൊളിച്ചു!"
+- Onam, temple festivals references where natural
+- Kerala's characteristic wit and understated humor`,
+
+  odia: `CULTURAL ADAPTATION (Odia):
+- Use Odia proverbs and folk expressions
+- Cultural references: ଓଡ଼ିଶା ସଂସ୍କୃତି, ଜଗନ୍ନାଥ ସଂସ୍କୃତି
+- Greetings: "ନମସ୍କାର" / "କେମିତି ଅଛନ୍ତି?" style
+- Relationship terms: ଭାଇ, ଭଉଣୀ, ମାମୁଁ, ମାଉସୀ, କାକା
+- Food references: ଦାଲମା, ଛେନା ପୋଡ଼, ରସଗୋଲା, ପଖାଳ ଭାତ
+- Exclamations: "ବାହା!", "କଣ କହୁଛ!", "ବେଶ୍!"
+- Rath Yatra, Raja festival references where natural`,
+
+  assamese: `CULTURAL ADAPTATION (Assamese):
+- Use Assamese proverbs and folk expressions
+- Cultural references: অসমীয়া সংস্কৃতি, চাহ বাগান, ব্ৰহ্মপুত্ৰ
+- Greetings: "নমস্কাৰ" / "কেনে আছা?" style
+- Relationship terms: দাদা, বাইদেউ, খুৰা, মাহী, পেহী
+- Food references: মাছ-ভাত, পিঠা, লাৰু, খাৰ, আলু পিটিকা
+- Exclamations: "বাঃ!", "কি কথা!", "অ' বাপৰে!"
+- Bihu, Majuli, গামোচা references where natural
+- Assamese gentle, poetic expression style`,
+
+  urdu: `CULTURAL ADAPTATION (Urdu):
+- Use Urdu muhavare (idioms) and zarb-ul-misal (proverbs) extensively
+- Shayari/poetry sensibility: use poetic and refined Urdu expressions
+- Greetings: "السلام علیکم" / "آداب" / "کیا حال ہے?" style
+- Relationship terms: بھائی جان, آپا, ابو, امی, خالہ, پھوپھو, چاچا
+- Food references: بریانی, نہاری, حلیم, شیر خرمہ, سویاں
+- Exclamations: "سبحان اللہ!", "ماشاءاللہ!", "واہ واہ!", "کیا بات ہے!"
+- Lucknowi/Hyderabadi tehzeeb (refinement/etiquette) in expression
+- Eid, mehfil, mushaira cultural references where natural
+- Prefer Persianized/Arabicized vocabulary over Sanskritized where natural`,
+};
+
 /* --- System prompt builder --- */
-const buildSingleConverterSystem = (id, selectedTone) => {
+const buildSingleConverterSystem = (id, selectedTone, culturalAdapt = false) => {
   const checklist = id === "haryanvi" ? `
 HARYANVI FINAL CHECKLIST:
 - \u0939\u0942\u0901 \u2192 \u0938\u0942\u0902 (MANDATORY)
@@ -858,13 +1019,16 @@ The input may be in ANY language: Hindi, English, Hinglish, Bhojpuri, Haryanvi, 
 Silently identify the source language. Do NOT mention it in your output.
 
 STEP 2 \u2014 UNDERSTAND THE MEANING:
-First mentally translate the input to standard Hindi to normalize it. Then extract the MEANING, story, emotion, and intent. Do NOT just swap words.
+First mentally translate the input to standard Hindi to normalize it. Then extract the MEANING, story, emotion, and intent. Do NOT just swap words.${culturalAdapt ? `
+IMPORTANT — CULTURAL ADAPTATION MODE IS ON:
+Go BEYOND literal conversion. Adapt idioms, proverbs, cultural references, greetings, exclamations, food references, and relationship terms to what a NATIVE ${id === "hindi" ? "Hindi" : id === "english" ? "English" : id} speaker would NATURALLY say in their own cultural context. Replace foreign cultural references with local equivalents where it preserves the meaning. The output should feel like it was ORIGINALLY WRITTEN in the target language/culture, not translated.` : ""}
 
 STEP 3 \u2014 REWRITE in ${id === "hindi" ? "standard Hindi" : id === "english" ? "natural English" : "authentic " + id + " dialect"}:
 - Write as a NATIVE SPEAKER would naturally speak \u2014 not a word-for-word swap.
 - Preserve the original meaning, emotion, and structure.
 - All names and proper nouns: preserve exactly as given.
 - Output ONLY the converted text. No explanation, no labels, nothing else.
+${culturalAdapt && CULTURAL_RULES[id] ? "\n" + CULTURAL_RULES[id] + "\n" : ""}
 ${needsContrastive ? "\n" + CONTRASTIVE_TABLE : ""}
 ${DIALECT_RULES[id]}
 ${checklist}
@@ -1656,6 +1820,7 @@ export default function App() {
 
   /* --- Transliteration Mode --- */
   const [translitMode, setTranslitMode] = useState(false);
+  const [culturalMode, setCulturalMode] = useState(false);
 
   // Find & Replace helpers
   const findMatchCount = useMemo(() => {
@@ -1951,7 +2116,7 @@ export default function App() {
           streamingSet[langId] = true;
           setStreaming(s => ({ ...s, [langId]: true }));
           const examples = FEW_SHOT_EXAMPLES[langId] || [];
-          const sysPrompt = buildSingleConverterSystem(langId, tone) + (translitMode ? `
+          const sysPrompt = buildSingleConverterSystem(langId, tone, culturalMode) + (translitMode ? `
 
 TRANSLITERATION MODE (IMPORTANT):
 After writing the converted text in the target script, add a blank line and then provide a full Roman script (Latin alphabet) transliteration of your output. Label it "Transliteration:" on its own line. The transliteration should be natural Hinglish-style romanization (e.g. "Kaise ho bhai?" not "Kaisē hō bhāī?"). Use simple English letters, no diacritics. This applies to all non-English outputs.` : "");
@@ -2089,7 +2254,7 @@ After writing the converted text in the target script, add a blank line and then
         try {
           const raw = await streamConvert({
             model: "anthropic/claude-sonnet-4-5",
-            system: buildSingleConverterSystem(langId, tone),
+            system: buildSingleConverterSystem(langId, tone, culturalMode),
             messages: [...examples, { role: "user", content: csvMode.rows[i] }],
           });
           res[langId].push(raw.trim());
@@ -2653,6 +2818,9 @@ After writing the converted text in the target script, add a blank line and then
           </div>
           <div style={{ padding: "14px 22px", borderTop: "1px solid rgba(166,152,130,0.1)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(166,152,130,0.04)", flexWrap: "wrap", gap: "8px" }}>
             <span className="ctrl-hint" style={{ fontSize: "11px", color: "#a08060", fontWeight: 500 }}>Ctrl + Enter</span>
+            <button onClick={() => { setCulturalMode(v => !v); playClick(); }} className="clay-btn" style={{ padding: "6px 14px", fontSize: "10px", fontWeight: 700, borderRadius: "10px", color: culturalMode ? "#fff" : (darkMode ? "#d4c8b0" : "#78350f"), background: culturalMode ? "linear-gradient(135deg,#8b5cf6,#6d28d9)" : undefined, boxShadow: culturalMode ? "0 2px 8px rgba(139,92,246,0.3)" : undefined, transition: "all 0.2s" }} title="Adapt idioms, proverbs, greetings & cultural references to target language culture">
+              {"\uD83C\uDF0D"} Cultural {culturalMode ? "ON" : "OFF"}
+            </button>
             <button onClick={() => { setTranslitMode(v => !v); playClick(); }} className="clay-btn" style={{ padding: "6px 14px", fontSize: "10px", fontWeight: 700, borderRadius: "10px", color: translitMode ? "#fff" : (darkMode ? "#d4c8b0" : "#78350f"), background: translitMode ? "linear-gradient(135deg,#f59e0b,#d97706)" : undefined, boxShadow: translitMode ? "0 2px 8px rgba(245,158,11,0.3)" : undefined, transition: "all 0.2s" }} title="Transliterate Devanagari to Roman script (Hinglish)">
               {translitMode ? "Aa" : "Aa"} Translit {translitMode ? "ON" : "OFF"}
             </button>
