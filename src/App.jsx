@@ -1329,16 +1329,29 @@ const CSS = `
       0 0 0 3px rgba(245,158,11,0.15) !important;
   }
 
-  @media(max-width:600px){
-    .topbar-c{padding:0 14px !important;height:54px !important;}
-    .main-c{padding:20px 12px 70px !important;}
-    .ruhi-title{font-size:44px !important;letter-spacing:-2px !important;}
-    .lang-grid{grid-template-columns:repeat(2, 1fr) !important;}
-    .converter-cols{flex-direction:column !important;}
-    .top-controls-row{flex-direction:column !important;}
-    .tone-sidebar{width:100% !important;}
+  @media(max-width:900px){
+    .main-c{padding:18px 14px 40px !important;max-width:100% !important;}
+    .top-controls-row{gap:10px !important;}
+    .tone-sidebar{width:180px !important;}
+    .converter-cols{gap:14px !important;}
   }
-  @media(max-width:400px){.ruhi-title{font-size:36px !important;}}
+  @media(max-width:600px){
+    .topbar-c{padding:0 10px !important;height:50px !important;}
+    .main-c{padding:12px 8px 32px !important;}
+    .ruhi-title{font-size:36px !important;letter-spacing:-2px !important;}
+    .converter-cols{flex-direction:column !important;gap:10px !important;}
+    .top-controls-row{flex-direction:column !important;gap:8px !important;margin-bottom:10px !important;}
+    .tone-sidebar{width:100% !important;}
+    .clay{padding:12px !important;border-radius:14px !important;}
+    .result-lang-name{font-size:13px !important;}
+    .results-title{font-size:12px !important;}
+    .lang-wc{display:none !important;}
+  }
+  @media(max-width:400px){
+    .ruhi-title{font-size:28px !important;}
+    .main-c{padding:8px 6px 24px !important;}
+    .clay{padding:10px !important;border-radius:12px !important;}
+  }
 
   /* Dark Mode — Pure Black */
   .dark body, .dark { background: #000000; color: #e8e0d4; }
@@ -1502,6 +1515,7 @@ const CSS = `
   @media (max-width: 600px) {
     .tts-options { grid-template-columns: 1fr; }
     .tts-advanced { grid-template-columns: 1fr; }
+    .tts-panel { padding: 10px !important; margin-bottom: 10px !important; }
   }
 
   /* Skeleton shimmer animation */
@@ -1552,7 +1566,7 @@ const ACCENT_THEMES = {
 function SkeletonLoader({ lines = 5, darkMode }) {
   const widths = ["100%", "85%", "92%", "70%", "60%"];
   return (
-    <div style={{ padding: "28px 24px" }}>
+    <div style={{ padding: "16px 14px" }}>
       {widths.slice(0, lines).map((w, i) => (
         <div
           key={i}
@@ -1820,7 +1834,7 @@ function ResultCard({ result, lang, copied, onCopy, isStreaming, srtMode, onDown
 
   return (
     <div className="clay" style={{
-      borderLeft: `4px solid ${lang.color}`, padding: "18px", marginBottom: "14px",
+      borderLeft: `4px solid ${lang.color}`, padding: "14px", marginBottom: "10px",
       animation: "fadeUp 0.35s ease both"
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "14px", flexWrap: "wrap", gap: "8px" }}>
@@ -1936,7 +1950,7 @@ function ResultCard({ result, lang, copied, onCopy, isStreaming, srtMode, onDown
       {editing ? (
         <textarea ref={editRef} value={editText} onChange={(e) => { setEditText(e.target.value); e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; }}
           className="clay-inner" style={{
-            width: "100%", fontSize: "13.5px", lineHeight: 1.9, color: darkMode ? "#e8e0d4" : "#3d3425",
+            width: "100%", fontSize: "13.5px", lineHeight: 1.7, color: darkMode ? "#e8e0d4" : "#3d3425",
             padding: "14px 16px", border: `2px solid ${lang.color}40`, borderRadius: "14px",
             background: darkMode ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.5)",
             resize: "none", outline: "none", fontFamily: "'Inter','Segoe UI',sans-serif",
@@ -1946,7 +1960,7 @@ function ResultCard({ result, lang, copied, onCopy, isStreaming, srtMode, onDown
           onBlur={e => e.target.style.borderColor = lang.color + "40"}
         />
       ) : (
-        <div className="clay-inner" style={{ fontSize: "13.5px", lineHeight: 1.9, color: darkMode ? "#e8e0d4" : "#3d3425", padding: "14px 16px", whiteSpace: "pre-wrap" }}>
+        <div className="clay-inner" style={{ fontSize: "13.5px", lineHeight: 1.7, color: darkMode ? "#e8e0d4" : "#3d3425", padding: "10px 14px", whiteSpace: "pre-wrap" }}>
           {displayText}
           {isStreaming && <span style={{ display: "inline-block", width: "2px", height: "16px", background: lang.color, marginLeft: "2px", verticalAlign: "text-bottom", animation: "pulse 0.8s ease-in-out infinite" }} />}
         </div>
@@ -3060,10 +3074,10 @@ After writing the converted text in the target script, add a blank line and then
       {activeTab === "analytics" && <AnalyticsDashboard darkMode={darkMode} />}
 
       {/* Script Converter Tab */}
-      {activeTab === "converter" && <div className="main-c" style={{ maxWidth: "1400px", margin: "0 auto", padding: "28px 22px 80px", position: "relative", zIndex: 1 }}>
+      {activeTab === "converter" && <div className="main-c" style={{ maxWidth: "1200px", margin: "0 auto", padding: "20px 16px 40px", position: "relative", zIndex: 1 }}>
 
         {/* Top Controls: Language Cards + Tone side by side */}
-        <div className="top-controls-row" style={{ display: "flex", gap: "16px", marginBottom: "20px", alignItems: "stretch" }}>
+        <div className="top-controls-row" style={{ display: "flex", gap: "12px", marginBottom: "14px", alignItems: "stretch" }}>
           {/* Language Cards */}
           <div style={{ flex: "1 1 0", minWidth: 0 }}>
             <LanguageCards selected={selected} onToggle={toggleLang} onSelectAll={() => setSelected(LANGUAGES.map(l => l.id))} onDeselectAll={() => setSelected([LANGUAGES[0].id])} darkMode={darkMode} />
@@ -3097,7 +3111,7 @@ After writing the converted text in the target script, add a blank line and then
 
         {/* Favorites Bar */}
         {favorites.length > 0 && (
-          <div className="clay" style={{ padding: "10px 18px", marginBottom: "14px", display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap", animation: "fadeUp 0.25s ease" }}>
+          <div className="clay" style={{ padding: "8px 14px", marginBottom: "10px", display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap", animation: "fadeUp 0.25s ease" }}>
             <span style={{ fontSize: "10px", fontWeight: 800, color: darkMode ? "#d4c8b0" : "#78350f", textTransform: "uppercase", letterSpacing: "1px" }}>{"\u2B50"} Favorites</span>
             {favorites.map(fav => (
               <div key={fav.key} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
@@ -3111,12 +3125,12 @@ After writing the converted text in the target script, add a blank line and then
         )}
 
         {/* Two-column layout: Input (left) | Output (right) */}
-        <div className="converter-cols" style={{ display: "flex", gap: "20px", alignItems: "flex-start", ...(fullscreen ? { position: "fixed", inset: 0, zIndex: 60, background: darkMode ? "#000" : "#f0ebe3", padding: "20px", overflow: "auto" } : {}) }}>
+        <div className="converter-cols" style={{ display: "flex", gap: "14px", alignItems: "flex-start", ...(fullscreen ? { position: "fixed", inset: 0, zIndex: 60, background: darkMode ? "#000" : "#f0ebe3", padding: "16px", overflow: "auto" } : {}) }}>
 
         {/* Left Column — Script Input */}
         <div style={{ flex: "1 1 0", minWidth: 0 }}>
-        <div className="clay ta-focus" style={{ marginBottom: "16px", overflow: "hidden" }}>
-          <div style={{ padding: "14px 22px", borderBottom: "1px solid rgba(166,152,130,0.12)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px" }}>
+        <div className="clay ta-focus" style={{ marginBottom: "10px", overflow: "hidden" }}>
+          <div style={{ padding: "10px 16px", borderBottom: "1px solid rgba(166,152,130,0.12)", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "6px" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <span>&#9997;&#65039;</span>
               <span style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "1.2px", textTransform: "uppercase", color: darkMode ? "#d4c8b0" : "#78350f" }}>Script Input</span>
@@ -3176,10 +3190,10 @@ After writing the converted text in the target script, add a blank line and then
               </div>
             </div>
           )}
-          <div style={{ padding: "18px 22px" }}>
+          <div style={{ padding: "12px 16px" }}>
             <textarea value={script} onChange={e => setScript(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && e.ctrlKey) convert(); }}
               placeholder={"Kisi bhi bhasha mein script paste karo...\n\nHindi, English, Bhojpuri, Gujarati, Haryanvi, Rajasthani, ya koi bhi mix.\n\nMultiple languages select karke ek saath convert karo!"}
-              style={{ width: "100%", background: "transparent", border: "none", outline: "none", color: "inherit", fontSize: `${fontSize}px`, resize: "none", lineHeight: 1.9, fontFamily: "'Inter','Segoe UI',sans-serif", minHeight: fullscreen ? "60vh" : "140px", boxSizing: "border-box", transition: "font-size 0.2s" }}
+              style={{ width: "100%", background: "transparent", border: "none", outline: "none", color: "inherit", fontSize: `${fontSize}px`, resize: "none", lineHeight: 1.7, fontFamily: "'Inter','Segoe UI',sans-serif", minHeight: fullscreen ? "60vh" : "120px", boxSizing: "border-box", transition: "font-size 0.2s" }}
             />
             {script.length > 0 && (
               <div style={{ marginTop: "8px", height: "3px", borderRadius: "2px", background: "rgba(166,152,130,0.15)", overflow: "hidden" }}>
@@ -3187,7 +3201,7 @@ After writing the converted text in the target script, add a blank line and then
               </div>
             )}
           </div>
-          <div style={{ padding: "14px 22px", borderTop: "1px solid rgba(166,152,130,0.1)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(166,152,130,0.04)", flexWrap: "wrap", gap: "8px" }}>
+          <div style={{ padding: "10px 16px", borderTop: "1px solid rgba(166,152,130,0.1)", display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(166,152,130,0.04)", flexWrap: "wrap", gap: "6px" }}>
             <span className="ctrl-hint" style={{ fontSize: "11px", color: "#a08060", fontWeight: 500 }}>Ctrl + Enter</span>
             <button onClick={() => { setCulturalMode(v => !v); playClick(); }} className="clay-btn" style={{ padding: "6px 14px", fontSize: "10px", fontWeight: 700, borderRadius: "10px", color: culturalMode ? "#fff" : (darkMode ? "#d4c8b0" : "#78350f"), background: culturalMode ? "linear-gradient(135deg,#8b5cf6,#6d28d9)" : undefined, boxShadow: culturalMode ? "0 2px 8px rgba(139,92,246,0.3)" : undefined, transition: "all 0.2s" }} title="Adapt idioms, proverbs, greetings & cultural references to target language culture">
               {"\uD83C\uDF0D"} Cultural {culturalMode ? "ON" : "OFF"}
@@ -3305,7 +3319,7 @@ After writing the converted text in the target script, add a blank line and then
 
         {/* Error */}
         {error && (
-          <div className="clay error-box" style={{ padding: "14px 18px", marginBottom: "14px", borderLeft: "4px solid #ef4444", color: "#991b1b", fontSize: "13px", display: "flex", gap: "9px" }}>
+          <div className="clay error-box" style={{ padding: "10px 14px", marginBottom: "10px", borderLeft: "4px solid #ef4444", color: "#991b1b", fontSize: "13px", display: "flex", gap: "8px" }}>
             <span>&#9888;</span><span>{error}</span>
           </div>
         )}
@@ -3331,7 +3345,7 @@ After writing the converted text in the target script, add a blank line and then
         {/* Results (show during streaming and after completion) */}
         {Object.keys(results).length > 0 && (
           <>
-            <div className="clay" style={{ padding: "14px 20px", marginBottom: "14px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "8px", borderLeft: `4px solid ${loading ? "#f59e0b" : "#22c55e"}` }}>
+            <div className="clay" style={{ padding: "10px 14px", marginBottom: "10px", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "6px", borderLeft: `4px solid ${loading ? "#f59e0b" : "#22c55e"}` }}>
               <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                 {loading
                   ? <span style={{ width: "18px", height: "18px", borderRadius: "50%", border: "2.5px solid rgba(245,158,11,0.3)", borderTopColor: "#f59e0b", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
@@ -3477,7 +3491,7 @@ After writing the converted text in the target script, add a blank line and then
                 <div key={langId}>
                   <ResultCard result={results[langId]} lang={lang} copied={copied} onCopy={copy} isStreaming={!!streaming[langId]} srtMode={srtMode} onDownloadSrt={downloadSrt} onShare={shareResult} onEdit={(id, text) => setResults(prev => ({ ...prev, [id]: text }))} darkMode={darkMode} onFeedback={handleFeedback} inputText={script} />
                   {ttsEnabled && !streaming[langId] && (
-                    <div className="clay" style={{ padding: "8px 14px", marginTop: "-10px", marginBottom: "14px", borderLeft: `4px solid ${lang.color}20` }}>
+                    <div className="clay" style={{ padding: "8px 12px", marginTop: "-6px", marginBottom: "10px", borderLeft: `4px solid ${lang.color}20` }}>
                       <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px" }}>
                         {!audioUrls[langId] ? (
                           <>
@@ -3543,7 +3557,7 @@ After writing the converted text in the target script, add a blank line and then
                   )}
                 </div>
               ) : loading ? (
-                <div key={langId} className="clay" style={{ marginBottom: "14px", borderLeft: `4px solid ${lang?.color || "#f59e0b"}`, overflow: "hidden" }}>
+                <div key={langId} className="clay" style={{ marginBottom: "10px", borderLeft: `4px solid ${lang?.color || "#f59e0b"}`, overflow: "hidden" }}>
                   <div style={{ padding: "14px 20px 0", display: "flex", alignItems: "center", gap: "8px" }}>
                     <span style={{ fontSize: "13px" }}>{lang?.label}</span>
                     <span style={{ fontSize: "10px", color: darkMode ? "#807060" : "#a08060" }}>Loading...</span>
@@ -3569,7 +3583,7 @@ After writing the converted text in the target script, add a blank line and then
 
         {/* Batch CSV Results */}
         {batchResults && csvMode && (
-          <div className="clay" style={{ padding: "18px", marginBottom: "14px" }}>
+          <div className="clay" style={{ padding: "14px", marginBottom: "10px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
               <div>
                 <div style={{ fontSize: "14px", fontWeight: 700, color: darkMode ? "#e8e0d4" : "#1e1b18" }}>
