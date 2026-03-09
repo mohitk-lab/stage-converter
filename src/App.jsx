@@ -1790,10 +1790,13 @@ function LanguageCards({ selected, onToggle, onSelectAll, onDeselectAll, darkMod
 }
 
 /* --- Result Card --- */
-function ResultCard({ result, lang, copied, onCopy, isStreaming, srtMode, onDownloadSrt, onShare, onEdit, darkMode }) {
+function ResultCard({ result, lang, copied, onCopy, isStreaming, srtMode, onDownloadSrt, onShare, onEdit, darkMode, onFeedback, inputText }) {
   const [editing, setEditing] = useState(false);
   const [editText, setEditText] = useState(result);
   const editRef = useRef(null);
+  const [fbOpen, setFbOpen] = useState(false);
+  const [fbText, setFbText] = useState("");
+  const [fbSent, setFbSent] = useState(false);
 
   useEffect(() => { setEditText(result); }, [result]);
   useEffect(() => {
@@ -1867,10 +1870,69 @@ function ResultCard({ result, lang, copied, onCopy, isStreaming, srtMode, onDown
                   {"\uD83D\uDD17"}
                 </button>
               )}
+              {!editing && onFeedback && (
+                <button onClick={() => { setFbOpen(o => !o); setFbSent(false); setFbText(""); }} className="clay-btn" style={{
+                  padding: "6px 10px", fontSize: "11px", fontWeight: 700,
+                  color: fbOpen ? "#f59e0b" : (darkMode ? "#d4c8b0" : "#6b5e50"),
+                  background: fbOpen ? "rgba(245,158,11,0.1)" : undefined,
+                }} title="Report wrong conversion / give feedback">
+                  {"\uD83D\uDCAC"}
+                </button>
+              )}
             </div>
           )}
         </div>
       </div>
+      {/* Feedback Panel */}
+      {fbOpen && !isStreaming && (
+        <div style={{
+          marginBottom: "12px", padding: "12px 14px", borderRadius: "12px",
+          background: darkMode ? "rgba(245,158,11,0.06)" : "rgba(245,158,11,0.05)",
+          border: `1.5px solid ${darkMode ? "rgba(245,158,11,0.15)" : "rgba(245,158,11,0.2)"}`,
+          animation: "fadeUp 0.2s ease",
+        }}>
+          {fbSent ? (
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", padding: "4px 0" }}>
+              <span style={{ fontSize: "16px" }}>{"\u2705"}</span>
+              <span style={{ fontSize: "12px", fontWeight: 700, color: "#16a34a" }}>Feedback saved! Future conversions for {lang.sub} will learn from this.</span>
+            </div>
+          ) : (
+            <>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "8px" }}>
+                <span style={{ fontSize: "12px" }}>{"\uD83D\uDCAC"}</span>
+                <span style={{ fontSize: "11px", fontWeight: 700, color: darkMode ? "#d4c8b0" : "#78350f" }}>What went wrong with this {lang.sub} conversion?</span>
+              </div>
+              <textarea value={fbText} onChange={e => setFbText(e.target.value)} placeholder={"e.g. \"Used \u0938\u0948 instead of \u092C\u093E\", \"Wrong verb form\", \"Not natural sounding\", \"Mixed up dialect markers\"..."} style={{
+                width: "100%", minHeight: "60px", fontSize: "12px", lineHeight: 1.7, padding: "10px 12px",
+                borderRadius: "10px", border: `1px solid ${darkMode ? "rgba(255,255,255,0.1)" : "rgba(166,152,130,0.2)"}`,
+                background: darkMode ? "rgba(0,0,0,0.2)" : "rgba(255,255,255,0.6)",
+                color: darkMode ? "#e8e0d4" : "#3d3425", resize: "vertical", outline: "none",
+                fontFamily: "'Inter','Segoe UI',sans-serif", boxSizing: "border-box",
+              }} />
+              <div style={{ display: "flex", gap: "8px", marginTop: "8px", justifyContent: "flex-end" }}>
+                <button onClick={() => setFbOpen(false)} className="clay-btn" style={{ padding: "5px 12px", fontSize: "10px", fontWeight: 700, color: darkMode ? "#a09080" : "#6b5e50" }}>
+                  Cancel
+                </button>
+                <button onClick={() => {
+                  if (fbText.trim()) {
+                    onFeedback(lang.id, { feedback: fbText.trim(), input: inputText, output: result, timestamp: Date.now() });
+                    setFbSent(true);
+                    setTimeout(() => { setFbOpen(false); setFbSent(false); }, 2500);
+                  }
+                }} disabled={!fbText.trim()} className="clay-btn" style={{
+                  padding: "5px 14px", fontSize: "10px", fontWeight: 700,
+                  color: fbText.trim() ? "#fff" : (darkMode ? "#605040" : "#a09080"),
+                  background: fbText.trim() ? "linear-gradient(135deg, #f59e0b, #d97706)" : undefined,
+                  cursor: fbText.trim() ? "pointer" : "not-allowed",
+                  borderRadius: "8px",
+                }}>
+                  Submit Feedback
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
       {editing ? (
         <textarea ref={editRef} value={editText} onChange={(e) => { setEditText(e.target.value); e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; }}
           className="clay-inner" style={{
@@ -2068,6 +2130,7 @@ export default function App() {
   const [fontSize, setFontSize] = useState(() => parseInt(localStorage.getItem("ruhi_fontsize") || "14"));
   const [fullscreen, setFullscreen] = useState(false);
   const [favorites, setFavorites] = useState(() => { try { return JSON.parse(localStorage.getItem("ruhi_favorites") || "[]"); } catch { return []; } });
+  const [feedbackStore, setFeedbackStore] = useState(() => { try { return JSON.parse(localStorage.getItem("ruhi_feedback") || "{}"); } catch { return {}; } });
   const [themeSchedule, setThemeSchedule] = useState(() => localStorage.getItem("ruhi_theme_schedule") === "1");
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [cmdPaletteOpen, setCmdPaletteOpen] = useState(false);
@@ -2269,6 +2332,18 @@ export default function App() {
   const loadFavorite = (fav) => { setSelected(fav.langs); playPop(); };
   const removeFavorite = (key) => { setFavorites(prev => prev.filter(f => f.key !== key)); };
 
+  // Feedback system: save per-language feedback to localStorage and inject into future prompts
+  const handleFeedback = (langId, entry) => {
+    setFeedbackStore(prev => {
+      const langFb = prev[langId] || [];
+      // Keep last 10 feedback entries per language
+      const updated = [...langFb, entry].slice(-10);
+      const next = { ...prev, [langId]: updated };
+      localStorage.setItem("ruhi_feedback", JSON.stringify(next));
+      return next;
+    });
+  };
+
   // Share functionality
   const shareResult = async (langId) => {
     const text = results[langId];
@@ -2381,7 +2456,16 @@ export default function App() {
           streamingSet[langId] = true;
           setStreaming(s => ({ ...s, [langId]: true }));
           const examples = FEW_SHOT_EXAMPLES[langId] || [];
-          const sysPrompt = buildSingleConverterSystem(langId, tone, culturalMode) + (translitMode ? `
+          // Build feedback context from stored corrections
+          const langFeedback = feedbackStore[langId] || [];
+          const fbPrompt = langFeedback.length > 0 ? `
+
+★★★ USER CORRECTIONS (LEARN FROM THESE — DO NOT REPEAT THESE MISTAKES) ★★★
+The user has previously reported these issues with ${langId} conversions. Study them carefully and AVOID making the same errors:
+${langFeedback.slice(-5).map((fb, i) => `${i + 1}. MISTAKE REPORTED: "${fb.feedback}"${fb.input ? `\n   Input was: "${fb.input.substring(0, 100)}..."` : ""}${fb.output ? `\n   Wrong output was: "${fb.output.substring(0, 100)}..."` : ""}`).join("\n")}
+★★★ END USER CORRECTIONS ★★★` : "";
+
+          const sysPrompt = buildSingleConverterSystem(langId, tone, culturalMode) + fbPrompt + (translitMode ? `
 
 TRANSLITERATION MODE (IMPORTANT):
 After writing the converted text in the target script, add a blank line and then provide a full Roman script (Latin alphabet) transliteration of your output. Label it "Transliteration:" on its own line. The transliteration should be natural Hinglish-style romanization (e.g. "Kaise ho bhai?" not "Kaisē hō bhāī?"). Use simple English letters, no diacritics. This applies to all non-English outputs.` : "");
@@ -2519,7 +2603,7 @@ After writing the converted text in the target script, add a blank line and then
         try {
           const raw = await streamConvert({
             model: "anthropic/claude-sonnet-4-5",
-            system: buildSingleConverterSystem(langId, tone, culturalMode),
+            system: buildSingleConverterSystem(langId, tone, culturalMode) + ((feedbackStore[langId] || []).length > 0 ? `\n\n★★★ USER CORRECTIONS ★★★\n${(feedbackStore[langId] || []).slice(-5).map((fb, j) => `${j + 1}. "${fb.feedback}"`).join("\n")}\n★★★ END ★★★` : ""),
             messages: [...examples, { role: "user", content: csvMode.rows[i] }],
           });
           res[langId].push(raw.trim());
@@ -3369,7 +3453,7 @@ After writing the converted text in the target script, add a blank line and then
               const lang = LANGUAGES.find(l => l.id === langId);
               return results[langId] ? (
                 <div key={langId}>
-                  <ResultCard result={results[langId]} lang={lang} copied={copied} onCopy={copy} isStreaming={!!streaming[langId]} srtMode={srtMode} onDownloadSrt={downloadSrt} onShare={shareResult} onEdit={(id, text) => setResults(prev => ({ ...prev, [id]: text }))} darkMode={darkMode} />
+                  <ResultCard result={results[langId]} lang={lang} copied={copied} onCopy={copy} isStreaming={!!streaming[langId]} srtMode={srtMode} onDownloadSrt={downloadSrt} onShare={shareResult} onEdit={(id, text) => setResults(prev => ({ ...prev, [id]: text }))} darkMode={darkMode} onFeedback={handleFeedback} inputText={script} />
                   {ttsEnabled && !streaming[langId] && (
                     <div className="clay" style={{ padding: "8px 14px", marginTop: "-10px", marginBottom: "14px", borderLeft: `4px solid ${lang.color}20` }}>
                       <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px" }}>
