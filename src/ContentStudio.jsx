@@ -8,7 +8,7 @@ import { useState, useRef, useEffect } from "react";
 const MODULES = [
   { id: "promo", icon: "\uD83C\uDFAC", label: "Promo Writer" },
   { id: "campaign", icon: "\uD83D\uDCE2", label: "Campaign" },
-  { id: "script", icon: "\uD83D\uDCDC", label: "Script Gen" },
+  { id: "synopsis", icon: "\uD83D\uDCD6", label: "Story Synopsis" },
   { id: "caption", icon: "\uD83D\uDCAC", label: "Captions" },
   { id: "headline", icon: "\uD83D\uDCF0", label: "Headline" },
   { id: "learning", icon: "\uD83E\uDDE0", label: "Learning" },
@@ -273,44 +273,59 @@ RULES:
 - Output ONLY the translated text, no explanations`;
 }
 
-function buildScriptSystem(data) {
-  return `You are a script writer for Stage OTT platform, specializing in ${data.language} ${data.genre} content.
+function buildSynopsisSystem() {
+  return `You are a story analyst for Stage OTT platform. Your job is to deeply analyze a story/synopsis and extract key elements that will be useful for promotional content writing.
 
-TASK: Generate a ${data.scenes}-scene script outline.
+TASK: Analyze the given story and extract a structured breakdown.
 
-TITLE: ${data.title || "Untitled"}
-GENRE: ${data.genre}
-LANGUAGE: ${data.language}
-TONE: ${data.tone}
-SYNOPSIS: ${data.synopsis || "Create an original story"}
+OUTPUT FORMAT:
 
-OUTPUT FORMAT for each scene:
-${"=".repeat(40)}
-SCENE [NUMBER]
-${"=".repeat(40)}
-LOCATION: [Interior/Exterior] - [Specific place] - [Day/Night]
-CHARACTERS: [List characters in scene]
+=== STORY TITLE ===
+[Title or suggested title]
 
-ACTION:
-[Describe what happens in the scene - 3-5 lines]
+=== GENRE & TONE ===
+[Primary genre, sub-genre, overall tone]
 
-DIALOGUE:
-CHARACTER NAME: [Dialogue in ${data.language}]
-CHARACTER NAME: [Response in ${data.language}]
-[Continue for 4-6 dialogue exchanges per scene]
+=== ONE-LINE HOOK ===
+[A single powerful line that captures the story's essence — written to grab attention]
 
-CAMERA: [Shot suggestions]
-MUSIC/SFX: [Sound design notes]
-MOOD: [Emotional tone of scene]
-${"=".repeat(40)}
+=== PLOT SUMMARY (5-7 lines) ===
+[Concise plot summary covering setup, conflict, climax]
+
+=== KEY CHARACTERS ===
+- [Character Name]: [Role + key trait + emotional arc in 1 line]
+(list all major characters)
+
+=== CENTRAL CONFLICT ===
+[What is the main conflict/tension that drives the story]
+
+=== EMOTIONAL HOOKS ===
+[List 4-5 emotional moments/angles that can be used in promos]
+
+=== MYSTERY/SUSPENSE ELEMENTS ===
+[What questions will the audience want answered? What creates curiosity?]
+
+=== KEY RELATIONSHIPS ===
+[Important relationship dynamics — love, rivalry, family bonds, betrayal etc.]
+
+=== CULTURAL/SOCIAL RELEVANCE ===
+[How does this story connect to audience's real life, society, culture?]
+
+=== PROMO-WORTHY MOMENTS ===
+[List 5-6 specific scenes/moments that would make great promo hooks]
+
+=== TARGET AUDIENCE ===
+[Who would this story appeal to most and why]
+
+=== STAR CAST ANGLES ===
+[If any actors/cast mentioned, note promotional angles for them]
 
 RULES:
-- All dialogue MUST be in authentic ${data.language}
-- Each scene should advance the plot
-- Include emotional beats and dramatic moments
-- Camera and music notes should be practical
-- Genre conventions for ${data.genre} must be followed
-- Keep dialogue natural and culturally authentic`;
+- Be thorough but concise
+- Focus on elements that are USEFUL for writing promotional content (VOs, captions, headlines, campaigns)
+- Identify the strongest emotional and curiosity hooks
+- Think like a marketer — what makes someone NEED to watch this?
+- If the story is in a regional language, preserve key dialogue/phrases that could be used in promos`;
 }
 
 function buildThumbnailSystem(data) {
@@ -719,8 +734,12 @@ export default function ContentStudio({ darkMode, streamConvert, dialectRules = 
   const [campaignData, setCampaignData] = useState({
     segment: "d0d1", language: "bhojpuri", contentType: "", hook: "fomo"
   });
-  const [scriptData, setScriptData] = useState({
-    title: "", genre: "comedy", language: "bhojpuri", scenes: "3", tone: "dramatic", synopsis: ""
+  const [synopsisData, setSynopsisData] = useState({
+    movieName: "", storyText: "", googleLink: ""
+  });
+  const [synopsisFetchingDoc, setSynopsisFetchingDoc] = useState(false);
+  const [savedSynopsis, setSavedSynopsis] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("stage_story_synopsis") || "null"); } catch { return null; }
   });
   const [captionData, setCaptionData] = useState({
     movieName: "", platform: "instagram", language: "bhojpuri", mood: "hype", count: "10",
@@ -765,6 +784,37 @@ export default function ContentStudio({ darkMode, streamConvert, dialectRules = 
       combined += (combined ? "\n\n---\n\n" : "") + text;
     }
     setLearningData({ ...learningData, scriptInput: combined });
+  };
+
+  const handleSynopsisFileUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    let combined = synopsisData.storyText;
+    for (const file of files) {
+      const text = await file.text();
+      combined += (combined ? "\n\n---\n\n" : "") + text;
+    }
+    setSynopsisData({ ...synopsisData, storyText: combined });
+  };
+
+  const fetchSynopsisDocLink = async () => {
+    const link = synopsisData.googleLink.trim();
+    if (!link) return;
+    setSynopsisFetchingDoc(true);
+    setError("");
+    try {
+      const res = await fetch("/api/fetch-doc", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: link }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not fetch document");
+      const newText = synopsisData.storyText + (synopsisData.storyText ? "\n\n---\n\n" : "") + data.text;
+      setSynopsisData({ ...synopsisData, storyText: newText, googleLink: "" });
+    } catch (err) {
+      setError(err.message || "Failed to fetch document");
+    }
+    setSynopsisFetchingDoc(false);
   };
 
   const [fetchingDoc, setFetchingDoc] = useState(false);
@@ -855,6 +905,16 @@ export default function ContentStudio({ darkMode, streamConvert, dialectRules = 
       switch (activeModule) {
         case "promo":
           system = buildPromoSystem(promoData, dialectRules);
+          // Inject saved synopsis analysis if available
+          if (savedSynopsis?.analysis) {
+            system += `\n\n=== STORY SYNOPSIS ANALYSIS (USE THIS AS PRIMARY STORY CONTEXT) ===
+You have been provided with a detailed story analysis. Use this as your PRIMARY source of story knowledge for writing VOs.
+Extract characters, plot points, emotional hooks, mystery elements, and relationships from this analysis.
+DO NOT make up story details — use ONLY what is provided here.
+
+${savedSynopsis.analysis}
+=== END SYNOPSIS ===`;
+          }
           userMessage = `Movie: "${promoData.movieName || "Untitled"}"
 Star Cast: ${promoData.starCast || "N/A"}
 Genre: ${promoData.genre}
@@ -872,15 +932,19 @@ Content: ${campaignData.contentType || "General Stage OTT content"}
 Hook Type: ${campaignData.hook}`;
           break;
 
-        case "script":
-          system = buildScriptSystem(scriptData);
-          userMessage = `Title: ${scriptData.title || "Create an original title"}
-Genre: ${scriptData.genre}
-Language: ${scriptData.language}
-Scenes: ${scriptData.scenes}
-Tone: ${scriptData.tone}
-Synopsis: ${scriptData.synopsis || "Create an original story"}`;
+        case "synopsis": {
+          if (!synopsisData.storyText.trim()) {
+            setError("Story paste karo ya document link se fetch karo.");
+            setIsGenerating(false);
+            return;
+          }
+          system = buildSynopsisSystem();
+          userMessage = `Movie/Show: ${synopsisData.movieName || "Not specified"}
+
+=== STORY/SYNOPSIS ===
+${synopsisData.storyText}`;
           break;
+        }
 
         case "caption":
           system = buildCaptionSystem(captionData, dialectRules);
@@ -985,6 +1049,18 @@ ${system}`;
         savePersonas(updated);
         setLearningData({ personaName: "", styleDescription: "", vocabularyPrefs: "", tonePatterns: "", scriptInput: "", googleLink: "" });
       }
+
+      // Save synopsis analysis for use in promo writing
+      if (activeModule === "synopsis" && result) {
+        const synopsisResult = {
+          movieName: synopsisData.movieName || "Untitled",
+          analysis: result,
+          rawStory: synopsisData.storyText.slice(0, 500),
+          savedAt: new Date().toISOString(),
+        };
+        setSavedSynopsis(synopsisResult);
+        localStorage.setItem("stage_story_synopsis", JSON.stringify(synopsisResult));
+      }
     } catch (err) {
       setError(err.message || "Generation failed");
     }
@@ -1037,6 +1113,12 @@ ${system}`;
           <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
             {/* PROMO WRITER */}
             {activeModule === "promo" && (<>
+              {savedSynopsis && (
+                <div className="clay-inner" style={{ padding: "8px 12px", borderLeft: "3px solid #22c55e", marginBottom: "4px" }}>
+                  <span style={{ fontSize: "10px", fontWeight: 700, color: "#22c55e" }}>📖 Story Synopsis Active:</span>
+                  <span style={{ fontSize: "10px", color: dm ? "#b0a090" : "#6b5e50", marginLeft: "6px" }}>{savedSynopsis.movieName} — story context auto-inject ho raha hai</span>
+                </div>
+              )}
               <PersonaSelector moduleId="promo" personas={personas} activePersonaMap={activePersonaMap} onSelect={handlePersonaSelect} darkMode={dm} />
               <StudioInput label="Movie/Show Name *" value={promoData.movieName} onChange={v => setPromoData({ ...promoData, movieName: v })} placeholder="" darkMode={dm} />
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
@@ -1076,25 +1158,40 @@ ${system}`;
               ]} darkMode={dm} />
             </>)}
 
-            {/* SCRIPT GEN */}
-            {activeModule === "script" && (<>
-              <PersonaSelector moduleId="script" personas={personas} activePersonaMap={activePersonaMap} onSelect={handlePersonaSelect} darkMode={dm} />
-              <StudioInput label="Title" value={scriptData.title} onChange={v => setScriptData({ ...scriptData, title: v })} placeholder="" darkMode={dm} />
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                <StudioSelect label="Genre" value={scriptData.genre} onChange={v => setScriptData({ ...scriptData, genre: v })} options={GENRES} darkMode={dm} />
-                <StudioSelect label="Language" value={scriptData.language} onChange={v => setScriptData({ ...scriptData, language: v })} options={LANGUAGES} darkMode={dm} />
+            {/* STORY SYNOPSIS */}
+            {activeModule === "synopsis" && (<>
+              <StudioInput label="Movie/Show Name" value={synopsisData.movieName} onChange={v => setSynopsisData({ ...synopsisData, movieName: v })} placeholder="" darkMode={dm} />
+              <StudioTextArea label="Paste Story / Synopsis *" value={synopsisData.storyText} onChange={v => setSynopsisData({ ...synopsisData, storyText: v })} placeholder="Yahan apni story ya synopsis paste karein..." rows={8} darkMode={dm} />
+              <div>
+                <label style={{ display: "block", fontSize: "10px", fontWeight: 700, color: dm ? "#b0a090" : "#92400e", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.8px" }}>Or Upload Text File</label>
+                <input type="file" accept=".txt,.csv,.doc,.docx" multiple onChange={handleSynopsisFileUpload} style={{ fontSize: "11px", color: dm ? "#b0a090" : "#6b5e50" }} />
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
-                <StudioSelect label="Scenes" value={scriptData.scenes} onChange={v => setScriptData({ ...scriptData, scenes: v })} options={[
-                  { value: "1", label: "1 Scene" }, { value: "3", label: "3 Scenes" },
-                  { value: "5", label: "5 Scenes" }, { value: "10", label: "10 Scenes" }
-                ]} darkMode={dm} />
-                <StudioSelect label="Tone" value={scriptData.tone} onChange={v => setScriptData({ ...scriptData, tone: v })} options={[
-                  { value: "dramatic", label: "Dramatic" }, { value: "comedic", label: "Comedic" },
-                  { value: "suspenseful", label: "Suspenseful" }, { value: "romantic", label: "Romantic" }
-                ]} darkMode={dm} />
+              <div style={{ display: "flex", gap: "8px", alignItems: "flex-end" }}>
+                <div style={{ flex: 1 }}>
+                  <StudioInput label="Or Paste Document Link (Google Docs / Drive)" value={synopsisData.googleLink} onChange={v => setSynopsisData({ ...synopsisData, googleLink: v })} placeholder="https://docs.google.com/document/d/..." darkMode={dm} />
+                </div>
+                {synopsisData.googleLink && (
+                  <button onClick={fetchSynopsisDocLink} disabled={synopsisFetchingDoc} className="clay-btn" style={{ padding: "8px 14px", fontSize: "11px", fontWeight: 700, color: dm ? "#d4c8b0" : "#78350f", whiteSpace: "nowrap", opacity: synopsisFetchingDoc ? 0.6 : 1 }}>
+                    {synopsisFetchingDoc ? "Fetching..." : "Fetch"}
+                  </button>
+                )}
               </div>
-              <StudioTextArea label="Synopsis/Outline" value={scriptData.synopsis} onChange={v => setScriptData({ ...scriptData, synopsis: v })} placeholder="" rows={4} darkMode={dm} />
+              {synopsisData.googleLink && (
+                <div className="clay-inner" style={{ padding: "8px 12px", fontSize: "10px", color: dm ? "#b0a090" : "#6b5e50", lineHeight: 1.6 }}>
+                  Tip: Document publicly shared hona chahiye ("Anyone with the link").
+                </div>
+              )}
+              {savedSynopsis && (
+                <div className="clay-inner" style={{ padding: "10px 12px", borderLeft: "3px solid #f59e0b" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+                    <span style={{ fontSize: "11px", fontWeight: 700, color: dm ? "#e8e0d4" : "#3d3425" }}>✅ Saved: {savedSynopsis.movieName}</span>
+                    <button onClick={() => { setSavedSynopsis(null); localStorage.removeItem("stage_story_synopsis"); }} className="clay-btn" style={{ padding: "3px 8px", fontSize: "10px", fontWeight: 700, color: "#dc2626" }}>
+                      Clear
+                    </button>
+                  </div>
+                  <span style={{ fontSize: "10px", color: dm ? "#807060" : "#a08060" }}>Ye analysis Promo Writer me auto-inject hogi. Saved: {new Date(savedSynopsis.savedAt).toLocaleDateString()}</span>
+                </div>
+              )}
             </>)}
 
             {/* CAPTIONS */}
@@ -1233,9 +1330,9 @@ ${system}`;
               display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginTop: "4px"
             }}>
               {isGenerating ? (
-                <><span style={{ width: "14px", height: "14px", borderRadius: "50%", border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", display: "inline-block", animation: "spin 0.7s linear infinite" }} /> {activeModule === "learning" ? "Analyzing..." : "Generating..."}</>
+                <><span style={{ width: "14px", height: "14px", borderRadius: "50%", border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", display: "inline-block", animation: "spin 0.7s linear infinite" }} /> {activeModule === "learning" || activeModule === "synopsis" ? "Analyzing..." : "Generating..."}</>
               ) : (
-                <>{activeModule === "learning" ? "Analyze & Learn" : `Generate ${MODULES.find(m => m.id === activeModule)?.label}`}</>
+                <>{activeModule === "learning" ? "Analyze & Learn" : activeModule === "synopsis" ? "Analyze Story" : `Generate ${MODULES.find(m => m.id === activeModule)?.label}`}</>
               )}
             </button>
           </div>
