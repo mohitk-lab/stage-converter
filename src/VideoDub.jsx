@@ -484,7 +484,7 @@ ${transcription.text}
 ${(transcription.segments || []).map(s => `[${s.start.toFixed(1)}s - ${s.end.toFixed(1)}s] ${s.text}`).join("\n")}`;
 
       await streamConvert({
-        model: "anthropic/claude-sonnet-4-5",
+        model: "anthropic/claude-sonnet-4.5",
         system,
         messages: [{ role: "user", content: userMessage }],
         onChunk: (partial) => setTranslatedText(partial),

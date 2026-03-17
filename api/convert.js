@@ -17,7 +17,7 @@ export default async function handler(req, res) {
       "X-Title": "Stage Converter",
     },
     body: JSON.stringify({
-      model: model || "anthropic/claude-sonnet-4-5",
+      model: model || "anthropic/claude-sonnet-4.5",
       max_tokens: 4096,
       stream: true,
       messages: system
@@ -27,8 +27,15 @@ export default async function handler(req, res) {
   });
 
   if (!orRes.ok) {
-    const data = await orRes.json();
-    return res.status(orRes.status).json(data);
+    const raw = await orRes.text();
+    let parsed = null;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {}
+
+    return res.status(orRes.status).json(
+      parsed || { error: { message: raw || "OpenRouter request failed" } }
+    );
   }
 
   res.setHeader("Content-Type", "text/event-stream");

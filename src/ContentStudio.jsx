@@ -825,7 +825,7 @@ export default function ContentStudio({ darkMode, streamConvert, dialectRules = 
 
     try {
       await streamConvert({
-        model: "anthropic/claude-sonnet-4-5",
+        model: "anthropic/claude-sonnet-4.5",
         system: `You are a social media hashtag specialist for Stage OTT platform. Analyze the given content and generate highly relevant, platform-optimized hashtags.\n\n${platformStyles[hashtagPlatform] || platformStyles.instagram}\n\nRULES:\n- Output ONLY the hashtags, nothing else\n- No explanations, no numbering, no categories\n- Each hashtag on the same line separated by spaces\n- Mix of English and regional language hashtags\n- Include #StageApp #StageOTT always`,
         messages: [{ role: "user", content: `Generate ${hashtagPlatform} hashtags for this content:\n\n${output.slice(0, 1500)}` }],
         onChunk: (partial) => setHashtagsResult(partial),
@@ -950,7 +950,7 @@ ${system}`;
       }
 
       const result = await streamConvert({
-        model: "anthropic/claude-sonnet-4-5",
+        model: "anthropic/claude-sonnet-4.5",
         system,
         messages: [{ role: "user", content: userMessage }],
         onChunk: (partial) => setOutput(partial),
@@ -960,7 +960,7 @@ ${system}`;
       if (abMode && activeModule !== "learning") {
         setVariantB("");
         await streamConvert({
-          model: "anthropic/claude-sonnet-4-5",
+          model: "anthropic/claude-sonnet-4.5",
           system: system + "\n\nIMPORTANT: Generate a COMPLETELY DIFFERENT version from your previous output. Use a different angle, tone variation, structure, and creative approach. Make it distinctly unique while maintaining quality.",
           messages: [{ role: "user", content: userMessage }],
           onChunk: (partial) => setVariantB(partial),

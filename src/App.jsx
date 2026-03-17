@@ -2484,7 +2484,7 @@ ${langFeedback.slice(-5).map((fb, i) => `${i + 1}. MISTAKE REPORTED: "${fb.feedb
 TRANSLITERATION MODE (IMPORTANT):
 After writing the converted text in the target script, add a blank line and then provide a full Roman script (Latin alphabet) transliteration of your output. Label it "Transliteration:" on its own line. The transliteration should be natural Hinglish-style romanization (e.g. "Kaise ho bhai?" not "Kaisē hō bhāī?"). Use simple English letters, no diacritics. This applies to all non-English outputs.` : "");
           const raw = await streamConvert({
-            model: "anthropic/claude-sonnet-4-5",
+            model: "anthropic/claude-sonnet-4.5",
             system: sysPrompt,
             messages: [...examples, { role: "user", content: script }],
             onChunk: (partial) => {
@@ -2616,7 +2616,7 @@ After writing the converted text in the target script, add a blank line and then
       for (let i = 0; i < csvMode.rows.length; i++) {
         try {
           const raw = await streamConvert({
-            model: "anthropic/claude-sonnet-4-5",
+            model: "anthropic/claude-sonnet-4.5",
             system: buildSingleConverterSystem(langId, tone, culturalMode) + ((feedbackStore[langId] || []).length > 0 ? `\n\n★★★ USER CORRECTIONS ★★★\n${(feedbackStore[langId] || []).slice(-5).map((fb, j) => `${j + 1}. "${fb.feedback}"`).join("\n")}\n★★★ END ★★★` : ""),
             messages: [...examples, { role: "user", content: csvMode.rows[i] }],
           });

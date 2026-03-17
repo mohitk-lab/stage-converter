@@ -163,7 +163,7 @@ export default function ChatBot({ darkMode, streamConvert }) {
       if (streamConvert) {
         let accumulated = "";
         await streamConvert({
-          model: "anthropic/claude-sonnet-4",
+          model: "anthropic/claude-sonnet-4.5",
           system: systemPrompt,
           messages: [{ role: "user", content: msg }],
           onChunk: (chunk) => {
