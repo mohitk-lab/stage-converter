@@ -1,4 +1,7 @@
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const OPENAI_API_KEY =
+  process.env.OPENAI_API_KEY ||
+  process.env.OPEN_AI_API ||
+  process.env.OPEN_AI;
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4.1-mini";
 
 function resolveModel(requestedModel) {
