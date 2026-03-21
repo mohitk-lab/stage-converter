@@ -3,8 +3,8 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const LLM_PROVIDER = (process.env.LLM_PROVIDER || "").toLowerCase();
 
 function pickProvider() {
-  if (LLM_PROVIDER === "openai" && OPENAI_API_KEY) return "openai";
-  if (LLM_PROVIDER === "openrouter" && OPENROUTER_KEY) return "openrouter";
+  if (LLM_PROVIDER === "openai") return OPENAI_API_KEY ? "openai" : null;
+  if (LLM_PROVIDER === "openrouter") return OPENROUTER_KEY ? "openrouter" : null;
   if (OPENAI_API_KEY) return "openai";
   if (OPENROUTER_KEY) return "openrouter";
   return null;
@@ -26,10 +26,19 @@ export default async function handler(req, res) {
 
   const provider = pickProvider();
   if (!provider) {
+    const forcedProviderMissingKey =
+      LLM_PROVIDER === "openai"
+        ? "LLM_PROVIDER is set to openai but OPENAI_API_KEY is missing."
+        : LLM_PROVIDER === "openrouter"
+          ? "LLM_PROVIDER is set to openrouter but OPENROUTER_KEY is missing."
+          : null;
     return res.status(500).json({
-      error: "No LLM key configured. Add OPENROUTER_KEY or OPENAI_API_KEY in Vercel environment variables.",
+      error:
+        forcedProviderMissingKey ||
+        "No LLM key configured. Add OPENROUTER_KEY or OPENAI_API_KEY in Vercel environment variables.",
     });
   }
+  res.setHeader("x-llm-provider", provider);
 
   const { system, messages, model } = req.body;
   if (!messages) return res.status(400).json({ error: "messages required" });
