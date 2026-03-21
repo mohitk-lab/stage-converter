@@ -42,6 +42,60 @@ function resolveModel(provider, requestedModel) {
   return process.env.OPENAI_MODEL || "gpt-4.1-mini";
 }
 
+function applyProviderOptions(provider, payload) {
+  if (provider === "groq" && payload.model === "qwen/qwen3-32b") {
+    payload.reasoning_format = "hidden";
+    payload.reasoning_effort = "none";
+  }
+  return payload;
+}
+
+async function readJsonOrText(response) {
+  const raw = await response.text();
+  try {
+    return { raw, parsed: JSON.parse(raw) };
+  } catch {
+    return { raw, parsed: null };
+  }
+}
+
+async function completeOnce({ url, headers, payload }) {
+  const response = await fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ ...payload, stream: false }),
+  });
+
+  if (!response.ok) {
+    const { raw, parsed } = await readJsonOrText(response);
+    return { ok: false, status: response.status, error: parsed || { error: { message: raw || "LLM request failed" } } };
+  }
+
+  const data = await response.json();
+  const content = data?.choices?.[0]?.message?.content || "";
+  return { ok: true, content };
+}
+
+function writeSseText(res, text, model) {
+  const chunk = {
+    id: `local-${Date.now()}`,
+    object: "chat.completion.chunk",
+    created: Math.floor(Date.now() / 1000),
+    model,
+    choices: [{ index: 0, delta: { content: text }, finish_reason: null }],
+  };
+  const finalChunk = {
+    id: `local-${Date.now()}-done`,
+    object: "chat.completion.chunk",
+    created: Math.floor(Date.now() / 1000),
+    model,
+    choices: [{ index: 0, delta: {}, finish_reason: "stop" }],
+  };
+  res.write(`data: ${JSON.stringify(chunk)}\n\n`);
+  res.write(`data: ${JSON.stringify(finalChunk)}\n\n`);
+  res.write("data: [DONE]\n\n");
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
 
@@ -87,7 +141,7 @@ export default async function handler(req, res) {
     headers["X-Title"] = "Stage Converter";
   }
 
-  const payload = {
+  const payload = applyProviderOptions(provider, {
     model: resolveModel(provider, model),
     max_tokens: 4096,
     temperature: 0.2,
@@ -95,11 +149,47 @@ export default async function handler(req, res) {
     messages: system
       ? [{ role: "system", content: system }, ...messages]
       : messages,
-  };
+  });
 
-  if (provider === "groq" && payload.model === "qwen/qwen3-32b") {
-    payload.reasoning_format = "hidden";
-    payload.reasoning_effort = "none";
+  const translationReviewMode =
+    provider === "groq" &&
+    typeof system === "string" &&
+    (system.includes("CRITICAL OUTPUT RULES") || system.includes("FINAL CHECKLIST"));
+
+  if (translationReviewMode) {
+    const firstPass = await completeOnce({ url, headers, payload });
+    if (!firstPass.ok) {
+      return res.status(firstPass.status).json(firstPass.error);
+    }
+
+    const sourceText = messages?.[messages.length - 1]?.content || "";
+    const reviewPayload = applyProviderOptions(provider, {
+      model: payload.model,
+      max_tokens: 4096,
+      temperature: 0.1,
+      messages: [
+        {
+          role: "system",
+          content:
+            `${system}\n\nYou are now in strict correction mode. Review the draft and fix only translation quality issues, dialect mixing, wrong script, unnatural phrasing, and grammar problems. Preserve meaning and sentence count exactly. Output only the corrected final text.`,
+        },
+        {
+          role: "user",
+          content: `SOURCE:\n${sourceText}\n\nDRAFT:\n${firstPass.content}`,
+        },
+      ],
+    });
+
+    const secondPass = await completeOnce({ url, headers, payload: reviewPayload });
+    if (!secondPass.ok) {
+      return res.status(secondPass.status).json(secondPass.error);
+    }
+
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    writeSseText(res, secondPass.content.trim(), payload.model);
+    return res.end();
   }
 
   let orRes = await fetch(url, {
