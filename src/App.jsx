@@ -7,9 +7,11 @@ import CommandPalette from "./CommandPalette.jsx";
 import GlossaryManager from "./GlossaryManager.jsx";
 import { playClick, playSuccess, playPop, playError } from "./sounds.js";
 
+const CONVERT_API_URL = import.meta.env.VITE_CONVERT_API_URL || "/api/convert";
+
 /* --- Streaming fetch helper --- */
 async function streamConvert({ model, system, messages, onChunk }) {
-  const res = await fetch("/api/convert", {
+  const res = await fetch(CONVERT_API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ model, system, messages }),
