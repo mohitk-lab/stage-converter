@@ -33,7 +33,7 @@ function resolveModel(provider, requestedModel) {
       !requestedModel.includes("/") &&
       /^(llama|mixtral|gemma|qwen|deepseek|moonshot|allam|meta-llama|mistral)/i.test(requestedModel);
     if (looksLikeGroqModel) return requestedModel;
-    return process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+    return process.env.GROQ_MODEL || "mistral-saba-24b";
   }
 
   // OpenAI accepts models like gpt-4.1-mini, gpt-4o-mini, o4-mini etc.
@@ -90,6 +90,7 @@ export default async function handler(req, res) {
   const payload = {
     model: resolveModel(provider, model),
     max_tokens: 4096,
+    temperature: 0.2,
     stream: true,
     messages: system
       ? [{ role: "system", content: system }, ...messages]
