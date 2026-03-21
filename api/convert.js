@@ -28,7 +28,12 @@ function resolveModel(provider, requestedModel) {
   }
 
   if (provider === "groq") {
-    return requestedModel || process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+    const looksLikeGroqModel =
+      typeof requestedModel === "string" &&
+      !requestedModel.includes("/") &&
+      /^(llama|mixtral|gemma|qwen|deepseek|moonshot|allam|meta-llama|mistral)/i.test(requestedModel);
+    if (looksLikeGroqModel) return requestedModel;
+    return process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
   }
 
   // OpenAI accepts models like gpt-4.1-mini, gpt-4o-mini, o4-mini etc.
