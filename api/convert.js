@@ -3,6 +3,7 @@ const OPENROUTER_KEY =
   process.env.OPENROUTER_API;
 const OPENAI_API_KEY =
   process.env.OPENAI_API_KEY ||
+  process.env.OPENAI_API ||
   process.env.OPEN_AI_API ||
   process.env.OPEN_AI;
 const LLM_PROVIDER = (process.env.LLM_PROVIDER || "").toLowerCase();
