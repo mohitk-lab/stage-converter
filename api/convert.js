@@ -1,6 +1,10 @@
 const OPENROUTER_KEY =
   process.env.OPENROUTER_KEY ||
   process.env.OPENROUTER_API;
+const GROQ_API_KEY =
+  process.env.GROQ_API_KEY ||
+  process.env.GROQ_API ||
+  process.env.GROQAI_API;
 const OPENAI_API_KEY =
   process.env.OPENAI_API_KEY ||
   process.env.OPENAI_API ||
@@ -9,8 +13,10 @@ const OPENAI_API_KEY =
 const LLM_PROVIDER = (process.env.LLM_PROVIDER || "").toLowerCase();
 
 function pickProvider() {
+  if (LLM_PROVIDER === "groq") return GROQ_API_KEY ? "groq" : null;
   if (LLM_PROVIDER === "openai") return OPENAI_API_KEY ? "openai" : null;
   if (LLM_PROVIDER === "openrouter") return OPENROUTER_KEY ? "openrouter" : null;
+  if (GROQ_API_KEY) return "groq";
   if (OPENAI_API_KEY) return "openai";
   if (OPENROUTER_KEY) return "openrouter";
   return null;
@@ -19,6 +25,10 @@ function pickProvider() {
 function resolveModel(provider, requestedModel) {
   if (provider === "openrouter") {
     return requestedModel || process.env.OPENROUTER_MODEL || "anthropic/claude-sonnet-4.5";
+  }
+
+  if (provider === "groq") {
+    return requestedModel || process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
   }
 
   // OpenAI accepts models like gpt-4.1-mini, gpt-4o-mini, o4-mini etc.
@@ -33,7 +43,9 @@ export default async function handler(req, res) {
   const provider = pickProvider();
   if (!provider) {
     const forcedProviderMissingKey =
-      LLM_PROVIDER === "openai"
+      LLM_PROVIDER === "groq"
+        ? "LLM_PROVIDER is set to groq but GROQ_API_KEY is missing."
+        : LLM_PROVIDER === "openai"
         ? "LLM_PROVIDER is set to openai but OPENAI_API_KEY is missing."
         : LLM_PROVIDER === "openrouter"
           ? "LLM_PROVIDER is set to openrouter but OPENROUTER_KEY is missing."
@@ -41,7 +53,7 @@ export default async function handler(req, res) {
     return res.status(500).json({
       error:
         forcedProviderMissingKey ||
-        "No LLM key configured. Add OPENROUTER_KEY or OPENAI_API_KEY in Vercel environment variables.",
+        "No LLM key configured. Add GROQ_API_KEY, OPENROUTER_KEY, or OPENAI_API_KEY in Vercel environment variables.",
     });
   }
   res.setHeader("x-llm-provider", provider);
@@ -52,8 +64,13 @@ export default async function handler(req, res) {
   const url =
     provider === "openrouter"
       ? "https://openrouter.ai/api/v1/chat/completions"
+      : provider === "groq"
+        ? "https://api.groq.com/openai/v1/chat/completions"
       : "https://api.openai.com/v1/chat/completions";
-  const authKey = provider === "openrouter" ? OPENROUTER_KEY : OPENAI_API_KEY;
+  const authKey =
+    provider === "openrouter" ? OPENROUTER_KEY
+    : provider === "groq" ? GROQ_API_KEY
+    : OPENAI_API_KEY;
 
   const headers = {
     "Content-Type": "application/json",
