@@ -97,6 +97,11 @@ export default async function handler(req, res) {
       : messages,
   };
 
+  if (provider === "groq" && payload.model === "qwen/qwen3-32b") {
+    payload.reasoning_format = "hidden";
+    payload.reasoning_effort = "none";
+  }
+
   let orRes = await fetch(url, {
     method: "POST",
     headers,
