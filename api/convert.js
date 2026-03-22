@@ -271,6 +271,14 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
   const isMarketReturnPattern =
     normalizedSource.includes("अभी बाज़ार जा रहा हूँ") &&
     normalizedSource.includes("शाम तक वापस");
+  const isWhyDidntOpenDoorPattern =
+    normalizedSource.includes("दरवाज़ा") &&
+    normalizedSource.includes("क्यों नहीं खोला");
+  const isTellTruthWhereWereYouPattern =
+    normalizedSource.includes("मुझे सच बताओ") &&
+    normalizedSource.includes("कहाँ थे");
+  const isNotAtHomePattern =
+    normalizedSource.includes("अभी घर पर नहीं है");
   const isDontTellGoHomePattern =
     normalizedSource.includes("यह बात किसी को मत बताना") &&
     normalizedSource.includes("अभी घर जाओ") &&
@@ -382,6 +390,21 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
     if (langId === "bhojpuri") return "हम अबहीं बाजार जात बानी, साँझ ले लौट आइब।";
     if (langId === "gujarati") return "હું હવે બજારમાં જઈ રહ્યો છું, સાંજ સુધી પાછો આવી જઈશ.";
     if (langId === "assamese") return "মই এতিয়া বজাৰলৈ গৈ আছোঁ, সন্ধিয়ালৈ উভতি আহিম।";
+  }
+
+  if (isWhyDidntOpenDoorPattern) {
+    if (langId === "haryanvi") return "तन्नै दरवज्जा क्यूं ना खोल्या?";
+    if (langId === "gujarati") return "તમે બારણું કેમ ન ખોલ્યું?";
+  }
+
+  if (isTellTruthWhereWereYouPattern) {
+    if (langId === "haryanvi") return "मन्नै सच बताइयो, तू कड़ै था?";
+    if (langId === "gujarati") return "મને સાચી વાત કહો, તમે ક્યાં હતા?";
+  }
+
+  if (isNotAtHomePattern) {
+    if (langId === "haryanvi") return "वो इब्बै घर पे ना सै।";
+    if (langId === "gujarati") return "એ હવે ઘરે નથી.";
   }
 
   if (isSecretInsideHousePattern) {
