@@ -428,16 +428,19 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
 
   if (isWhyDidntOpenDoorPattern) {
     if (langId === "haryanvi") return "तन्नै दरवज्जा क्यूं ना खोल्या?";
+    if (langId === "bhojpuri") return "तू दुआर काहे ना खोललऽ?";
     if (langId === "gujarati") return "તમે બારણું કેમ ન ખોલ્યું?";
   }
 
   if (isTellTruthWhereWereYouPattern) {
     if (langId === "haryanvi") return "मन्नै सच बताइयो, तू कड़ै था?";
+    if (langId === "bhojpuri") return "हमके साँच बतावऽ, तू कहाँ रहलऽ?";
     if (langId === "gujarati") return "મને સાચી વાત કહો, તમે ક્યાં હતા?";
   }
 
   if (isNotAtHomePattern) {
     if (langId === "haryanvi") return "वो इब्बै घर पे ना सै।";
+    if (langId === "bhojpuri") return "ऊ अबहीं घरे नइखे।";
     if (langId === "gujarati") return "એ હવે ઘરે નથી.";
   }
 
@@ -544,9 +547,13 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
       return "रउरा के इहीं पूरी कहानी मिली, बाकिर अबहीं सच मत बताईं।";
     }
     output = output
+      .replace(/दरवाज़ा/g, "दुआर")
+      .replace(/दरवाजा/g, "दुआर")
       .replace(/तो यहाँ मिली त हमरा/g, "रउरा के इहीं")
       .replace(/आपको/g, "रउरा के")
       .replace(/तुम्हें/g, "रउरा के")
+      .replace(/तुमने/g, "तू")
+      .replace(/तुम /g, "तू ")
       .replace(/यहां/g, "इहीं")
       .replace(/यहाँ/g, "इहीं")
       .replace(/मिलती हई/g, "मिली")
@@ -556,8 +563,11 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
       .replace(/क्यों/g, "काहे")
       .replace(/मुझे/g, "हमके")
       .replace(/मैं /g, "हम ")
+      .replace(/घर पर/g, "घरे")
       .replace(/नहीं है/g, "नइखे")
       .replace(/नहीं हैं/g, "नइखन")
+      .replace(/बताओ/g, "बतावऽ")
+      .replace(/कहना/g, "कहब")
       .replace(/नहीं /g, "मत ")
       .replace(/मत बताओ ना/g, "मत बताईं")
       .replace(/मत बताओ/g, "मत बताईं")

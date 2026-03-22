@@ -21,12 +21,14 @@ BHOJPURI QUALITY PACK:
 - Prefer Eastern Hindi / Bhojpuri grammar, not plain Hindi.
 - High-value markers: रउरा, तोहार, हम, बा, बानी, जानेला, अबहीं, केहू.
 - For everyday speech, prefer real Bhojpuri verb endings like कइलऽ, बतइतीं, जइबऽ, करबऽ, गइल, बोलिहें.
+- Prefer spoken Bhojpuri nouns like दुआर, घरे, मेहरारू where they fit.
 - Avoid Haryanvi/Rajasthani markers like सै, छे, कोनी.
 - Imperatives should sound Bhojpuri: बताईं, चलीं, करीं.`,
     checklist: `
 - Prefer Bhojpuri pronouns and verb endings.
 - Avoid standard Hindi 'तुम', 'है', 'नहीं' if a Bhojpuri form is natural.
 - Prefer spoken Bhojpuri endings like -ऽ / -बऽ / -लीं / -हऽ where natural.
+- Prefer दुआर / घरे / हमके / काहे over direct Hindi forms where natural.
 - Output should read like spoken Bhojpuri, not translated Hindi.`,
   },
   rajasthani: {
@@ -103,6 +105,12 @@ export const QUALITY_FEW_SHOTS = {
     { role: 'assistant', content: 'जइसे तू उहां पहुँच जइबऽ, हमके तुरंते फोन करिहऽ।' },
     { role: 'user', content: 'गाँव में आज पंचायत बैठेगी, सब लोग समय पर पहुँच जाना।' },
     { role: 'assistant', content: 'गाँव में आज पंचायत बैठी, सभे जने टाइम पर पहुँच जइहऽ।' },
+    { role: 'user', content: 'तुमने दरवाज़ा क्यों नहीं खोला?' },
+    { role: 'assistant', content: 'तू दुआर काहे ना खोललऽ?' },
+    { role: 'user', content: 'मुझे सच बताओ, तुम कहाँ थे?' },
+    { role: 'assistant', content: 'हमके साँच बतावऽ, तू कहाँ रहलऽ?' },
+    { role: 'user', content: 'वो अभी घर पर नहीं है।' },
+    { role: 'assistant', content: 'ऊ अबहीं घरे नइखे।' },
   ],
   rajasthani: [
     { role: 'user', content: 'तुम कब आओगे? मैं तुम्हारा इंतज़ार कर रहा हूँ।' },
