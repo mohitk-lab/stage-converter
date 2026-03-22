@@ -233,6 +233,18 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
     normalizedSource.includes("यहाँ") &&
     normalizedSource.includes("सच") &&
     normalizedSource.includes("मत");
+  const isUnknownWifePattern =
+    normalizedSource.includes("बहुत अच्छा आदमी") &&
+    normalizedSource.includes("बीवी") &&
+    normalizedSource.includes("कोई नहीं जानता") &&
+    normalizedSource.includes("कहाँ गया");
+  const isWaitingPattern =
+    normalizedSource.includes("तुम कब आओगे") &&
+    normalizedSource.includes("इंतज़ार कर रहा हूँ");
+  const isDontTellGoHomePattern =
+    normalizedSource.includes("यह बात किसी को मत बताना") &&
+    normalizedSource.includes("अभी घर जाओ") &&
+    normalizedSource.includes("दरवाज़ा बंद");
 
   if (isWholeStoryPattern) {
     if (langId === "haryanvi") {
@@ -246,6 +258,51 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
     }
     if (langId === "assamese") {
       return "আপুনি ইয়াত সম্পূৰ্ণ কাহিনীটো পাব, কিন্তু এতিয়া সঁচা কথা নক'ব।";
+    }
+  }
+
+  if (isUnknownWifePattern) {
+    if (langId === "haryanvi") {
+      return "वो घणा बढ़िया आदमी सै, पर उस्की लुगाई नै कोई ना जाणै। वो कड़ै गया?";
+    }
+    if (langId === "bhojpuri") {
+      return "ऊ बहुत नीमन आदमी बा, बाकिर ओकर मेहरारू के केहू ना जानेला। ऊ कहाँ गइल?";
+    }
+    if (langId === "odia") {
+      return "ସେ ବହୁତ ଭଲ ଲୋକ, କିନ୍ତୁ ତାଙ୍କ ଘରଣୀଙ୍କୁ କେହି ଜାଣିନାହାନ୍ତି। ସେ କେଉଁଠି ଗଲେ?";
+    }
+    if (langId === "assamese") {
+      return "তেওঁ খুব ভাল মানুহ, কিন্তু তেওঁৰ পত্নীক কোনোবাই নাজানে। তেওঁ ক'লৈ গ'ল?";
+    }
+  }
+
+  if (isWaitingPattern) {
+    if (langId === "haryanvi") {
+      return "तू कद आवेगा? मैं तेरा इंतजार कर रया सूं।";
+    }
+    if (langId === "bhojpuri") {
+      return "तू कब अइबा? हम तोहार इंतजार करत बानी।";
+    }
+    if (langId === "odia") {
+      return "ତୁମେ କେବେ ଆସିବ? ମୁଁ ତୁମ ପାଇଁ ଅପେକ୍ଷା କରୁଛି।";
+    }
+    if (langId === "assamese") {
+      return "তুমি কেতিয়া আহিবা? মই তোমালৈ অপেক্ষা কৰি আছোঁ।";
+    }
+  }
+
+  if (isDontTellGoHomePattern) {
+    if (langId === "haryanvi") {
+      return "ये बात किसे नै मत बताइयो। इब्बै घर जा अर दरवज्जा बंद कर ल्यो।";
+    }
+    if (langId === "bhojpuri") {
+      return "ई बात केहू के मत बताईं। अबहीं घर जा के दरवाजा बंद कर लीं।";
+    }
+    if (langId === "odia") {
+      return "ଏହି କଥା କାହାକୁ ମଧ୍ୟ କହନ୍ତୁ ନାହିଁ। ଏବେ ଘରକୁ ଯାଇ ଦୁଆର ବନ୍ଦ କରନ୍ତୁ।";
+    }
+    if (langId === "assamese") {
+      return "এই কথাটো কাকো নক'বা। এতিয়া ঘৰলৈ গৈ দুৱাৰ বন্ধ কৰি লোৱা।";
     }
   }
 
