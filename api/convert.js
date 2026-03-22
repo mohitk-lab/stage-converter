@@ -426,6 +426,19 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
       return "तन्नै यहीं पूरी कहानी मिल जागी, पर इब्बै सच मत बताइयो।";
     }
     output = output
+      .replace(/दरवाज़ा/g, "दरवज्जा")
+      .replace(/दर्वाजा/g, "दरवज्जा")
+      .replace(/क्यों/g, "क्यूं")
+      .replace(/कहाँ/g, "कड़ै")
+      .replace(/मुझे/g, "मन्नै")
+      .replace(/मुझको/g, "मन्नै")
+      .replace(/तुमने/g, "तन्नै")
+      .replace(/तुम/g, "तू")
+      .replace(/अभी/g, "इब्बै")
+      .replace(/घर पर/g, "घर पे")
+      .replace(/नहीं है/g, "ना सै")
+      .replace(/मत खोलना/g, "मत खोलियो")
+      .replace(/बताओ/g, "बताइयो")
       .replace(/इहाँ/g, "यहाँ")
       .replace(/यहां/g, "यहाँ")
       .replace(/तुम्हें/g, "तन्नै")
@@ -435,7 +448,14 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
       .replace(/मत सुनाइए/g, "मत बताइयो")
       .replace(/पर अभी तो /g, "पर इब्बै ")
       .replace(/पर अभी /g, "पर इब्बै ")
-      .replace(/लेकिन अभी /g, "पर इब्बै ");
+      .replace(/लेकिन अभी /g, "पर इब्बै ")
+      .replace(/रिया हाँ/g, "रया सूं")
+      .replace(/रहा हूँ/g, "रया सूं")
+      .replace(/रहा हूं/g, "रया सूं")
+      .replace(/हूँ/g, "सूं")
+      .replace(/ हूं/g, " सूं")
+      .replace(/ है\b/g, " सै")
+      .replace(/ हैं\b/g, " सैं");
 
     if (!/(सै|सूं|सैं|इब्बै|तन्नै|म्ह)/.test(output)) {
       output = output
@@ -492,6 +512,32 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
       .replace(/সত্য নিবেদন কৰিব নেকি/g, "সঁচা কথা নক'ব")
       .replace(/সত্য কথা কবি নাই/g, "সঁচা কথা নক'ব")
       .replace(/সত্য কওঁ নকৰিবা/g, "সঁচা কথা নক'ব");
+  }
+
+  if (langId === "gujarati") {
+    output = output
+      .replace(/दरवाज़ा/g, "બારણું")
+      .replace(/दरवाजा/g, "બારણું")
+      .replace(/दरवाजो/g, "બારણું")
+      .replace(/घर/g, "ઘર")
+      .replace(/अभी/g, "હવે")
+      .replace(/यहाँ/g, "અહીં")
+      .replace(/यहां/g, "અહીં")
+      .replace(/तुरंत/g, "તરત")
+      .replace(/फोन करना/g, "ફોન કરજો")
+      .replace(/कहना मत/g, "કહેશો નહીં")
+      .replace(/मत बताना/g, "કહેશો નહીં")
+      .replace(/कहाँ/g, "ક્યાં")
+      .replace(/क्यों/g, "કેમ")
+      .replace(/मुझे/g, "મને")
+      .replace(/तुम/g, "તમે")
+      .replace(/वो /g, "એ ")
+      .replace(/दरवाजो बंद/g, "બારણું બંધ")
+      .replace(/રાહ જોઈ રહ્યો છું\./g, "રાહ જોઈ રહ્યો છું.")
+      .replace(/દરવાજો/g, "બારણું")
+      .replace(/જઈશું/g, "જઈશ")
+      .replace(/સાંજ સુધીમાં/g, "સાંજ સુધી")
+      .replace(/હમણાં/g, "હવે");
   }
 
   return output.replace(/\s+/g, " ").trim();

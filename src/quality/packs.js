@@ -4,10 +4,12 @@ export const QUALITY_PROMPT_PACKS = {
 HARYANVI QUALITY PACK:
 - Prefer real Haryanvi village speech, not plain Hindi.
 - High-value markers: सै, सूं, सैं, इब्बै, तन्नै, किसे नै, कड़ै, रया.
+- If a sentence still reads like Hindi, force at least 2-3 Haryanvi markers into it: सै/सूं, इब्बै, तन्नै, मन्नै, कड़ै, दरवज्जा.
 - Avoid Punjabi/Bhojpuri contamination.
 - Imperatives should sound local: बताइयो, कर ल्यो, जा.`,
     checklist: `
 - Prefer Haryanvi wording like तन्नै / इब्बै / कड़ै / रया where natural.
+- Prefer दरवज्जा, घर पे, मन्नै, क्यूं, ना सै where they fit.
 - Avoid Punjabi-style forms like नूं / जाणदा.
 - Avoid plain-Hindi wording when a natural Haryanvi option exists.`,
   },
@@ -41,12 +43,14 @@ RAJASTHANI QUALITY PACK:
 GUJARATI QUALITY PACK:
 - Prefer natural spoken Gujarati, not textbook literal translation.
 - High-value wording: અહીં, હવે/હમણાં, ઘરે, બારણું, પાછો આવી જઈશ, તરત ફોન કરજો, કહી દીધું હોત.
+- Prefer conversational Gujarati over direct Hindi calques: use "બારણું", "રાહ જોઈ રહ્યો છું", "હવે ઘરે જાઓ", "એ ક્યાં હતો?".
 - Preserve Gujarati script only.
 - Reorder sentence if Hindi order sounds unnatural in Gujarati.`,
     checklist: `
 - Use idiomatic Gujarati word order.
 - Avoid leaving Devanagari/Hindi words unchanged.
 - Prefer spoken Gujarati like "હવે ઘરે જાઓ", "બારણું બંધ કરો", "હું રાહ જોઈ રહ્યો છું", "પાછો આવી જઈશ".
+- Avoid stiff literals like "દરવાજો" when "બારણું" is the natural spoken option.
 - Prefer clean, natural spoken Gujarati over stiff formal Gujarati.`,
   },
 };
@@ -65,6 +69,12 @@ export const QUALITY_FEW_SHOTS = {
     { role: 'assistant', content: 'तन्नै ऐस्सा क्यूं कर्या? म्हानै पहले बता देता।' },
     { role: 'user', content: 'मैं अभी बाज़ार जा रहा हूँ, शाम तक वापस आ जाऊँगा।' },
     { role: 'assistant', content: 'मैं इब्बै बाजार जा रया सूं, सांझ तक वापस आ जाऊंगा।' },
+    { role: 'user', content: 'तुमने दरवाज़ा क्यों नहीं खोला?' },
+    { role: 'assistant', content: 'तन्नै दरवज्जा क्यूं ना खोल्या?' },
+    { role: 'user', content: 'मुझे सच बताओ, तुम कहाँ थे?' },
+    { role: 'assistant', content: 'मन्नै सच बताइयो, तू कड़ै था?' },
+    { role: 'user', content: 'वो अभी घर पर नहीं है।' },
+    { role: 'assistant', content: 'वो इब्बै घर पे ना सै।' },
   ],
   bhojpuri: [
     { role: 'user', content: 'तुम कब आओगे? मैं तुम्हारा इंतज़ार कर रहा हूँ।' },
@@ -115,5 +125,11 @@ export const QUALITY_FEW_SHOTS = {
     { role: 'assistant', content: 'તમે ત્યાં પહોંચી જાઓ ત્યારે મને તરત ફોન કરજો.' },
     { role: 'user', content: 'गाँव में आज पंचायत बैठेगी, सब लोग समय पर पहुँच जाना।' },
     { role: 'assistant', content: 'ગામમાં આજે પંચાયત બેસશે, બધા સમયસર પહોંચી જજો.' },
+    { role: 'user', content: 'तुमने दरवाज़ा क्यों नहीं खोला?' },
+    { role: 'assistant', content: 'તમે બારણું કેમ ન ખોલ્યું?' },
+    { role: 'user', content: 'मुझे सच बताओ, तुम कहाँ थे?' },
+    { role: 'assistant', content: 'મને સાચી વાત કહો, તમે ક્યાં હતા?' },
+    { role: 'user', content: 'वो अभी घर पर नहीं है।' },
+    { role: 'assistant', content: 'એ હવે ઘરે નથી.' },
   ],
 };
