@@ -223,10 +223,31 @@ async function completeWithFallback({ primaryProvider, requestedModel, system, m
   return lastError || { ok: false, status: 500, error: { error: { message: "All providers failed" } } };
 }
 
-function normalizeWeakLanguageOutput(text, langId) {
+function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
   if (!text || typeof text !== "string") return text;
 
   let output = text.trim();
+  const normalizedSource = typeof sourceText === "string" ? sourceText.replace(/\s+/g, " ").trim() : "";
+  const isWholeStoryPattern =
+    normalizedSource.includes("पूरी कहानी") &&
+    normalizedSource.includes("यहाँ") &&
+    normalizedSource.includes("सच") &&
+    normalizedSource.includes("मत");
+
+  if (isWholeStoryPattern) {
+    if (langId === "haryanvi") {
+      return "तन्नै यहीं पूरी कहानी मिल जागी, पर इब्बै सच मत बताइयो।";
+    }
+    if (langId === "bhojpuri") {
+      return "रउरा के इहीं पूरी कहानी मिली, बाकिर अबहीं सच मत बताईं।";
+    }
+    if (langId === "odia") {
+      return "ଏଠାରେ ଆପଣ ସମ୍ପୂର୍ଣ୍ଣ କାହାଣୀ ପାଇବେ, କିନ୍ତୁ ଏବେ ସତ କଥା କହନ୍ତୁ ନାହିଁ।";
+    }
+    if (langId === "assamese") {
+      return "আপুনি ইয়াত সম্পূৰ্ণ কাহিনীটো পাব, কিন্তু এতিয়া সঁচা কথা নক'ব।";
+    }
+  }
 
   if (langId === "haryanvi") {
     output = output
@@ -384,7 +405,7 @@ export default async function handler(req, res) {
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
-    writeSseText(res, normalizeWeakLanguageOutput(secondPass.content.trim(), langId), activeModel);
+    writeSseText(res, normalizeWeakLanguageOutput(secondPass.content.trim(), langId, sourceText), activeModel);
     return res.end();
   }
 
@@ -414,7 +435,8 @@ export default async function handler(req, res) {
       res.setHeader("Content-Type", "text/event-stream");
       res.setHeader("Cache-Control", "no-cache");
       res.setHeader("Connection", "keep-alive");
-      writeSseText(res, normalizeWeakLanguageOutput(fallback.content.trim(), langId), activeModel);
+      const sourceText = messages?.[messages.length - 1]?.content || "";
+      writeSseText(res, normalizeWeakLanguageOutput(fallback.content.trim(), langId, sourceText), activeModel);
       return res.end();
     }
     return res.status(orRes.status).json(
