@@ -203,21 +203,39 @@ async function completeOnce({ url, headers, payload }) {
   return { ok: true, content };
 }
 
+async function sleep(ms) {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 async function completeWithFallback({ primaryProvider, requestedModel, system, messages, providersOverride = null }) {
   const providers = providersOverride || buildFallbackProviders(primaryProvider);
   let lastError = null;
 
   for (const provider of providers) {
     const cfg = buildProviderConfig(provider, requestedModel, system, messages, false);
-    const result = await completeOnce(cfg);
-    if (result.ok) return { ...result, provider, model: cfg.payload.model };
 
-    const raw = result.error?.error?.message || JSON.stringify(result.error);
-    const parsed = result.error;
-    if (!shouldTryNextProvider(provider, result.status, raw, parsed)) {
-      return result;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const result = await completeOnce(cfg);
+      if (result.ok) return { ...result, provider, model: cfg.payload.model };
+
+      const raw = result.error?.error?.message || JSON.stringify(result.error);
+      const parsed = result.error;
+      const retryable = shouldTryNextProvider(provider, result.status, raw, parsed);
+      const shouldRetrySameProvider = retryable && attempt === 0 && (result.status === 429 || result.status >= 500);
+
+      if (shouldRetrySameProvider) {
+        await sleep(600);
+        lastError = result;
+        continue;
+      }
+
+      if (!retryable) {
+        return result;
+      }
+
+      lastError = result;
+      break;
     }
-    lastError = result;
   }
 
   return lastError || { ok: false, status: 500, error: { error: { message: "All providers failed" } } };
@@ -465,6 +483,15 @@ export default async function handler(req, res) {
       messages: reviewMessages,
     });
     if (!secondPass.ok) {
+      const fallbackReviewed = normalizeWeakLanguageOutput(firstPass.content.trim(), langId, sourceText);
+      if (fallbackReviewed) {
+        res.setHeader("x-llm-provider", `${activeProvider}-review-fallback`);
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Connection", "keep-alive");
+        writeSseText(res, fallbackReviewed, activeModel);
+        return res.end();
+      }
       return res.status(secondPass.status).json(secondPass.error);
     }
     activeProvider = secondPass.provider || activeProvider;
