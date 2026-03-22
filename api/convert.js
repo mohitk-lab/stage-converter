@@ -208,6 +208,7 @@ export default async function handler(req, res) {
     const errorText = (parsed?.error?.message || parsed?.error || raw || "").toString().toLowerCase();
     const shouldFallbackToOpenAI =
       provider === "openrouter" &&
+      LLM_PROVIDER !== "openrouter" &&
       OPENAI_API_KEY &&
       (errorText.includes("insufficient credits") || errorText.includes("quota"));
 
