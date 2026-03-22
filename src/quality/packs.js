@@ -5,11 +5,13 @@ HARYANVI QUALITY PACK:
 - Prefer real Haryanvi village speech, not plain Hindi.
 - High-value markers: सै, सूं, सैं, इब्बै, तन्नै, किसे नै, कड़ै, रया.
 - If a sentence still reads like Hindi, force at least 2-3 Haryanvi markers into it: सै/सूं, इब्बै, तन्नै, मन्नै, कड़ै, दरवज्जा.
+- Questions should shift too: क्यों→क्यूं, कहाँ→कड़ै, कब→कद, कौन→कौण where natural.
 - Avoid Punjabi/Bhojpuri contamination.
 - Imperatives should sound local: बताइयो, कर ल्यो, जा.`,
     checklist: `
 - Prefer Haryanvi wording like तन्नै / इब्बै / कड़ै / रया where natural.
 - Prefer दरवज्जा, घर पे, मन्नै, क्यूं, ना सै where they fit.
+- Convert copula/negation fully: है→सै, हूँ→सूं, नहीं है→ना सै, नहीं हूँ→ना सूं, नहीं हैं→ना सैं.
 - Avoid Punjabi-style forms like नूं / जाणदा.
 - Avoid plain-Hindi wording when a natural Haryanvi option exists.`,
   },
@@ -44,6 +46,7 @@ GUJARATI QUALITY PACK:
 - Prefer natural spoken Gujarati, not textbook literal translation.
 - High-value wording: અહીં, હવે/હમણાં, ઘરે, બારણું, પાછો આવી જઈશ, તરત ફોન કરજો, કહી દીધું હોત.
 - Prefer conversational Gujarati over direct Hindi calques: use "બારણું", "રાહ જોઈ રહ્યો છું", "હવે ઘરે જાઓ", "એ ક્યાં હતો?".
+- Questions should sound Gujarati: क्या→શું, क्यों→કેમ, कहाँ→ક્યાં, कब→ક્યારે, कौन→કોણ.
 - Preserve Gujarati script only.
 - Reorder sentence if Hindi order sounds unnatural in Gujarati.`,
     checklist: `
@@ -51,6 +54,7 @@ GUJARATI QUALITY PACK:
 - Avoid leaving Devanagari/Hindi words unchanged.
 - Prefer spoken Gujarati like "હવે ઘરે જાઓ", "બારણું બંધ કરો", "હું રાહ જોઈ રહ્યો છું", "પાછો આવી જઈશ".
 - Avoid stiff literals like "દરવાજો" when "બારણું" is the natural spoken option.
+- Prefer Gujarati question words and copula forms over direct Hindi structure.
 - Prefer clean, natural spoken Gujarati over stiff formal Gujarati.`,
   },
 };
@@ -75,6 +79,10 @@ export const QUALITY_FEW_SHOTS = {
     { role: 'assistant', content: 'मन्नै सच बताइयो, तू कड़ै था?' },
     { role: 'user', content: 'वो अभी घर पर नहीं है।' },
     { role: 'assistant', content: 'वो इब्बै घर पे ना सै।' },
+    { role: 'user', content: 'वो कौन था और कब आया?' },
+    { role: 'assistant', content: 'वो कौण था अर कद आया?' },
+    { role: 'user', content: 'मैं अभी तैयार नहीं हूँ।' },
+    { role: 'assistant', content: 'मैं इब्बै तैयार ना सूं।' },
   ],
   bhojpuri: [
     { role: 'user', content: 'तुम कब आओगे? मैं तुम्हारा इंतज़ार कर रहा हूँ।' },
@@ -131,5 +139,9 @@ export const QUALITY_FEW_SHOTS = {
     { role: 'assistant', content: 'મને સાચી વાત કહો, તમે ક્યાં હતા?' },
     { role: 'user', content: 'वो अभी घर पर नहीं है।' },
     { role: 'assistant', content: 'એ હવે ઘરે નથી.' },
+    { role: 'user', content: 'वो कौन था और कब आया?' },
+    { role: 'assistant', content: 'એ કોણ હતો અને ક્યારે આવ્યો?' },
+    { role: 'user', content: 'मैं अभी तैयार नहीं हूँ।' },
+    { role: 'assistant', content: 'હું હવે તૈયાર નથી.' },
   ],
 };
