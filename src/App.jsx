@@ -1166,45 +1166,123 @@ HOSPITALITY: મેહમાન નવાજી, "જમવા ચાલો" (co
 
 /* --- System prompt builder --- */
 const buildSingleConverterSystem = (id, selectedTone, culturalAdapt = false) => {
-  const checklist = id === "haryanvi" ? `
+  const checklistMap = {
+    haryanvi: `
 HARYANVI FINAL CHECKLIST:
-- \u0939\u0942\u0901 \u2192 \u0938\u0942\u0902 (MANDATORY)
-- \u0939\u0948 \u2192 \u0938\u0948 (MANDATORY)
-- \u0939\u0948\u0902 \u2192 \u0938\u0948\u0902 (MANDATORY)
-- ALL "-\u0928\u093E" infinitives \u2192 "-\u0923\u093E" (NOT "-\u0923\u094B" \u2014 that's Rajasthani!)
-- \u0928\u0939\u0940\u0902 \u2192 \u0928\u093E / \u0915\u094B\u0928\u0940
-- \u092E\u0948\u0902 \u2192 \u092E\u094D\u0939\u0948\u0902 | \u092E\u0947\u0930\u093E \u2192 \u092E\u094D\u0939\u093E\u0930\u093E | \u092C\u0939\u0941\u0924 \u2192 \u0918\u0923\u093E
-- Past: \u0915\u093F\u092F\u093E\u2192\u0915\u0930\u094D\u092F\u093E (m)/\u0915\u0930\u0940 (f) (NOT \u0915\u093F\u092F\u094B \u2014 that's Rajasthani!)
-- ZERO Bhojpuri words: \u092C\u093E, \u092C\u093E\u0921\u093C\u0928, \u092C\u093E\u0928\u0940, \u0928\u093E\u0939\u0940\u0902, \u0939\u092E\u0915\u0947, \u090A, \u0913\u0915\u0930, \u0915\u0947\u0924\u0928\u093E
-- ZERO Rajasthani words: \u091B\u0947, \u091B\u0942\u0902, \u091B\u094B, -\u0923\u094B endings, \u092E\u094D\u0939\u093E\u0930\u094B, \u0925\u094B, \u0917\u092F\u094B, \u0915\u093F\u092F\u094B, \u0926\u0947\u0916\u094D\u092F\u094B, \u0918\u0923\u094B, \u0938\u0917\u0933\u093E, \u0915\u0920\u0947
-SELF-CHECK: Scan output \u2014 if you see \u091B\u0947/\u091B\u0942\u0902/\u092C\u093E/\u092C\u093E\u0928\u0940/-\u0923\u094B/\u0928\u093E\u0939\u0940\u0902, REWRITE those words.` : id === "rajasthani" ? `
+- हूँ → सूं (MANDATORY)
+- है → सै (MANDATORY)
+- हैं → सैं (MANDATORY)
+- ALL "-ना" infinitives → "-णा" (NOT "-णो" — that's Rajasthani!)
+- नहीं → ना / कोनी
+- मैं → म्हैं | मेरा → म्हारा | बहुत → घणा
+- Past: किया→कर्या (m)/करी (f) (NOT कियो — that's Rajasthani!)
+- ZERO Bhojpuri words: बा, बाड़न, बानी, नाहीं, हमके, ऊ, ओकर, केतना
+- ZERO Rajasthani words: छे, छूं, छो, -णो endings, म्हारो, थो, गयो, कियो, देख्यो, घणो, सगळा, कठे
+- Do NOT leave the sentence in plain Hindi. At least the copula, pronouns, and verb shapes must be genuinely Haryanvi where applicable.
+SELF-CHECK: Scan output — if you see छे/छूं/बा/बानी/-णो/नाहीं, REWRITE those words.`,
+    rajasthani: `
 RAJASTHANI FINAL CHECKLIST:
-- \u0939\u0942\u0901 \u2192 \u091B\u0942\u0902 (MANDATORY)
-- \u0939\u0948 \u2192 \u091B\u0947 (MANDATORY)
-- ALL "-\u0928\u093E" infinitives \u2192 "-\u0923\u094B" (NOT "-\u0923\u093E" \u2014 that's Haryanvi!)
-- \u0928\u0939\u0940\u0902 \u2192 \u0915\u094B\u0928\u0940 (MANDATORY)
-- \u092E\u0948\u0902 \u2192 \u092E\u094D\u0939\u0948\u0902 | \u092E\u0947\u0930\u093E \u2192 \u092E\u094D\u0939\u093E\u0930\u094B (NOT \u092E\u094D\u0939\u093E\u0930\u093E \u2014 that's Haryanvi!) | \u092C\u0939\u0941\u0924 \u2192 \u0918\u0923\u094B/\u0918\u0923\u0940
-- Past: \u0925\u093E\u2192\u0925\u094B (m) | \u0917\u092F\u093E\u2192\u0917\u092F\u094B (m) (NOT \u0915\u0930\u094D\u092F\u093E/\u0926\u0947\u0916\u094D\u092F\u093E \u2014 that's Haryanvi!)
-- ZERO Bhojpuri words: \u092C\u093E, \u092C\u093E\u0921\u093C\u0928, \u092C\u093E\u0928\u0940, \u0928\u093E\u0939\u0940\u0902, \u0939\u092E\u0915\u0947, \u090A, \u0913\u0915\u0930, \u0915\u0947\u0924\u0928\u093E, \u092C\u0939\u0941\u0924\u0947
-- ZERO Haryanvi words: \u0938\u0948, \u0938\u0942\u0902, \u0938\u0948\u0902, \u0938\u094B, -\u0923\u093E endings, \u092E\u094D\u0939\u093E\u0930\u093E, \u0915\u0930\u094D\u092F\u093E, \u0926\u0947\u0916\u094D\u092F\u093E, \u0915\u093F\u0924\u094D\u0924\u093E, \u0915\u0921\u093C\u0948
-SELF-CHECK: Scan output \u2014 if you see \u0938\u0948/\u0938\u0942\u0902/\u092C\u093E/\u092C\u093E\u0928\u0940/-\u0923\u093E endings/\u0928\u093E\u0939\u0940\u0902, REWRITE those words.` : id === "bhojpuri" ? `
+- हूँ → छूं (MANDATORY)
+- है → छे (MANDATORY)
+- ALL "-ना" infinitives → "-णो" (NOT "-णा" — that's Haryanvi!)
+- नहीं → कोनी (MANDATORY)
+- मैं → म्हैं | मेरा → म्हारो (NOT म्हारा — that's Haryanvi!) | बहुत → घणो/घणी
+- Past: था→थो (m) | गया→गयो (m) (NOT कर्या/देख्या — that's Haryanvi!)
+- ZERO Bhojpuri words: बा, बाड़न, बानी, नाहीं, हमके, ऊ, ओकर, केतना, बहुते
+- ZERO Haryanvi words: सै, सूं, सैं, सो, -णा endings, म्हारा, कर्या, देख्या, कित्ता, कड़ै
+- Prefer natural Rajasthani wording like म्हैं/थारै/कठै/कोनी where relevant.
+SELF-CHECK: Scan output — if you see सै/सूं/बा/बानी/-णा endings/नाहीं, REWRITE those words.`,
+    bhojpuri: `
 BHOJPURI FINAL CHECKLIST:
-- \u0939\u0948 \u2192 \u092C\u093E | \u0939\u0948\u0902 \u2192 \u092C\u093E\u0921\u093C\u0928 | \u0939\u0942\u0901 \u2192 \u092C\u093E\u0928\u0940 (MANDATORY)
-- \u0928\u0939\u0940\u0902 \u2192 \u0928\u093E\u0939\u0940\u0902 | \u092E\u0948\u0902 \u2192 \u0939\u092E | \u092E\u0941\u091D\u0947 \u2192 \u0939\u092E\u0915\u0947 | \u0935\u094B \u2192 \u090A
-- NEVER use "\u0939\u0948", "\u0928\u0939\u0940\u0902", "\u092E\u0948\u0902" in output
-- ZERO Haryanvi words: \u0938\u0948, \u0938\u0942\u0902, \u0938\u0948\u0902, -\u0923\u093E endings, \u092E\u094D\u0939\u0948\u0902, \u092E\u094D\u0939\u093E\u0928\u0947, \u092E\u094D\u0939\u093E\u0930\u093E, \u0918\u0923\u093E, \u0915\u0930\u094D\u092F\u093E, \u0915\u0921\u093C\u0948
-- ZERO Rajasthani words: \u091B\u0947, \u091B\u0942\u0902, -\u0923\u094B endings, \u092E\u094D\u0939\u093E\u0930\u094B, \u0915\u094B\u0928\u0940, \u0918\u0923\u094B, \u0917\u092F\u094B, \u0925\u094B, \u0915\u0920\u0947
-SELF-CHECK: Scan output \u2014 if you see \u0938\u0948/\u091B\u0947/\u0938\u0942\u0902/\u091B\u0942\u0902/\u092E\u094D\u0939\u0948\u0902/\u0915\u094B\u0928\u0940, REWRITE those words.` : id === "hindi" ? `
+- है → बा | हैं → बाड़न | हूँ → बानी (MANDATORY)
+- नहीं → नाहीं | मैं → हम | मुझे → हमके | वो → ऊ
+- NEVER use "है", "नहीं", "मैं" in output
+- ZERO Haryanvi words: सै, सूं, सैं, -णा endings, म्हैं, म्हाने, म्हारा, घणा, कर्या, कड़ै
+- ZERO Rajasthani words: छे, छूं, -णो endings, म्हारो, कोनी, घणो, गयो, थो, कठे
+- Do NOT leave the sentence in plain Hindi. Use real Bhojpuri verbs and pronouns.
+- Prefer Bhojpuri wording like मिली/मिल जाई/बतइब/कहब where natural.
+SELF-CHECK: Scan output — if you see सै/छे/सूं/छूं/म्हैं/कोनी, REWRITE those words.`,
+    hindi: `
 HINDI FINAL CHECKLIST:
-- Remove ALL dialect markers (\u092C\u093E, \u0938\u0948, \u091B\u0947, etc.)
-- Use standard \u0939\u0948/\u0939\u0948\u0902/\u0925\u093E/\u0925\u0940
-- Use standard \u0928\u0939\u0940\u0902 (not \u0928\u093E\u0939\u0940\u0902/\u0915\u094B\u0928\u0940)
-- Clean, grammatically correct Khari Boli` : id === "english" ? `
+- Remove ALL dialect markers (बा, सै, छे, etc.)
+- Use standard है/हैं/था/थी
+- Use standard नहीं (not नाहीं/कोनी)
+- Clean, grammatically correct Khari Boli`,
+    english: `
 ENGLISH FINAL CHECKLIST:
 - Natural, conversational English
 - NO Hindi/Devanagari words in output (except proper nouns/cultural terms)
 - Preserve tone and emotion of original
-- Not literal translation \u2014 capture the meaning and feel` : "";
+- Not literal translation — capture the meaning and feel`,
+    gujarati: `
+GUJARATI FINAL CHECKLIST:
+- Output entirely in Gujarati script.
+- Do NOT leave Hindi/Devanagari words unchanged.
+- Prefer natural Gujarati phrasing like "અહીં તમને ... મળશે".
+- Avoid literal Hindi word order if it sounds translated.
+SELF-CHECK: if Devanagari appears in output, rewrite.`,
+    marathi: `
+MARATHI FINAL CHECKLIST:
+- Output in natural Marathi (Devanagari), not Hindi with minor substitutions.
+- Prefer Marathi phrasing like "इथे/येथे तुम्हाला..." and "सांगू नका".
+- Keep register natural, not overly Sanskritized unless needed.
+SELF-CHECK: if the sentence reads like plain Hindi, rewrite in Marathi.`,
+    bengali: `
+BENGALI FINAL CHECKLIST:
+- Output entirely in Bengali script.
+- Use natural Bengali word order and polite forms.
+- Prefer natural forms like "এখানে", "এখন", "সত্যি কথা" where relevant.
+SELF-CHECK: if Hindi structure is visible, rewrite.`,
+    punjabi: `
+PUNJABI FINAL CHECKLIST:
+- Output entirely in Gurmukhi script.
+- Use natural Punjabi phrasing, not literal Hindi.
+- Prefer simpler Punjabi forms over stiff translations like "ਪ੍ਰਾਪਤ ਕਰੋਗੇ" when a natural alternative exists.
+SELF-CHECK: if it sounds like translated Hindi, rewrite in spoken Punjabi.`,
+    tamil: `
+TAMIL FINAL CHECKLIST:
+- Output entirely in Tamil script.
+- Use natural Tamil syntax, not direct Hindi order.
+- Avoid assistant-style replies or explanation.
+SELF-CHECK: if non-Tamil script appears, rewrite.`,
+    telugu: `
+TELUGU FINAL CHECKLIST:
+- Output entirely in Telugu script.
+- Preserve politeness. For polite Hindi imperatives, use polite Telugu forms, not casual ones.
+- Prefer natural Telugu syntax rather than Hindi order.
+SELF-CHECK: if politeness level changed, rewrite.`,
+    kannada: `
+KANNADA FINAL CHECKLIST:
+- Output entirely in Kannada script.
+- Use natural Kannada sentence order and register.
+- Preserve politeness and tone.
+SELF-CHECK: if the sentence sounds like Hindi in Kannada script, rewrite.`,
+    malayalam: `
+MALAYALAM FINAL CHECKLIST:
+- Output entirely in Malayalam script.
+- Use natural Malayalam syntax and polite negation/imperative forms.
+- Preserve meaning exactly.
+SELF-CHECK: if non-Malayalam script appears, rewrite.`,
+    odia: `
+ODIA FINAL CHECKLIST:
+- Output entirely in Odia script.
+- Translate "story" as "କାହାଣୀ", not generic "କଥାବାର୍ତ୍ତା", unless the source explicitly means conversation.
+- Keep wording simple and natural.
+SELF-CHECK: if the core noun meaning changed, rewrite.`,
+    assamese: `
+ASSAMESE FINAL CHECKLIST:
+- Output entirely in Assamese script.
+- Use Assamese-specific forms like "আপুনি/তুমি", "ইয়াত", "এতিয়া", "সঁচা কথা" naturally.
+- Avoid Bengali spellings or Hindi-in-script output.
+SELF-CHECK: if pronouns or spelling look non-Assamese, rewrite.`,
+    urdu: `
+URDU FINAL CHECKLIST:
+- Output entirely in Urdu script.
+- Keep register natural and idiomatic.
+- Preserve politeness and imperative tone.
+SELF-CHECK: if the wording sounds mechanically translated, rewrite.`,
+  };
+  const checklist = checklistMap[id] || "";
 
   const needsContrastive = ["bhojpuri", "haryanvi", "rajasthani"].includes(id);
   const contrastiveDialects = {
@@ -1235,6 +1313,7 @@ STEP 3 \u2014 REWRITE in ${id === "hindi" ? "standard Hindi" : id === "english" 
 - Preserve the original meaning, emotion, and structure.
 - All names and proper nouns: preserve exactly as given.
 - Output ONLY the converted text. No explanation, no labels, nothing else.
+- ${id === "english" ? "Write only in English Latin script." : "Write only in the target language/script. Do not leave Hindi source words unchanged unless they are proper nouns."}
 ${culturalAdapt && CULTURAL_RULES[id] ? "\n" + CULTURAL_RULES[id] + "\n" : ""}
 ${needsContrastive ? "\n" + CONTRASTIVE_TABLE : ""}
 ${DIALECT_RULES[id]}
@@ -1246,7 +1325,8 @@ ${checklist}
 3. Do NOT prepend or append any example text, greetings, or filler sentences.
 4. The number of sentences in your output must match the number of sentences in the input.
 5. If the input has 3 sentences, your output must have exactly 3 sentences (converted).
-6. NEVER add content from training examples or previous context into the output.`;
+6. NEVER add content from training examples or previous context into the output.
+7. NEVER answer the user as an assistant. This is translation only. If you produce a reply like "Hello! How can I help?", you have FAILED.`;
 };
 
 /* ============================================
