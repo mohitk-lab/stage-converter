@@ -33,10 +33,12 @@ BHOJPURI QUALITY PACK:
     system: `
 RAJASTHANI QUALITY PACK:
 - Prefer natural Rajasthani markers: छे, छूं, म्हारो, थारै, कठै, कोनी.
+- Question words should feel local: क्यूं, कठै, कद, कुण.
 - Avoid Haryanvi markers like सै, सूं, इब्बै.
 - Imperatives should sound Rajasthani: बतायजो, बोलियो, जासी, कर ल्यो.`,
     checklist: `
 - Prefer local Rajasthani forms over neutral Hindi.
+- Prefer कोनी/छे/छूं and Rajasthani question words over direct Hindi forms.
 - Avoid Haryanvi/Bhojpuri bleed.
 - Keep sentence flow natural and regional, not textbook Hindi.`,
   },
@@ -115,6 +117,10 @@ export const QUALITY_FEW_SHOTS = {
     { role: 'assistant', content: 'थैं ऐसो क्यूं कियो? म्हानै पहलां बताय देतो।' },
     { role: 'user', content: 'मैं अभी बाज़ार जा रहा हूँ, शाम तक वापस आ जाऊँगा।' },
     { role: 'assistant', content: 'म्हैं अबार बाजार जावां छूं, सांझ ताईं वापस आ जासूं।' },
+    { role: 'user', content: 'घर के अंदर बहुत बड़ा राज़ छुपा है, पर अभी किसी को मत बताना।' },
+    { role: 'assistant', content: 'घर रै अंदर घणो मोटौ राज लुकायलो छे, पण अबार काकै नै मत बतायजो।' },
+    { role: 'user', content: 'जब तुम वहाँ पहुँच जाओ तो मुझे तुरंत फोन करना।' },
+    { role: 'assistant', content: 'जद तूं उते पहुंच जावेलो, म्हानै तुरत फोन करज्यो।' },
   ],
   gujarati: [
     { role: 'user', content: 'तुम कब आओगे? मैं तुम्हारा इंतज़ार कर रहा हूँ।' },

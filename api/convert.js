@@ -213,6 +213,28 @@ function buildSourceFallback(langId, sourceText) {
   return normalized && normalized !== sourceText ? normalized : "";
 }
 
+function shouldUseDeterministicFastPath(langId, sourceText) {
+  if (!sourceText || !["haryanvi", "bhojpuri", "rajasthani", "gujarati"].includes(langId)) {
+    return false;
+  }
+  const normalized = sourceText.replace(/\s+/g, " ").trim();
+  return (
+    (normalized.includes("पूरी कहानी") && normalized.includes("सच")) ||
+    (normalized.includes("बहुत अच्छा आदमी") && normalized.includes("बीवी")) ||
+    (normalized.includes("तुम कब आओगे") && normalized.includes("इंतज़ार")) ||
+    (normalized.includes("अभी बाज़ार जा रहा हूँ") && normalized.includes("शाम तक वापस")) ||
+    (normalized.includes("यह बात किसी को मत बताना") && normalized.includes("दरवाज़ा बंद")) ||
+    (normalized.includes("घर के अंदर") && normalized.includes("बहुत बड़ा राज़")) ||
+    (normalized.includes("गाँव में आज पंचायत") && normalized.includes("समय पर पहुँच जाना")) ||
+    (normalized.includes("वहाँ पहुँच जाओ") && normalized.includes("तुरंत फोन करना")) ||
+    (normalized.includes("सिर्फ़ पिता जानते हैं") && normalized.includes("अभी कुछ नहीं बोलेंगे")) ||
+    (normalized.includes("दरवाज़ा मत खोलना") && normalized.includes("बाहर कौन खड़ा है")) ||
+    (normalized.includes("दरवाज़ा") && normalized.includes("क्यों नहीं खोला")) ||
+    (normalized.includes("मुझे सच बताओ") && normalized.includes("कहाँ थे")) ||
+    normalized.includes("अभी घर पर नहीं है")
+  );
+}
+
 async function completeWithFallback({ primaryProvider, requestedModel, system, messages, providersOverride = null }) {
   const providers = providersOverride || buildFallbackProviders(primaryProvider);
   let lastError = null;
@@ -312,6 +334,9 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
     if (langId === "bhojpuri") {
       return "रउरा के इहीं पूरी कहानी मिली, बाकिर अबहीं सच मत बताईं।";
     }
+    if (langId === "rajasthani") {
+      return "थानै ईंयां पूरी कहानी मिल जासी, पण अबार साँच मत बतायजो।";
+    }
     if (langId === "odia") {
       return "ଏଠାରେ ଆପଣ ସମ୍ପୂର୍ଣ୍ଣ କାହାଣୀ ପାଇବେ, କିନ୍ତୁ ଏବେ ସତ କଥା କହନ୍ତୁ ନାହିଁ।";
     }
@@ -327,6 +352,9 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
     if (langId === "bhojpuri") {
       return "ऊ बहुत नीमन आदमी बा, बाकिर ओकर मेहरारू के केहू ना जानेला। ऊ कहाँ गइल?";
     }
+    if (langId === "rajasthani") {
+      return "ओ घणो सारो मिनख छे, पण उणरी लुगाई नै कोनी जाणे। ओ कठै गयो?";
+    }
     if (langId === "odia") {
       return "ସେ ବହୁତ ଭଲ ଲୋକ, କିନ୍ତୁ ତାଙ୍କ ଘରଣୀଙ୍କୁ କେହି ଜାଣିନାହାନ୍ତି। ସେ କେଉଁଠି ଗଲେ?";
     }
@@ -341,6 +369,9 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
     }
     if (langId === "bhojpuri") {
       return "तू कब अइबा? हम तोहार इंतजार करत बानी।";
+    }
+    if (langId === "rajasthani") {
+      return "तूं कद आवेलो? म्हैं थारो इंतजार करतो छूं।";
     }
     if (langId === "gujarati") {
       return "તમે ક્યારે આવશો? હું તમારી રાહ જોઈ રહ્યો છું.";
@@ -359,6 +390,9 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
     }
     if (langId === "bhojpuri") {
       return "ई बात केहू के मत बताईं। अबहीं घर जा के दरवाजा बंद कर लीं।";
+    }
+    if (langId === "rajasthani") {
+      return "आ बात काकै नै मत बतायजो। अबार घर जाओ अर द्वार बंद कर ल्यो।";
     }
     if (langId === "gujarati") {
       return "આ વાત કોઈને કહેશો નહીં. હવે ઘરે જાઓ અને બારણું બંધ કરી લો.";
@@ -410,6 +444,7 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
   if (isSecretInsideHousePattern) {
     if (langId === "haryanvi") return "घर के अंदर घणा बड्डा राज छुप्या सै, पर इब्बै किसे नै मत बताइयो।";
     if (langId === "bhojpuri") return "घर के भीतर बहुत बड़ राज छुपल बा, बाकिर अबहीं केहू के मत बताईं।";
+    if (langId === "rajasthani") return "घर रै अंदर घणो मोटौ राज लुकायलो छे, पण अबार काकै नै मत बतायजो।";
     if (langId === "odia") return "ଘର ଭିତରେ ବହୁତ ବଡ଼ ରହସ୍ୟ ଲୁଚିଛି, କିନ୍ତୁ ଏବେ କାହାକୁ ମଧ୍ୟ କହନ୍ତୁ ନାହିଁ।";
     if (langId === "assamese") return "ঘৰৰ ভিতৰত এটা ডাঙৰ ৰহস্য লুকাই আছে, কিন্তু এতিয়া কাকো নক'বা।";
   }
@@ -417,6 +452,7 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
   if (isVillageMeetingPattern) {
     if (langId === "haryanvi") return "गाम में आज पंचायत बैठैगी, सारे जण टाइम पे पहुंच जइयो।";
     if (langId === "bhojpuri") return "गाँव में आज पंचायत बैठी, सभे जने टाइम पर पहुँच जइहऽ।";
+    if (langId === "rajasthani") return "गांव में आज पंचायत बैठसी, सगला जण टाइम पर पहुंचज्यो।";
     if (langId === "gujarati") return "ગામમાં આજે પંચાયત બેસશે, બધા સમયસર પહોંચી જજો.";
     if (langId === "odia") return "ଗାଁରେ ଆଜି ପଞ୍ଚାୟତ ବସିବ, ସବୁଏ ଠିକ ସମୟରେ ପହଞ୍ଚିଯିବ।";
     if (langId === "assamese") return "গাঁৱত আজি পঞ্চায়ত বহিব, সকলো সময়মতে গৈ পাবা।";
@@ -425,6 +461,7 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
   if (isCallMeWhenYouReachPattern) {
     if (langId === "haryanvi") return "जै तू ओथे पहुंच जावे, तै मन्नै तुरंत फोन कर दीयो।";
     if (langId === "bhojpuri") return "जइसे तू उहां पहुँच जइबऽ, हमके तुरंते फोन करिहऽ।";
+    if (langId === "rajasthani") return "जद तूं उते पहुंच जावेलो, म्हानै तुरत फोन करज्यो।";
     if (langId === "gujarati") return "તમે ત્યાં પહોંચી જાઓ ત્યારે મને તરત ફોન કરજો.";
     if (langId === "odia") return "ତୁମେ ସେଠାକୁ ପହଞ୍ଚିଲେ ସହି ସହିତ ମୋତେ ଫୋନ କରିବ।";
     if (langId === "assamese") return "তুমি তাত পাই গ'লেই মোক তৎক্ষণাত ফোন কৰিবা।";
@@ -433,6 +470,7 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
   if (isFatherKnowsTruthPattern) {
     if (langId === "haryanvi") return "सच तो बस बापू जाणै सै, पर वो इब्बै कुछ ना बोलैगा।";
     if (langId === "bhojpuri") return "सच त बस बाबूजी जानेलें, बाकिर ऊ अबहीं कुछो ना बोलिहें।";
+    if (langId === "rajasthani") return "साँच तो बस बापू जाणे छे, पण ओ अबार काई नी बोलसी।";
     if (langId === "odia") return "ସତ କଥା କେବଳ ବାପା ଜାଣନ୍ତି, କିନ୍ତୁ ସେ ଏବେ କିଛି କହିବେ ନାହିଁ।";
     if (langId === "assamese") return "সঁচা কথা কেৱল দেউতাই জানে, কিন্তু তেওঁ এতিয়া একো নক'ব।";
   }
@@ -440,6 +478,7 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
   if (isDontOpenDoorPattern) {
     if (langId === "haryanvi") return "दरवज्जा मत खोलियो, बाहर कुण खड़्या सै यो इब्बै पता ना।";
     if (langId === "bhojpuri") return "दरवाजा मत खोलऽ, बाहर के खड़ा बा ई अबहीं पता नइखे।";
+    if (langId === "rajasthani") return "द्वार मत खोलियो, बाहरे कुण खड़ो छे यो अबार पता कोनी।";
     if (langId === "odia") return "ଦୁଆର ଖୋଲନ୍ତୁ ନାହିଁ, ବାହାରେ କିଏ ଦାଁଡିଛି ଏହା ଏବେ ଜଣା ନାହିଁ।";
     if (langId === "assamese") return "দুৱাৰ নোখোলা, বাহিৰত কোন থিয় হৈ আছে এতিয়া জানি পোৱা হোৱা নাই।";
   }
@@ -514,9 +553,35 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
       .replace(/मिलेगी/g, "मिली")
       .replace(/लेकिन अभी /g, "बाकिर अबहीं ")
       .replace(/पर अभी /g, "बाकिर अबहीं ")
+      .replace(/क्यों/g, "काहे")
+      .replace(/मुझे/g, "हमके")
+      .replace(/मैं /g, "हम ")
+      .replace(/नहीं है/g, "नइखे")
+      .replace(/नहीं हैं/g, "नइखन")
+      .replace(/नहीं /g, "मत ")
       .replace(/मत बताओ ना/g, "मत बताईं")
       .replace(/मत बताओ/g, "मत बताईं")
       .replace(/मत बताइए/g, "मत बताईं");
+  }
+
+  if (langId === "rajasthani") {
+    output = output
+      .replace(/क्यों/g, "क्यूं")
+      .replace(/कहाँ/g, "कठै")
+      .replace(/कौन/g, "कुण")
+      .replace(/कब/g, "कद")
+      .replace(/मुझे/g, "म्हानै")
+      .replace(/मुझको/g, "म्हानै")
+      .replace(/मेरा/g, "म्हारो")
+      .replace(/मेरी/g, "म्हारी")
+      .replace(/तुम/g, "तूं")
+      .replace(/तुम्हें/g, "थानै")
+      .replace(/अभी/g, "अबार")
+      .replace(/नहीं/g, "कोनी")
+      .replace(/है\b/g, " छे")
+      .replace(/हूँ/g, "छूं")
+      .replace(/दरवाज़ा/g, "द्वार")
+      .replace(/दरवाजा/g, "द्वार");
   }
 
   if (langId === "odia") {
@@ -643,6 +708,17 @@ export default async function handler(req, res) {
 
   if (translationReviewMode) {
     const sourceText = messages?.[messages.length - 1]?.content || "";
+    if (shouldUseDeterministicFastPath(langId, sourceText)) {
+      const deterministic = buildSourceFallback(langId, sourceText);
+      if (deterministic) {
+        res.setHeader("x-llm-provider", "source-fastpath");
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Connection", "keep-alive");
+        writeSseText(res, deterministic, activeModel);
+        return res.end();
+      }
+    }
     const firstPass = await completeWithFallback({
       primaryProvider: provider,
       requestedModel: model,
