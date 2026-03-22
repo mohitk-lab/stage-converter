@@ -12,6 +12,48 @@ const OPENAI_API_KEY =
   process.env.OPEN_AI;
 const LLM_PROVIDER = (process.env.LLM_PROVIDER || "").toLowerCase();
 
+const LANGUAGE_REVIEW_RULES = {
+  haryanvi: `
+TARGET LANGUAGE: Haryanvi.
+- Rewrite into genuine Haryanvi, not plain Hindi.
+- Mandatory markers where naturally applicable: सै / सूं / सैं, ना / कोनी, म्हारा / म्हैं.
+- Do not use Rajasthani markers like छे, छूं, -णो, म्हारो.
+- Do not use Bhojpuri markers like बा, बाड़न, बानी, नाहीं.
+- If the draft reads like standard Hindi, rewrite it more natively.`,
+  rajasthani: `
+TARGET LANGUAGE: Rajasthani.
+- Rewrite into genuine Rajasthani, not plain Hindi.
+- Prefer natural markers like छे, छूं, कोनी, म्हारो, थारै, कठै where relevant.
+- Do not use Haryanvi markers like सै, सूं, -णा, म्हारा.
+- Do not use Bhojpuri markers like बा, बाड़न, बानी, नाहीं.
+- If the draft reads like standard Hindi, rewrite it more natively.`,
+  bhojpuri: `
+TARGET LANGUAGE: Bhojpuri.
+- Rewrite into real Bhojpuri, not Hindi with a few changed words.
+- Prefer Bhojpuri grammar and pronouns like बा/बाड़न/बानी, नाहीं, हम, हमके, ऊ where natural.
+- Do not use Haryanvi markers like सै, सूं, -णा.
+- Do not use Rajasthani markers like छे, छूं, -णो, कोनी.
+- Keep it idiomatic and conversational, not literary Hindi.`,
+  punjabi: `
+TARGET LANGUAGE: Punjabi in Gurmukhi.
+- Use natural spoken Punjabi, not stiff literal translation.
+- Avoid overly formal renderings like "ਪ੍ਰਾਪਤ ਕਰੋਗੇ" when a simpler phrase works.
+- Prefer everyday Punjabi flow and vocabulary.
+- Output only Gurmukhi script.`,
+  odia: `
+TARGET LANGUAGE: Odia.
+- Output only Odia script.
+- Translate "story" as "କାହାଣୀ" here, not vague terms like "ସମସ୍ତ କଥା" or "କଥାବାର୍ତ୍ତା".
+- Preserve the meaning "you will get the full story here" rather than "you will hear everything".
+- Keep the sentence natural and direct.`,
+  assamese: `
+TARGET LANGUAGE: Assamese.
+- Output only Assamese script.
+- Use natural Assamese wording and grammar, not Bengali-like spellings and not Hindi-in-script.
+- Prefer standard Assamese forms like "আপুনি/তুমি", "ইয়াত", "এতিয়া", "সঁচা কথা" when they fit.
+- Avoid awkward forms like "কবি নাই" if a natural Assamese imperative is expected.`,
+};
+
 function pickProvider() {
   if (LLM_PROVIDER === "groq") return GROQ_API_KEY ? "groq" : null;
   if (LLM_PROVIDER === "openai") return OPENAI_API_KEY ? "openai" : null;
@@ -222,7 +264,7 @@ export default async function handler(req, res) {
   }
   res.setHeader("x-llm-provider", provider);
 
-  const { system, messages, model } = req.body;
+  const { system, messages, model, langId } = req.body;
   if (!messages) return res.status(400).json({ error: "messages required" });
   const cfg = buildProviderConfig(provider, model, system, messages, true);
   let activeProvider = cfg.provider;
@@ -247,8 +289,9 @@ export default async function handler(req, res) {
     res.setHeader("x-llm-provider", `${activeProvider}-review`);
 
     const sourceText = messages?.[messages.length - 1]?.content || "";
+    const languageReviewRules = LANGUAGE_REVIEW_RULES[langId] || "";
     const reviewSystem =
-      `${system}\n\nYou are now in strict correction mode. Review the draft and fix only translation quality issues, dialect mixing, wrong script, unnatural phrasing, grammar problems, and accidental assistant-style answers. Preserve meaning and sentence count exactly. Output only the corrected final text.`;
+      `${system}\n\nYou are now in strict correction mode. Review the draft and fix only translation quality issues, dialect mixing, wrong script, unnatural phrasing, grammar problems, and accidental assistant-style answers. Preserve meaning and sentence count exactly. Output only the corrected final text.${languageReviewRules ? `\n\n${languageReviewRules}` : ""}`;
     const reviewMessages = [
       {
         role: "user",

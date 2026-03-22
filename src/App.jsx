@@ -12,11 +12,11 @@ const GLOSSARY_STORAGE_KEY = "ruhi_glossary";
 const BRAIN_STORAGE_KEY = "ruhi_feedback";
 
 /* --- Streaming fetch helper --- */
-async function streamConvert({ model, system, messages, onChunk }) {
+async function streamConvert({ model, system, messages, onChunk, langId }) {
   const res = await fetch(CONVERT_API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model, system, messages }),
+    body: JSON.stringify({ model, system, messages, langId }),
   });
   if (!res.ok) {
     const e = await res.json().catch(() => ({}));
@@ -2611,6 +2611,7 @@ After writing the converted text in the target script, add a blank line and then
             model: "anthropic/claude-sonnet-4.5",
             system: sysPrompt,
             messages: [...examples, { role: "user", content: script }],
+            langId,
             onChunk: (partial) => {
               setResults(prev => ({ ...prev, [langId]: partial }));
             }
@@ -2744,6 +2745,7 @@ After writing the converted text in the target script, add a blank line and then
             model: "anthropic/claude-sonnet-4.5",
             system: buildSingleConverterSystem(langId, tone, culturalMode) + brainPrompt,
             messages: [...examples, { role: "user", content: csvMode.rows[i] }],
+            langId,
           });
           res[langId].push(raw.trim());
         } catch (err) {
