@@ -13,11 +13,11 @@ const GLOSSARY_STORAGE_KEY = "ruhi_glossary";
 const BRAIN_STORAGE_KEY = "ruhi_feedback";
 
 /* --- Streaming fetch helper --- */
-async function streamConvert({ model, system, messages, onChunk, langId }) {
+async function streamConvert({ model, system, messages, onChunk, langId, translationReviewMode = false }) {
   const res = await fetch(CONVERT_API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model, system, messages, langId }),
+    body: JSON.stringify({ model, system, messages, langId, translationReviewMode }),
   });
   if (!res.ok) {
     const e = await res.json().catch(() => ({}));
@@ -2631,6 +2631,7 @@ After writing the converted text in the target script, add a blank line and then
             system: sysPrompt,
             messages: [...examples, { role: "user", content: script }],
             langId,
+            translationReviewMode: true,
             onChunk: (partial) => {
               setResults(prev => ({ ...prev, [langId]: partial }));
             }
@@ -2765,6 +2766,7 @@ After writing the converted text in the target script, add a blank line and then
             system: buildSingleConverterSystem(langId, tone, culturalMode) + brainPrompt,
             messages: [...examples, { role: "user", content: csvMode.rows[i] }],
             langId,
+            translationReviewMode: true,
           });
           res[langId].push(raw.trim());
         } catch (err) {

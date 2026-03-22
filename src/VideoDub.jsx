@@ -487,6 +487,8 @@ ${(transcription.segments || []).map(s => `[${s.start.toFixed(1)}s - ${s.end.toF
         model: "anthropic/claude-sonnet-4.5",
         system,
         messages: [{ role: "user", content: userMessage }],
+        langId: targetLanguage,
+        translationReviewMode: true,
         onChunk: (partial) => setTranslatedText(partial),
       });
       setCurrentStep(6);

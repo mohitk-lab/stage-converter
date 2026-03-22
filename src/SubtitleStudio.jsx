@@ -376,6 +376,8 @@ export default function SubtitleStudio({ darkMode, streamConvert }) {
         model: "anthropic/claude-sonnet-4.5",
         system: `You are a professional subtitle translator. Translate each line to ${lang}. Keep the same number of lines. Output ONLY the translated lines, one per line. No numbering, no timestamps. Blocks are separated by ---BLOCK--- markers. Keep these markers in your output to separate translated blocks.`,
         messages: [{ role: "user", content: allText }],
+        langId: targetLang,
+        translationReviewMode: true,
         onChunk: (partial) => {
           const doneCount = (partial.match(/---BLOCK---/g) || []).length;
           setTranslatingProgress(

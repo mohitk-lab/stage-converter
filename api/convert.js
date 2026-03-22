@@ -207,10 +207,63 @@ async function sleep(ms) {
   await new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+const WEAK_LANGUAGE_QUALITY_RULES = {
+  haryanvi: {
+    forbidden: [/\bछे\b/, /\bछूं\b/, /\bबानी\b/, /\bबा\b/, /\bनूं\b/],
+    preferred: ["सै", "सूं", "सैं", "इब्बै", "तन्नै", "मन्नै", "कड़ै", "रया", "अर", "सबतै", "कसूता"],
+    tooHindi: [/\bहै\b/, /\bहूँ\b/, /\bहैं\b/, /\bनहीं\b/, /\bमुझे\b/, /\bतुम\b/],
+  },
+  bhojpuri: {
+    forbidden: [/\bसै\b/, /\bछे\b/, /\bकोनी\b/, /\bछूं\b/],
+    preferred: ["बा", "बानी", "रउरा", "हमके", "अबहीं", "नइखे", "काहे", "घरे", "दुआर", "बतावऽ", "कइलऽ"],
+    tooHindi: [/\bहै\b/, /\bहूँ\b/, /\bहैं\b/, /\bनहीं\b/, /\bमुझे\b/, /\bतुम\b/],
+  },
+  rajasthani: {
+    forbidden: [/\bसै\b/, /\bसूं\b/, /\bबानी\b/, /\bबा\b/],
+    preferred: ["छे", "छूं", "कोनी", "म्हारो", "म्हानै", "थानै", "कठै", "अबार", "जासी", "बतायजो"],
+    tooHindi: [/\bहै\b/, /\bहूँ\b/, /\bहैं\b/, /\bनहीं\b/, /\bमुझे\b/, /\bतुम\b/],
+  },
+  gujarati: {
+    forbidden: [/[\u0900-\u097F]/],
+    preferred: ["અહીં", "હવે", "ઘરે", "બારણું", "ક્યાં", "કેમ", "કોણ", "ક્યારે", "કરજો", "નથી"],
+    tooHindi: [/[\u0900-\u097F]/],
+  },
+};
+
 function buildSourceFallback(langId, sourceText) {
   if (!sourceText) return "";
   const normalized = normalizeWeakLanguageOutput(sourceText, langId, sourceText);
   return normalized && normalized !== sourceText ? normalized : "";
+}
+
+function countQualityIssues(langId, output, sourceText = "") {
+  const rules = WEAK_LANGUAGE_QUALITY_RULES[langId];
+  if (!rules || !output) return 0;
+
+  let issues = 0;
+  const normalizedOutput = output.replace(/\s+/g, " ").trim();
+  const normalizedSource = (sourceText || "").replace(/\s+/g, " ").trim();
+
+  if (rules.forbidden.some((pattern) => pattern.test(normalizedOutput))) issues += 2;
+  if (rules.preferred.length > 0 && !rules.preferred.some((token) => normalizedOutput.includes(token))) issues += 1;
+  if (rules.tooHindi.some((pattern) => pattern.test(normalizedOutput)) && normalizedOutput !== normalizedSource) issues += 1;
+  if (normalizedOutput === normalizedSource) issues += 2;
+  if (/^(hello|hi|sure|okay|translation:|here(?:'|’)s|ज़रूर|ठीक है|बिलकुल)/i.test(normalizedOutput)) issues += 3;
+  if (/\bhow can i help\b/i.test(normalizedOutput)) issues += 3;
+
+  return issues;
+}
+
+function finalizeWeakLanguageOutput(langId, output, sourceText = "") {
+  const normalized = normalizeWeakLanguageOutput(output, langId, sourceText);
+  const currentIssues = countQualityIssues(langId, normalized, sourceText);
+  if (!currentIssues) return normalized;
+
+  const sourceFallback = buildSourceFallback(langId, sourceText);
+  if (!sourceFallback) return normalized;
+
+  const fallbackIssues = countQualityIssues(langId, sourceFallback, sourceText);
+  return fallbackIssues <= currentIssues ? sourceFallback : normalized;
 }
 
 function shouldUseDeterministicFastPath(langId, sourceText) {
@@ -408,6 +461,8 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
   if (isMotherWaitingPattern) {
     if (langId === "haryanvi") return "माँ द्वार पे खड़ी तेरा इंतजार कर री सै। झट घर आ जा।";
     if (langId === "bhojpuri") return "माई दुआर पर खड़ी तोहार इंतजार करत बाड़ी। फटाफट घर आ जा।";
+    if (langId === "rajasthani") return "माँ द्वार पै खड़ी थारो इंतजार कर री छे। झट घर आ जावो।";
+    if (langId === "gujarati") return "મા બારણે ઊભી તમારી રાહ જોઈ રહી છે. જલ્દી ઘરે આવી જજો.";
     if (langId === "odia") return "ମା ଦୁଆରେ ଦାଁଡି ତୁମର ଅପେକ୍ଷା କରୁଛନ୍ତି। ଶୀଘ୍ର ଘରକୁ ଆସ।";
     if (langId === "assamese") return "মা দুৱাৰত থিয় হৈ তোমালৈ অপেক্ষা কৰি আছে। সোনকালে ঘৰলৈ আহা।";
   }
@@ -415,6 +470,7 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
   if (isWhyDidYouDoThisPattern) {
     if (langId === "haryanvi") return "तन्नै ऐस्सा क्यूं कर्या? म्हानै पहले बता देता।";
     if (langId === "bhojpuri") return "तू अइसन काहे कइलऽ? हमके पहिले बता दिहलऽ होतऽ।";
+    if (langId === "rajasthani") return "थैं ऐसो क्यूं कियो? म्हानै पहलां बताय देतो।";
     if (langId === "gujarati") return "તમે આવું કેમ કર્યું? મને પહેલાં કહી દીધું હોત.";
     if (langId === "assamese") return "তুমি এনেকুৱা কিয় কৰিলা? মোক আগতেই কৈ দিব পাৰিলা.";
   }
@@ -422,6 +478,7 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
   if (isMarketReturnPattern) {
     if (langId === "haryanvi") return "मैं इब्बै बाजार जा रया सूं, सांझ तक वापस आ जाऊंगा।";
     if (langId === "bhojpuri") return "हम अबहीं बाजार जात बानी, साँझ ले लौट आइब।";
+    if (langId === "rajasthani") return "म्हैं अबार बाजार जावां छूं, सांझ ताईं वापस आ जासूं।";
     if (langId === "gujarati") return "હું હવે બજારમાં જઈ રહ્યો છું, સાંજ સુધી પાછો આવી જઈશ.";
     if (langId === "assamese") return "মই এতিয়া বজাৰলৈ গৈ আছোঁ, সন্ধিয়ালৈ উভতি আহিম।";
   }
@@ -429,18 +486,21 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
   if (isWhyDidntOpenDoorPattern) {
     if (langId === "haryanvi") return "तन्नै दरवज्जा क्यूं ना खोल्या?";
     if (langId === "bhojpuri") return "तू दुआर काहे ना खोललऽ?";
+    if (langId === "rajasthani") return "थैं द्वार क्यूं कोनी खोल्यो?";
     if (langId === "gujarati") return "તમે બારણું કેમ ન ખોલ્યું?";
   }
 
   if (isTellTruthWhereWereYouPattern) {
     if (langId === "haryanvi") return "मन्नै सच बताइयो, तू कड़ै था?";
     if (langId === "bhojpuri") return "हमके साँच बतावऽ, तू कहाँ रहलऽ?";
+    if (langId === "rajasthani") return "म्हानै साँच बतायजो, तूं कठै थो?";
     if (langId === "gujarati") return "મને સાચી વાત કહો, તમે ક્યાં હતા?";
   }
 
   if (isNotAtHomePattern) {
     if (langId === "haryanvi") return "वो इब्बै घर पे ना सै।";
     if (langId === "bhojpuri") return "ऊ अबहीं घरे नइखे।";
+    if (langId === "rajasthani") return "ओ अबार घर पै कोनी छे।";
     if (langId === "gujarati") return "એ હવે ઘરે નથી.";
   }
 
@@ -706,15 +766,16 @@ export default async function handler(req, res) {
   }
   res.setHeader("x-llm-provider", provider);
 
-  const { system, messages, model, langId } = req.body;
+  const { system, messages, model, langId, translationReviewMode: translationReviewModeFlag } = req.body;
   if (!messages) return res.status(400).json({ error: "messages required" });
   const cfg = buildProviderConfig(provider, model, system, messages, true);
   let activeProvider = cfg.provider;
   let activeModel = cfg.payload.model;
 
   const translationReviewMode =
-    typeof system === "string" &&
-    (system.includes("CRITICAL OUTPUT RULES") || system.includes("FINAL CHECKLIST"));
+    translationReviewModeFlag === true ||
+    (typeof system === "string" &&
+      (system.includes("CRITICAL OUTPUT RULES") || system.includes("FINAL CHECKLIST")));
 
   if (translationReviewMode) {
     const sourceText = messages?.[messages.length - 1]?.content || "";
@@ -768,7 +829,7 @@ export default async function handler(req, res) {
       messages: reviewMessages,
     });
     if (!secondPass.ok) {
-      const fallbackReviewed = normalizeWeakLanguageOutput(firstPass.content.trim(), langId, sourceText);
+      const fallbackReviewed = finalizeWeakLanguageOutput(langId, firstPass.content.trim(), sourceText);
       if (fallbackReviewed) {
         res.setHeader("x-llm-provider", `${activeProvider}-review-fallback`);
         res.setHeader("Content-Type", "text/event-stream");
@@ -786,7 +847,7 @@ export default async function handler(req, res) {
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
-    writeSseText(res, normalizeWeakLanguageOutput(secondPass.content.trim(), langId, sourceText), activeModel);
+    writeSseText(res, finalizeWeakLanguageOutput(langId, secondPass.content.trim(), sourceText), activeModel);
     return res.end();
   }
 
@@ -827,7 +888,7 @@ export default async function handler(req, res) {
       res.setHeader("Cache-Control", "no-cache");
       res.setHeader("Connection", "keep-alive");
       const sourceText = messages?.[messages.length - 1]?.content || "";
-      writeSseText(res, normalizeWeakLanguageOutput(fallback.content.trim(), langId, sourceText), activeModel);
+      writeSseText(res, finalizeWeakLanguageOutput(langId, fallback.content.trim(), sourceText), activeModel);
       return res.end();
     }
     return res.status(orRes.status).json(
