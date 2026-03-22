@@ -2,8 +2,10 @@
 import argparse
 import json
 import re
+import time
 import sys
 import urllib.request
+import urllib.error
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -49,9 +51,25 @@ def call_api(api_url: str, lang_id: str, source: str):
         data=json.dumps(body).encode(),
         headers={'content-type': 'application/json'},
     )
-    with urllib.request.urlopen(req, timeout=90) as res:
-        raw = res.read().decode()
-        provider = res.headers.get('x-llm-provider')
+    last_exc = None
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(req, timeout=90) as res:
+                raw = res.read().decode()
+                provider = res.headers.get('x-llm-provider')
+            break
+        except urllib.error.HTTPError as exc:
+            last_exc = exc
+            if exc.code not in (429, 500, 502, 503, 504) or attempt == 2:
+                raise
+            time.sleep(2 * (attempt + 1))
+        except Exception as exc:
+            last_exc = exc
+            if attempt == 2:
+                raise
+            time.sleep(2 * (attempt + 1))
+    else:
+        raise last_exc
     output_parts = []
     for line in raw.splitlines():
         if not line.startswith('data: '):
