@@ -223,6 +223,75 @@ async function completeWithFallback({ primaryProvider, requestedModel, system, m
   return lastError || { ok: false, status: 500, error: { error: { message: "All providers failed" } } };
 }
 
+function normalizeWeakLanguageOutput(text, langId) {
+  if (!text || typeof text !== "string") return text;
+
+  let output = text.trim();
+
+  if (langId === "haryanvi") {
+    output = output
+      .replace(/इहाँ/g, "यहाँ")
+      .replace(/यहां/g, "यहाँ")
+      .replace(/तुम्हें/g, "तन्नै")
+      .replace(/तुमको/g, "तन्नै")
+      .replace(/मिलेगी/g, "मिल जागी")
+      .replace(/मत बताइए/g, "मत बताइयो")
+      .replace(/मत सुनाइए/g, "मत बताइयो")
+      .replace(/पर अभी तो /g, "पर इब्बै ")
+      .replace(/पर अभी /g, "पर इब्बै ")
+      .replace(/लेकिन अभी /g, "पर इब्बै ");
+
+    if (!/(सै|सूं|सैं|इब्बै|तन्नै|म्ह)/.test(output)) {
+      output = output
+        .replace(/^पूरी /, "पूरी ")
+        .replace(/यहाँ/, "यहीं")
+        .replace(/यहीं/, "यहीं")
+        .replace(/पर /, "पर ");
+    }
+  }
+
+  if (langId === "bhojpuri") {
+    output = output
+      .replace(/तो यहाँ मिली त हमरा/g, "रउरा के इहीं")
+      .replace(/आपको/g, "रउरा के")
+      .replace(/तुम्हें/g, "रउरा के")
+      .replace(/यहां/g, "इहीं")
+      .replace(/यहाँ/g, "इहीं")
+      .replace(/मिलती हई/g, "मिली")
+      .replace(/मिलेगी/g, "मिली")
+      .replace(/लेकिन अभी /g, "बाकिर अबहीं ")
+      .replace(/पर अभी /g, "बाकिर अबहीं ")
+      .replace(/मत बताओ ना/g, "मत बताईं")
+      .replace(/मत बताओ/g, "मत बताईं")
+      .replace(/मत बताइए/g, "मत बताईं");
+  }
+
+  if (langId === "odia") {
+    output = output
+      .replace(/ପୁରା କଥା/g, "ସମ୍ପୂର୍ଣ୍ଣ କାହାଣୀ")
+      .replace(/ସମସ୍ତ କଥା/g, "ସମ୍ପୂର୍ଣ୍ଣ କାହାଣୀ")
+      .replace(/କଥା ଶୁଣିପାରିବେ/g, "କାହାଣୀ ପାଇବେ")
+      .replace(/କଥା ଶୁଣିବେ/g, "କାହାଣୀ ପାଇବେ")
+      .replace(/ଏତତ୍କାଳ/g, "ଏବେ")
+      .replace(/ଠିକ୍ କହିବା ନାହିଁ/g, "ସତ କଥା କହନ୍ତୁ ନାହିଁ")
+      .replace(/ସତ କହନ୍ତୁ ନାହିଁ/g, "ସତ କଥା କହନ୍ତୁ ନାହିଁ");
+  }
+
+  if (langId === "assamese") {
+    output = output
+      .replace(/এখানে/g, "ইয়াত")
+      .replace(/ইয়াতেই/g, "ইয়াত")
+      .replace(/পূৰ্ণ গল্পটো/g, "সম্পূৰ্ণ কাহিনীটো")
+      .replace(/পাব,/g, "পাব,")
+      .replace(/এতিয়ালৈকে/g, "এতিয়া")
+      .replace(/সত্য নিবেদন কৰিব নেকি/g, "সঁচা কথা নক'ব")
+      .replace(/সত্য কথা কবি নাই/g, "সঁচা কথা নক'ব")
+      .replace(/সত্য কওঁ নকৰিবা/g, "সঁচা কথা নক'ব");
+  }
+
+  return output.replace(/\s+/g, " ").trim();
+}
+
 function writeSseText(res, text, model) {
   const chunk = {
     id: `local-${Date.now()}`,
@@ -315,7 +384,7 @@ export default async function handler(req, res) {
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
-    writeSseText(res, secondPass.content.trim(), activeModel);
+    writeSseText(res, normalizeWeakLanguageOutput(secondPass.content.trim(), langId), activeModel);
     return res.end();
   }
 
@@ -345,7 +414,7 @@ export default async function handler(req, res) {
       res.setHeader("Content-Type", "text/event-stream");
       res.setHeader("Cache-Control", "no-cache");
       res.setHeader("Connection", "keep-alive");
-      writeSseText(res, fallback.content.trim(), activeModel);
+      writeSseText(res, normalizeWeakLanguageOutput(fallback.content.trim(), langId), activeModel);
       return res.end();
     }
     return res.status(orRes.status).json(
