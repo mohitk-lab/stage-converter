@@ -8,6 +8,8 @@ import GlossaryManager from "./GlossaryManager.jsx";
 import { playClick, playSuccess, playPop, playError } from "./sounds.js";
 
 const CONVERT_API_URL = import.meta.env.VITE_CONVERT_API_URL || "/api/convert";
+const GLOSSARY_STORAGE_KEY = "ruhi_glossary";
+const BRAIN_STORAGE_KEY = "ruhi_feedback";
 
 /* --- Streaming fetch helper --- */
 async function streamConvert({ model, system, messages, onChunk }) {
@@ -45,6 +47,54 @@ async function streamConvert({ model, system, messages, onChunk }) {
     }
   }
   return content;
+}
+
+function loadGlossaryEntries() {
+  try {
+    return JSON.parse(localStorage.getItem(GLOSSARY_STORAGE_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function buildBrainContext({ langId, inputText, feedbackStore }) {
+  const glossaryEntries = loadGlossaryEntries();
+  const normalizedInput = (inputText || "").toLowerCase();
+  const langFeedback = feedbackStore[langId] || [];
+  const relevantGlossary = glossaryEntries
+    .filter((entry) => entry.targetLang === langId || entry.sourceLang === langId)
+    .filter((entry) => {
+      const source = (entry.sourceWord || "").toLowerCase();
+      const target = (entry.targetWord || "").toLowerCase();
+      return source && normalizedInput.includes(source) || target && normalizedInput.includes(target);
+    })
+    .slice(0, 12);
+
+  const glossaryBlock = relevantGlossary.length > 0
+    ? `\n\n★★★ GLOSSARY MEMORY (MANDATORY TERM PREFERENCES) ★★★
+Use these preferred mappings whenever relevant:
+${relevantGlossary.map((entry, index) => `${index + 1}. ${entry.sourceWord} -> ${entry.targetWord}${entry.notes ? ` (${entry.notes})` : ""}`).join("\n")}
+★★★ END GLOSSARY MEMORY ★★★`
+    : "";
+
+  const correctionsBlock = langFeedback.length > 0
+    ? `\n\n★★★ BRAIN MEMORY: USER CORRECTIONS (DO NOT REPEAT THESE MISTAKES) ★★★
+${langFeedback.slice(-12).map((fb, i) => {
+  const parts = [`${i + 1}. ISSUE: "${fb.feedback}"`];
+  if (fb.input) parts.push(`   SOURCE: "${fb.input.substring(0, 140)}"`);
+  if (fb.output) parts.push(`   WRONG OUTPUT: "${fb.output.substring(0, 140)}"`);
+  if (fb.correctedOutput) parts.push(`   PREFERRED OUTPUT: "${fb.correctedOutput.substring(0, 140)}"`);
+  return parts.join("\n");
+}).join("\n")}
+★★★ END BRAIN MEMORY ★★★`
+    : "";
+
+  const antiAnswerBlock = `\n\n★★★ ANTI-ANSWERING RULE ★★★
+You are a translator/re-writer, not a chatbot.
+If the draft sounds like a reply, explanation, greeting, or assistant answer, rewrite it into the target-language translation of the SOURCE text only.
+Never answer the user. Never explain. Never add help text.`;
+
+  return `${glossaryBlock}${correctionsBlock}${antiAnswerBlock}`;
 }
 
 /* --- Languages --- */
@@ -1829,7 +1879,7 @@ function ResultCard({ result, lang, copied, onCopy, isStreaming, srtMode, onDown
   const isEdited = editText !== result;
 
   const handleSave = () => {
-    if (onEdit && editText !== result) onEdit(lang.id, editText);
+    if (onEdit && editText !== result) onEdit(lang.id, editText, result, inputText);
     setEditing(false);
   };
   const handleCancel = () => { setEditText(result); setEditing(false); };
@@ -2146,7 +2196,7 @@ export default function App() {
   const [fontSize, setFontSize] = useState(() => parseInt(localStorage.getItem("ruhi_fontsize") || "14"));
   const [fullscreen, setFullscreen] = useState(false);
   const [favorites, setFavorites] = useState(() => { try { return JSON.parse(localStorage.getItem("ruhi_favorites") || "[]"); } catch { return []; } });
-  const [feedbackStore, setFeedbackStore] = useState(() => { try { return JSON.parse(localStorage.getItem("ruhi_feedback") || "{}"); } catch { return {}; } });
+  const [feedbackStore, setFeedbackStore] = useState(() => { try { return JSON.parse(localStorage.getItem(BRAIN_STORAGE_KEY) || "{}"); } catch { return {}; } });
   const [themeSchedule, setThemeSchedule] = useState(() => localStorage.getItem("ruhi_theme_schedule") === "1");
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [cmdPaletteOpen, setCmdPaletteOpen] = useState(false);
@@ -2352,10 +2402,9 @@ export default function App() {
   const handleFeedback = (langId, entry) => {
     setFeedbackStore(prev => {
       const langFb = prev[langId] || [];
-      // Keep last 10 feedback entries per language
-      const updated = [...langFb, entry].slice(-10);
+      const updated = [...langFb, entry].slice(-40);
       const next = { ...prev, [langId]: updated };
-      localStorage.setItem("ruhi_feedback", JSON.stringify(next));
+      localStorage.setItem(BRAIN_STORAGE_KEY, JSON.stringify(next));
       return next;
     });
   };
@@ -2472,16 +2521,9 @@ export default function App() {
           streamingSet[langId] = true;
           setStreaming(s => ({ ...s, [langId]: true }));
           const examples = FEW_SHOT_EXAMPLES[langId] || [];
-          // Build feedback context from stored corrections
-          const langFeedback = feedbackStore[langId] || [];
-          const fbPrompt = langFeedback.length > 0 ? `
+          const brainPrompt = buildBrainContext({ langId, inputText: script, feedbackStore });
 
-★★★ USER CORRECTIONS (LEARN FROM THESE — DO NOT REPEAT THESE MISTAKES) ★★★
-The user has previously reported these issues with ${langId} conversions. Study them carefully and AVOID making the same errors:
-${langFeedback.slice(-5).map((fb, i) => `${i + 1}. MISTAKE REPORTED: "${fb.feedback}"${fb.input ? `\n   Input was: "${fb.input.substring(0, 100)}..."` : ""}${fb.output ? `\n   Wrong output was: "${fb.output.substring(0, 100)}..."` : ""}`).join("\n")}
-★★★ END USER CORRECTIONS ★★★` : "";
-
-          const sysPrompt = buildSingleConverterSystem(langId, tone, culturalMode) + fbPrompt + (translitMode ? `
+          const sysPrompt = buildSingleConverterSystem(langId, tone, culturalMode) + brainPrompt + (translitMode ? `
 
 TRANSLITERATION MODE (IMPORTANT):
 After writing the converted text in the target script, add a blank line and then provide a full Roman script (Latin alphabet) transliteration of your output. Label it "Transliteration:" on its own line. The transliteration should be natural Hinglish-style romanization (e.g. "Kaise ho bhai?" not "Kaisē hō bhāī?"). Use simple English letters, no diacritics. This applies to all non-English outputs.` : "");
@@ -2617,9 +2659,10 @@ After writing the converted text in the target script, add a blank line and then
       const examples = FEW_SHOT_EXAMPLES[langId] || [];
       for (let i = 0; i < csvMode.rows.length; i++) {
         try {
+          const brainPrompt = buildBrainContext({ langId, inputText: csvMode.rows[i], feedbackStore });
           const raw = await streamConvert({
             model: "anthropic/claude-sonnet-4.5",
-            system: buildSingleConverterSystem(langId, tone, culturalMode) + ((feedbackStore[langId] || []).length > 0 ? `\n\n★★★ USER CORRECTIONS ★★★\n${(feedbackStore[langId] || []).slice(-5).map((fb, j) => `${j + 1}. "${fb.feedback}"`).join("\n")}\n★★★ END ★★★` : ""),
+            system: buildSingleConverterSystem(langId, tone, culturalMode) + brainPrompt,
             messages: [...examples, { role: "user", content: csvMode.rows[i] }],
           });
           res[langId].push(raw.trim());
@@ -3491,7 +3534,30 @@ After writing the converted text in the target script, add a blank line and then
               const lang = LANGUAGES.find(l => l.id === langId);
               return results[langId] ? (
                 <div key={langId}>
-                  <ResultCard result={results[langId]} lang={lang} copied={copied} onCopy={copy} isStreaming={!!streaming[langId]} srtMode={srtMode} onDownloadSrt={downloadSrt} onShare={shareResult} onEdit={(id, text) => setResults(prev => ({ ...prev, [id]: text }))} darkMode={darkMode} onFeedback={handleFeedback} inputText={script} />
+                  <ResultCard
+                    result={results[langId]}
+                    lang={lang}
+                    copied={copied}
+                    onCopy={copy}
+                    isStreaming={!!streaming[langId]}
+                    srtMode={srtMode}
+                    onDownloadSrt={downloadSrt}
+                    onShare={shareResult}
+                    onEdit={(id, text, previousText, sourceText) => {
+                      setResults(prev => ({ ...prev, [id]: text }));
+                      handleFeedback(id, {
+                        feedback: "User manually corrected this output. Prefer the corrected wording/style next time.",
+                        input: sourceText,
+                        output: previousText,
+                        correctedOutput: text,
+                        timestamp: Date.now(),
+                        source: "manual-edit",
+                      });
+                    }}
+                    darkMode={darkMode}
+                    onFeedback={handleFeedback}
+                    inputText={script}
+                  />
                   {ttsEnabled && !streaming[langId] && (
                     <div className="clay" style={{ padding: "8px 12px", marginTop: "-6px", marginBottom: "10px", borderLeft: `4px solid ${lang.color}20` }}>
                       <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px" }}>

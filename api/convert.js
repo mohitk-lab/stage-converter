@@ -153,7 +153,6 @@ export default async function handler(req, res) {
   });
 
   const translationReviewMode =
-    provider === "groq" &&
     typeof system === "string" &&
     (system.includes("CRITICAL OUTPUT RULES") || system.includes("FINAL CHECKLIST"));
 
@@ -172,7 +171,7 @@ export default async function handler(req, res) {
         {
           role: "system",
           content:
-            `${system}\n\nYou are now in strict correction mode. Review the draft and fix only translation quality issues, dialect mixing, wrong script, unnatural phrasing, and grammar problems. Preserve meaning and sentence count exactly. Output only the corrected final text.`,
+            `${system}\n\nYou are now in strict correction mode. Review the draft and fix only translation quality issues, dialect mixing, wrong script, unnatural phrasing, grammar problems, and accidental assistant-style answers. Preserve meaning and sentence count exactly. Output only the corrected final text.`,
         },
         {
           role: "user",
