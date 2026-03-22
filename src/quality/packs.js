@@ -4,6 +4,7 @@ export const QUALITY_PROMPT_PACKS = {
 HARYANVI QUALITY PACK:
 - Prefer real Haryanvi village speech, not plain Hindi.
 - High-value markers: सै, सूं, सैं, इब्बै, तन्नै, किसे नै, कड़ै, रया.
+- Sheet-backed authentic Haryanvi cues that should feel natural where they fit: सबतै, अपणी, खात्तर, क्युकर, गाम, होरया, कसूता, कती कसूती, कुणबा, बेच्या जाणा.
 - If a sentence still reads like Hindi, force at least 2-3 Haryanvi markers into it: सै/सूं, इब्बै, तन्नै, मन्नै, कड़ै, दरवज्जा.
 - Questions should shift too: क्यों→क्यूं, कहाँ→कड़ै, कब→कद, कौन→कौण where natural.
 - Avoid Punjabi/Bhojpuri contamination.
@@ -11,6 +12,7 @@ HARYANVI QUALITY PACK:
     checklist: `
 - Prefer Haryanvi wording like तन्नै / इब्बै / कड़ै / रया where natural.
 - Prefer दरवज्जा, घर पे, मन्नै, क्यूं, ना सै where they fit.
+- If the line is dramatic/promotional, prefer stronger Haryanvi phrasing like सबतै, अपणी, गाम, होरया, कसूता, खात्तर over flat Hindi wording.
 - Convert copula/negation fully: है→सै, हूँ→सूं, नहीं है→ना सै, नहीं हूँ→ना सूं, नहीं हैं→ना सैं.
 - Avoid Punjabi-style forms like नूं / जाणदा.
 - Avoid plain-Hindi wording when a natural Haryanvi option exists.`,
@@ -89,6 +91,24 @@ export const QUALITY_FEW_SHOTS = {
     { role: 'assistant', content: 'वो कौण था अर कद आया?' },
     { role: 'user', content: 'मैं अभी तैयार नहीं हूँ।' },
     { role: 'assistant', content: 'मैं इब्बै तैयार ना सूं।' },
+    { role: 'user', content: 'यह रिवाज नहीं, औरतों की खरीद-बेच है।' },
+    { role: 'assistant', content: 'यो रिवाज कोनी, औरतां की खरीद-बेच सै।' },
+    { role: 'user', content: 'यह कहानी हरियाणा की राजनीति और मीडिया को हिला देगी।' },
+    { role: 'assistant', content: 'या कहाणी हरियाणा की राजनीति अर मीडिया नै हिला देगी।' },
+    { role: 'user', content: 'असली बवाल अब शुरू होगा।' },
+    { role: 'assistant', content: 'असली बवाल इब शुरू होएगा।' },
+    { role: 'user', content: 'जब विदेशी बहू ने हरियाणवी सीखी, सबके होश उड़ गए।' },
+    { role: 'assistant', content: 'जद विदेशी बहु नै हरियाणवी सीख ली, सबके होश उड़्गे।' },
+    { role: 'user', content: 'क्या हो रहा है? यह सब किसका खेल है?' },
+    { role: 'assistant', content: 'के होरया सै? यो सारा किसका खेल सै?' },
+    { role: 'user', content: 'पूरा गाँव यह तमाशा देख रहा है।' },
+    { role: 'assistant', content: 'पूरा गाम यो तमाशा देख रया सै।' },
+    { role: 'user', content: 'अपनी बेटी को बचाने के लिए माँ क्या करेगी?' },
+    { role: 'assistant', content: 'अपणी बेटी नै बचावण खात्तर माँ के करैगी?' },
+    { role: 'user', content: 'यह हरियाणा का सबसे बड़ा कांड है।' },
+    { role: 'assistant', content: 'यो हरियाणा का सबतै बड़ा कांड सै।' },
+    { role: 'user', content: 'इतना कसूता ड्रामा तुमने पहले नहीं देखा होगा।' },
+    { role: 'assistant', content: 'इतना कसूता ड्रामा तन्नै पहले कोनी देख्या होगा।' },
   ],
   bhojpuri: [
     { role: 'user', content: 'तुम कब आओगे? मैं तुम्हारा इंतज़ार कर रहा हूँ।' },
