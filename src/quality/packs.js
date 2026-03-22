@@ -22,6 +22,7 @@ BHOJPURI QUALITY PACK:
 - High-value markers: रउरा, तोहार, हम, बा, बानी, जानेला, अबहीं, केहू.
 - For everyday speech, prefer real Bhojpuri verb endings like कइलऽ, बतइतीं, जइबऽ, करबऽ, गइल, बोलिहें.
 - Prefer spoken Bhojpuri nouns like दुआर, घरे, मेहरारू where they fit.
+- Sheet-backed natural promo vocabulary that reads authentic Bhojpuri: एगो, रउआ, देखीं, गरदा, दिमाग हिला दी, रोंगटा खड़ा हो जाई, पूरा परिवार के साथ देखीं.
 - Avoid Haryanvi/Rajasthani markers like सै, छे, कोनी.
 - Imperatives should sound Bhojpuri: बताईं, चलीं, करीं.`,
     checklist: `
@@ -29,6 +30,7 @@ BHOJPURI QUALITY PACK:
 - Avoid standard Hindi 'तुम', 'है', 'नहीं' if a Bhojpuri form is natural.
 - Prefer spoken Bhojpuri endings like -ऽ / -बऽ / -लीं / -हऽ where natural.
 - Prefer दुआर / घरे / हमके / काहे over direct Hindi forms where natural.
+- If emotional/dramatic tone fits, prefer Bhojpuri-native punch like "दिमाग हिला दी", "रोंगटा खड़ा हो जाई", "देखीं" over flat Hindi-style copy.
 - Output should read like spoken Bhojpuri, not translated Hindi.`,
   },
   rajasthani: {
@@ -111,6 +113,12 @@ export const QUALITY_FEW_SHOTS = {
     { role: 'assistant', content: 'हमके साँच बतावऽ, तू कहाँ रहलऽ?' },
     { role: 'user', content: 'वो अभी घर पर नहीं है।' },
     { role: 'assistant', content: 'ऊ अबहीं घरे नइखे।' },
+    { role: 'user', content: 'यह कहानी तुम्हारा दिमाग हिला देगी।' },
+    { role: 'assistant', content: 'ई कहानी तोहार दिमाग हिला दी।' },
+    { role: 'user', content: 'यह दृश्य देखकर तुम्हारे रोंगटे खड़े हो जाएँगे।' },
+    { role: 'assistant', content: 'ई दृश्य देख के रउरा के रोंगटा खड़ा हो जाई।' },
+    { role: 'user', content: 'पूरे परिवार के साथ यह फिल्म देखो।' },
+    { role: 'assistant', content: 'पूरा परिवार के साथ ई फिलिम देखीं।' },
   ],
   rajasthani: [
     { role: 'user', content: 'तुम कब आओगे? मैं तुम्हारा इंतज़ार कर रहा हूँ।' },
