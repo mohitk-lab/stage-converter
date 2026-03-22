@@ -24,7 +24,8 @@ function pickProvider() {
 
 function resolveModel(provider, requestedModel) {
   if (provider === "openrouter") {
-    return requestedModel || process.env.OPENROUTER_MODEL || "anthropic/claude-sonnet-4.5";
+    if (process.env.OPENROUTER_MODEL) return process.env.OPENROUTER_MODEL;
+    return requestedModel || "anthropic/claude-sonnet-4.5";
   }
 
   if (provider === "groq") {
