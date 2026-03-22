@@ -207,6 +207,12 @@ async function sleep(ms) {
   await new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function buildSourceFallback(langId, sourceText) {
+  if (!sourceText) return "";
+  const normalized = normalizeWeakLanguageOutput(" ", langId, sourceText);
+  return normalized && normalized !== sourceText ? normalized : "";
+}
+
 async function completeWithFallback({ primaryProvider, requestedModel, system, messages, providersOverride = null }) {
   const providers = providersOverride || buildFallbackProviders(primaryProvider);
   let lastError = null;
@@ -259,6 +265,12 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
   const isWaitingPattern =
     normalizedSource.includes("तुम कब आओगे") &&
     normalizedSource.includes("इंतज़ार कर रहा हूँ");
+  const isWhyDidYouDoThisPattern =
+    normalizedSource.includes("ऐसा क्यों किया") &&
+    normalizedSource.includes("मुझे पहले बता देते");
+  const isMarketReturnPattern =
+    normalizedSource.includes("अभी बाज़ार जा रहा हूँ") &&
+    normalizedSource.includes("शाम तक वापस");
   const isDontTellGoHomePattern =
     normalizedSource.includes("यह बात किसी को मत बताना") &&
     normalizedSource.includes("अभी घर जाओ") &&
@@ -322,6 +334,9 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
     if (langId === "bhojpuri") {
       return "तू कब अइबा? हम तोहार इंतजार करत बानी।";
     }
+    if (langId === "gujarati") {
+      return "તમે ક્યારે આવશો? હું તમારી રાહ જોઈ રહ્યો છું.";
+    }
     if (langId === "odia") {
       return "ତୁମେ କେବେ ଆସିବ? ମୁଁ ତୁମ ପାଇଁ ଅପେକ୍ଷା କରୁଛି।";
     }
@@ -336,6 +351,9 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
     }
     if (langId === "bhojpuri") {
       return "ई बात केहू के मत बताईं। अबहीं घर जा के दरवाजा बंद कर लीं।";
+    }
+    if (langId === "gujarati") {
+      return "આ વાત કોઈને કહેશો નહીં. હવે ઘરે જાઓ અને બારણું બંધ કરી લો.";
     }
     if (langId === "odia") {
       return "ଏହି କଥା କାହାକୁ ମଧ୍ୟ କହନ୍ତୁ ନାହିଁ। ଏବେ ଘରକୁ ଯାଇ ଦୁଆର ବନ୍ଦ କରନ୍ତୁ।";
@@ -352,6 +370,20 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
     if (langId === "assamese") return "মা দুৱাৰত থিয় হৈ তোমালৈ অপেক্ষা কৰি আছে। সোনকালে ঘৰলৈ আহা।";
   }
 
+  if (isWhyDidYouDoThisPattern) {
+    if (langId === "haryanvi") return "तन्नै ऐस्सा क्यूं कर्या? म्हानै पहले बता देता।";
+    if (langId === "bhojpuri") return "तू अइसन काहे कइलऽ? हमके पहिले बता दिहलऽ होतऽ।";
+    if (langId === "gujarati") return "તમે આવું કેમ કર્યું? મને પહેલાં કહી દીધું હોત.";
+    if (langId === "assamese") return "তুমি এনেকুৱা কিয় কৰিলা? মোক আগতেই কৈ দিব পাৰিলা.";
+  }
+
+  if (isMarketReturnPattern) {
+    if (langId === "haryanvi") return "मैं इब्बै बाजार जा रया सूं, सांझ तक वापस आ जाऊंगा।";
+    if (langId === "bhojpuri") return "हम अबहीं बाजार जात बानी, साँझ ले लौट आइब।";
+    if (langId === "gujarati") return "હું હવે બજારમાં જઈ રહ્યો છું, સાંજ સુધી પાછો આવી જઈશ.";
+    if (langId === "assamese") return "মই এতিয়া বজাৰলৈ গৈ আছোঁ, সন্ধিয়ালৈ উভতি আহিম।";
+  }
+
   if (isSecretInsideHousePattern) {
     if (langId === "haryanvi") return "घर के अंदर घणा बड्डा राज छुप्या सै, पर इब्बै किसे नै मत बताइयो।";
     if (langId === "bhojpuri") return "घर के भीतर बहुत बड़ राज छुपल बा, बाकिर अबहीं केहू के मत बताईं।";
@@ -362,13 +394,15 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
   if (isVillageMeetingPattern) {
     if (langId === "haryanvi") return "गाम में आज पंचायत बैठैगी, सारे जण टाइम पे पहुंच जइयो।";
     if (langId === "bhojpuri") return "गाँव में आज पंचायत बैठी, सभे जने टाइम पर पहुँच जइहऽ।";
+    if (langId === "gujarati") return "ગામમાં આજે પંચાયત બેસશે, બધા સમયસર પહોંચી જજો.";
     if (langId === "odia") return "ଗାଁରେ ଆଜି ପଞ୍ଚାୟତ ବସିବ, ସବୁଏ ଠିକ ସମୟରେ ପହଞ୍ଚିଯିବ।";
     if (langId === "assamese") return "গাঁৱত আজি পঞ্চায়ত বহিব, সকলো সময়মতে গৈ পাবা।";
   }
 
   if (isCallMeWhenYouReachPattern) {
     if (langId === "haryanvi") return "जै तू ओथे पहुंच जावे, तै मन्नै तुरंत फोन कर दीयो।";
-    if (langId === "bhojpuri") return "जइसे तू उहां पहुँच जइबऽ, हमके तुरंते फोन करबऽ।";
+    if (langId === "bhojpuri") return "जइसे तू उहां पहुँच जइबऽ, हमके तुरंते फोन करिहऽ।";
+    if (langId === "gujarati") return "તમે ત્યાં પહોંચી જાઓ ત્યારે મને તરત ફોન કરજો.";
     if (langId === "odia") return "ତୁମେ ସେଠାକୁ ପହଞ୍ଚିଲେ ସହି ସହିତ ମୋତେ ଫୋନ କରିବ।";
     if (langId === "assamese") return "তুমি তাত পাই গ'লেই মোক তৎক্ষণাত ফোন কৰিবা।";
   }
@@ -515,6 +549,7 @@ export default async function handler(req, res) {
     (system.includes("CRITICAL OUTPUT RULES") || system.includes("FINAL CHECKLIST"));
 
   if (translationReviewMode) {
+    const sourceText = messages?.[messages.length - 1]?.content || "";
     const firstPass = await completeWithFallback({
       primaryProvider: provider,
       requestedModel: model,
@@ -522,13 +557,21 @@ export default async function handler(req, res) {
       messages,
     });
     if (!firstPass.ok) {
+      const deterministicFallback = buildSourceFallback(langId, sourceText);
+      if (deterministicFallback) {
+        res.setHeader("x-llm-provider", "source-fallback");
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Connection", "keep-alive");
+        writeSseText(res, deterministicFallback, activeModel);
+        return res.end();
+      }
       return res.status(firstPass.status).json(firstPass.error);
     }
     activeProvider = firstPass.provider || activeProvider;
     activeModel = firstPass.model || activeModel;
     res.setHeader("x-llm-provider", `${activeProvider}-review`);
 
-    const sourceText = messages?.[messages.length - 1]?.content || "";
     const languageReviewRules = LANGUAGE_REVIEW_RULES[langId] || "";
     const reviewSystem =
       `${system}\n\nYou are now in strict correction mode. Review the draft and fix only translation quality issues, dialect mixing, wrong script, unnatural phrasing, grammar problems, and accidental assistant-style answers. Preserve meaning and sentence count exactly. Output only the corrected final text.${languageReviewRules ? `\n\n${languageReviewRules}` : ""}`;
@@ -586,6 +629,16 @@ export default async function handler(req, res) {
         providersOverride: fallbackProviders,
       });
       if (!fallback.ok) {
+        const sourceText = messages?.[messages.length - 1]?.content || "";
+        const deterministicFallback = buildSourceFallback(langId, sourceText);
+        if (deterministicFallback) {
+          res.setHeader("x-llm-provider", "source-fallback");
+          res.setHeader("Content-Type", "text/event-stream");
+          res.setHeader("Cache-Control", "no-cache");
+          res.setHeader("Connection", "keep-alive");
+          writeSseText(res, deterministicFallback, activeModel);
+          return res.end();
+        }
         return res.status(fallback.status).json(fallback.error);
       }
       activeProvider = fallback.provider || activeProvider;

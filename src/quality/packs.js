@@ -16,11 +16,13 @@ HARYANVI QUALITY PACK:
 BHOJPURI QUALITY PACK:
 - Prefer Eastern Hindi / Bhojpuri grammar, not plain Hindi.
 - High-value markers: रउरा, तोहार, हम, बा, बानी, जानेला, अबहीं, केहू.
+- For everyday speech, prefer real Bhojpuri verb endings like कइलऽ, बतइतीं, जइबऽ, करबऽ, गइल, बोलिहें.
 - Avoid Haryanvi/Rajasthani markers like सै, छे, कोनी.
 - Imperatives should sound Bhojpuri: बताईं, चलीं, करीं.`,
     checklist: `
 - Prefer Bhojpuri pronouns and verb endings.
 - Avoid standard Hindi 'तुम', 'है', 'नहीं' if a Bhojpuri form is natural.
+- Prefer spoken Bhojpuri endings like -ऽ / -बऽ / -लीं / -हऽ where natural.
 - Output should read like spoken Bhojpuri, not translated Hindi.`,
   },
   rajasthani: {
@@ -38,12 +40,13 @@ RAJASTHANI QUALITY PACK:
     system: `
 GUJARATI QUALITY PACK:
 - Prefer natural spoken Gujarati, not textbook literal translation.
-- High-value wording: અહીં, તમને, મળશે, હમણાં, સાચી વાત, કહેશો નહીં.
+- High-value wording: અહીં, હવે/હમણાં, ઘરે, બારણું, પાછો આવી જઈશ, તરત ફોન કરજો, કહી દીધું હોત.
 - Preserve Gujarati script only.
 - Reorder sentence if Hindi order sounds unnatural in Gujarati.`,
     checklist: `
 - Use idiomatic Gujarati word order.
 - Avoid leaving Devanagari/Hindi words unchanged.
+- Prefer spoken Gujarati like "હવે ઘરે જાઓ", "બારણું બંધ કરો", "હું રાહ જોઈ રહ્યો છું", "પાછો આવી જઈશ".
 - Prefer clean, natural spoken Gujarati over stiff formal Gujarati.`,
   },
 };
@@ -73,9 +76,13 @@ export const QUALITY_FEW_SHOTS = {
     { role: 'user', content: 'सच्चाई अभी मत बोलो, सही समय आने दो।' },
     { role: 'assistant', content: 'सच अबहीं मत बोलऽ, सही बखत आवे दऽ।' },
     { role: 'user', content: 'तुमने ऐसा क्यों किया? मुझे पहले बता देते।' },
-    { role: 'assistant', content: 'तू अइसन काहे कइलऽ? हमके पहिले बता देतऽ।' },
+    { role: 'assistant', content: 'तू अइसन काहे कइलऽ? हमके पहिले बता दिहलऽ होतऽ।' },
     { role: 'user', content: 'मैं अभी बाज़ार जा रहा हूँ, शाम तक वापस आ जाऊँगा।' },
     { role: 'assistant', content: 'हम अबहीं बाजार जात बानी, साँझ ले लौट आइब।' },
+    { role: 'user', content: 'जब तुम वहाँ पहुँच जाओ तो मुझे तुरंत फोन करना।' },
+    { role: 'assistant', content: 'जइसे तू उहां पहुँच जइबऽ, हमके तुरंते फोन करिहऽ।' },
+    { role: 'user', content: 'गाँव में आज पंचायत बैठेगी, सब लोग समय पर पहुँच जाना।' },
+    { role: 'assistant', content: 'गाँव में आज पंचायत बैठी, सभे जने टाइम पर पहुँच जइहऽ।' },
   ],
   rajasthani: [
     { role: 'user', content: 'तुम कब आओगे? मैं तुम्हारा इंतज़ार कर रहा हूँ।' },
@@ -93,7 +100,7 @@ export const QUALITY_FEW_SHOTS = {
   ],
   gujarati: [
     { role: 'user', content: 'तुम कब आओगे? मैं तुम्हारा इंतज़ार कर रहा हूँ।' },
-    { role: 'assistant', content: 'તમે ક્યારે આવશો? હું તમારું રાહ જોઈ રહ્યો છું.' },
+    { role: 'assistant', content: 'તમે ક્યારે આવશો? હું તમારી રાહ જોઈ રહ્યો છું.' },
     { role: 'user', content: 'यह बात किसी को मत बताना। अभी घर जाओ और दरवाज़ा बंद कर लो।' },
     { role: 'assistant', content: 'આ વાત કોઈને કહેશો નહીં. હમણાં ઘરે જાઓ અને બારણું બંધ કરી લો.' },
     { role: 'user', content: 'वो बहुत अच्छा आदमी है लेकिन उसकी बीवी को कोई नहीं जानता। वो कहाँ गया?' },
@@ -104,5 +111,9 @@ export const QUALITY_FEW_SHOTS = {
     { role: 'assistant', content: 'તમે આવું કેમ કર્યું? મને પહેલાં કહી દીધું હોત.' },
     { role: 'user', content: 'मैं अभी बाज़ार जा रहा हूँ, शाम तक वापस आ जाऊँगा।' },
     { role: 'assistant', content: 'હું હમણાં બજારમાં જઈ રહ્યો છું, સાંજ સુધી પાછો આવી જઈશ.' },
+    { role: 'user', content: 'जब तुम वहाँ पहुँच जाओ तो मुझे तुरंत फोन करना।' },
+    { role: 'assistant', content: 'તમે ત્યાં પહોંચી જાઓ ત્યારે મને તરત ફોન કરજો.' },
+    { role: 'user', content: 'गाँव में आज पंचायत बैठेगी, सब लोग समय पर पहुँच जाना।' },
+    { role: 'assistant', content: 'ગામમાં આજે પંચાયત બેસશે, બધા સમયસર પહોંચી જજો.' },
   ],
 };
