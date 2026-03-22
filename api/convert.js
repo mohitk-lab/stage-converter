@@ -51,6 +51,90 @@ function applyProviderOptions(provider, payload) {
   return payload;
 }
 
+function buildProviderConfig(provider, requestedModel, system, messages, stream = true) {
+  const url =
+    provider === "openrouter"
+      ? "https://openrouter.ai/api/v1/chat/completions"
+      : provider === "groq"
+        ? "https://api.groq.com/openai/v1/chat/completions"
+        : "https://api.openai.com/v1/chat/completions";
+
+  const authKey =
+    provider === "openrouter" ? OPENROUTER_KEY
+    : provider === "groq" ? GROQ_API_KEY
+    : OPENAI_API_KEY;
+
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${authKey}`,
+  };
+
+  if (provider === "openrouter") {
+    headers["HTTP-Referer"] = "https://stage-converter.vercel.app";
+    headers["X-Title"] = "Stage Converter";
+  }
+
+  const payload = applyProviderOptions(provider, {
+    model: resolveModel(provider, requestedModel),
+    max_tokens: 4096,
+    temperature: 0.2,
+    stream,
+    messages: system
+      ? [{ role: "system", content: system }, ...messages]
+      : messages,
+  });
+
+  return { provider, url, headers, payload };
+}
+
+function buildFallbackProviders(primaryProvider) {
+  const providers = [primaryProvider];
+
+  if (primaryProvider === "openrouter") {
+    if (GROQ_API_KEY) providers.push("groq");
+    if (LLM_PROVIDER !== "openrouter" && OPENAI_API_KEY) providers.push("openai");
+    return [...new Set(providers)];
+  }
+
+  if (primaryProvider === "groq") {
+    if (OPENROUTER_KEY) providers.push("openrouter");
+    if (OPENAI_API_KEY) providers.push("openai");
+    return [...new Set(providers)];
+  }
+
+  if (primaryProvider === "openai") {
+    if (GROQ_API_KEY) providers.push("groq");
+    if (OPENROUTER_KEY) providers.push("openrouter");
+    return [...new Set(providers)];
+  }
+
+  return providers;
+}
+
+function shouldTryNextProvider(provider, status, raw, parsed) {
+  const errorText = (parsed?.error?.message || parsed?.error || raw || "").toString().toLowerCase();
+
+  if (provider === "openrouter") {
+    return (
+      status === 402 ||
+      status === 408 ||
+      status === 409 ||
+      status === 429 ||
+      status >= 500 ||
+      errorText.includes("temporarily rate-limited") ||
+      errorText.includes("provider returned error") ||
+      errorText.includes("insufficient credits") ||
+      errorText.includes("model") && errorText.includes("does not exist")
+    );
+  }
+
+  if (provider === "groq") {
+    return status === 429 || status >= 500 || errorText.includes("rate limit");
+  }
+
+  return false;
+}
+
 async function readJsonOrText(response) {
   const raw = await response.text();
   try {
@@ -75,6 +159,26 @@ async function completeOnce({ url, headers, payload }) {
   const data = await response.json();
   const content = data?.choices?.[0]?.message?.content || "";
   return { ok: true, content };
+}
+
+async function completeWithFallback({ primaryProvider, requestedModel, system, messages, providersOverride = null }) {
+  const providers = providersOverride || buildFallbackProviders(primaryProvider);
+  let lastError = null;
+
+  for (const provider of providers) {
+    const cfg = buildProviderConfig(provider, requestedModel, system, messages, false);
+    const result = await completeOnce(cfg);
+    if (result.ok) return { ...result, provider, model: cfg.payload.model };
+
+    const raw = result.error?.error?.message || JSON.stringify(result.error);
+    const parsed = result.error;
+    if (!shouldTryNextProvider(provider, result.status, raw, parsed)) {
+      return result;
+    }
+    lastError = result;
+  }
+
+  return lastError || { ok: false, status: 500, error: { error: { message: "All providers failed" } } };
 }
 
 function writeSseText(res, text, model) {
@@ -120,130 +224,90 @@ export default async function handler(req, res) {
 
   const { system, messages, model } = req.body;
   if (!messages) return res.status(400).json({ error: "messages required" });
-
-  const url =
-    provider === "openrouter"
-      ? "https://openrouter.ai/api/v1/chat/completions"
-      : provider === "groq"
-        ? "https://api.groq.com/openai/v1/chat/completions"
-      : "https://api.openai.com/v1/chat/completions";
-  const authKey =
-    provider === "openrouter" ? OPENROUTER_KEY
-    : provider === "groq" ? GROQ_API_KEY
-    : OPENAI_API_KEY;
-
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${authKey}`,
-  };
-
-  if (provider === "openrouter") {
-    headers["HTTP-Referer"] = "https://stage-converter.vercel.app";
-    headers["X-Title"] = "Stage Converter";
-  }
-
-  const payload = applyProviderOptions(provider, {
-    model: resolveModel(provider, model),
-    max_tokens: 4096,
-    temperature: 0.2,
-    stream: true,
-    messages: system
-      ? [{ role: "system", content: system }, ...messages]
-      : messages,
-  });
+  const cfg = buildProviderConfig(provider, model, system, messages, true);
+  let activeProvider = cfg.provider;
+  let activeModel = cfg.payload.model;
 
   const translationReviewMode =
     typeof system === "string" &&
     (system.includes("CRITICAL OUTPUT RULES") || system.includes("FINAL CHECKLIST"));
 
   if (translationReviewMode) {
-    const firstPass = await completeOnce({ url, headers, payload });
+    const firstPass = await completeWithFallback({
+      primaryProvider: provider,
+      requestedModel: model,
+      system,
+      messages,
+    });
     if (!firstPass.ok) {
       return res.status(firstPass.status).json(firstPass.error);
     }
+    activeProvider = firstPass.provider || activeProvider;
+    activeModel = firstPass.model || activeModel;
+    res.setHeader("x-llm-provider", `${activeProvider}-review`);
 
     const sourceText = messages?.[messages.length - 1]?.content || "";
-    const reviewPayload = applyProviderOptions(provider, {
-      model: payload.model,
-      max_tokens: 4096,
-      temperature: 0.1,
-      messages: [
-        {
-          role: "system",
-          content:
-            `${system}\n\nYou are now in strict correction mode. Review the draft and fix only translation quality issues, dialect mixing, wrong script, unnatural phrasing, grammar problems, and accidental assistant-style answers. Preserve meaning and sentence count exactly. Output only the corrected final text.`,
-        },
-        {
-          role: "user",
-          content: `SOURCE:\n${sourceText}\n\nDRAFT:\n${firstPass.content}`,
-        },
-      ],
-    });
+    const reviewSystem =
+      `${system}\n\nYou are now in strict correction mode. Review the draft and fix only translation quality issues, dialect mixing, wrong script, unnatural phrasing, grammar problems, and accidental assistant-style answers. Preserve meaning and sentence count exactly. Output only the corrected final text.`;
+    const reviewMessages = [
+      {
+        role: "user",
+        content: `SOURCE:\n${sourceText}\n\nDRAFT:\n${firstPass.content}`,
+      },
+    ];
 
-    const secondPass = await completeOnce({ url, headers, payload: reviewPayload });
+    const secondPass = await completeWithFallback({
+      primaryProvider: activeProvider,
+      requestedModel: activeModel,
+      system: reviewSystem,
+      messages: reviewMessages,
+    });
     if (!secondPass.ok) {
       return res.status(secondPass.status).json(secondPass.error);
     }
+    activeProvider = secondPass.provider || activeProvider;
+    activeModel = secondPass.model || activeModel;
+    res.setHeader("x-llm-provider", `${activeProvider}-review`);
 
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
-    writeSseText(res, secondPass.content.trim(), payload.model);
+    writeSseText(res, secondPass.content.trim(), activeModel);
     return res.end();
   }
 
-  let orRes = await fetch(url, {
+  let orRes = await fetch(cfg.url, {
     method: "POST",
-    headers,
-    body: JSON.stringify(payload),
+    headers: cfg.headers,
+    body: JSON.stringify(cfg.payload),
   });
 
   if (!orRes.ok) {
-    const raw = await orRes.text();
-    let parsed = null;
-    try {
-      parsed = JSON.parse(raw);
-    } catch {}
-
-    const errorText = (parsed?.error?.message || parsed?.error || raw || "").toString().toLowerCase();
-    const shouldFallbackToOpenAI =
-      provider === "openrouter" &&
-      LLM_PROVIDER !== "openrouter" &&
-      OPENAI_API_KEY &&
-      (errorText.includes("insufficient credits") || errorText.includes("quota"));
-
-    if (shouldFallbackToOpenAI) {
-      const openAiHeaders = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-      };
-
-      orRes = await fetch("https://api.openai.com/v1/chat/completions", {
-        method: "POST",
-        headers: openAiHeaders,
-        body: JSON.stringify({
-          ...payload,
-          model: resolveModel("openai", model),
-        }),
+    const { raw, parsed } = await readJsonOrText(orRes);
+    if (shouldTryNextProvider(provider, orRes.status, raw, parsed)) {
+      const fallbackProviders = buildFallbackProviders(provider).filter((p) => p !== provider);
+      const fallback = await completeWithFallback({
+        primaryProvider: fallbackProviders[0] || provider,
+        requestedModel: model,
+        system,
+        messages,
+        providersOverride: fallbackProviders,
       });
-
-      if (orRes.ok) {
-        res.setHeader("x-llm-provider", "openai-fallback");
-      } else {
-        const openAiRaw = await orRes.text();
-        let openAiParsed = null;
-        try {
-          openAiParsed = JSON.parse(openAiRaw);
-        } catch {}
-        return res.status(orRes.status).json(
-          openAiParsed || { error: { message: openAiRaw || "LLM request failed" } }
-        );
+      if (!fallback.ok) {
+        return res.status(fallback.status).json(fallback.error);
       }
-    } else {
-      return res.status(orRes.status).json(
-        parsed || { error: { message: raw || "LLM request failed" } }
-      );
+      activeProvider = fallback.provider || activeProvider;
+      activeModel = fallback.model || activeModel;
+      res.setHeader("x-llm-provider", `${activeProvider}-fallback`);
+      res.setHeader("Content-Type", "text/event-stream");
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Connection", "keep-alive");
+      writeSseText(res, fallback.content.trim(), activeModel);
+      return res.end();
     }
+    return res.status(orRes.status).json(
+      parsed || { error: { message: raw || "LLM request failed" } }
+    );
   }
 
   res.setHeader("Content-Type", "text/event-stream");
