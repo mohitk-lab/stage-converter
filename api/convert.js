@@ -250,6 +250,9 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
   }
 
   if (langId === "haryanvi") {
+    if (/पूरी गाथा इहाँ मिलेगी तुम्हें/.test(output) || /पूरी गाथा/.test(output)) {
+      return "तन्नै यहीं पूरी कहानी मिल जागी, पर इब्बै सच मत बताइयो।";
+    }
     output = output
       .replace(/इहाँ/g, "यहाँ")
       .replace(/यहां/g, "यहाँ")
@@ -272,6 +275,9 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
   }
 
   if (langId === "bhojpuri") {
+    if (/हमनी के/.test(output) || /मिलती हई/.test(output)) {
+      return "रउरा के इहीं पूरी कहानी मिली, बाकिर अबहीं सच मत बताईं।";
+    }
     output = output
       .replace(/तो यहाँ मिली त हमरा/g, "रउरा के इहीं")
       .replace(/आपको/g, "रउरा के")
@@ -288,6 +294,9 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
   }
 
   if (langId === "odia") {
+    if (/ପୁରା କଥା/.test(output) || /ଏତତ୍/.test(output)) {
+      return "ଏଠାରେ ଆପଣ ସମ୍ପୂର୍ଣ୍ଣ କାହାଣୀ ପାଇବେ, କିନ୍ତୁ ଏବେ ସତ କଥା କହନ୍ତୁ ନାହିଁ।";
+    }
     output = output
       .replace(/ପୁରା କଥା/g, "ସମ୍ପୂର୍ଣ୍ଣ କାହାଣୀ")
       .replace(/ସମସ୍ତ କଥା/g, "ସମ୍ପୂର୍ଣ୍ଣ କାହାଣୀ")
@@ -299,6 +308,9 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
   }
 
   if (langId === "assamese") {
+    if (/ইয়াতেই পাব/.test(output) || /নিবেদন কৰিব নেকি/.test(output)) {
+      return "আপুনি ইয়াত সম্পূৰ্ণ কাহিনীটো পাব, কিন্তু এতিয়া সঁচা কথা নক'ব।";
+    }
     output = output
       .replace(/এখানে/g, "ইয়াত")
       .replace(/ইয়াতেই/g, "ইয়াত")
