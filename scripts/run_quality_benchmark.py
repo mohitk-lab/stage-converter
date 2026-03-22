@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
+import argparse
 import json
 import re
 import sys
 import urllib.request
+from collections import Counter, defaultdict
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -80,8 +82,75 @@ def score_output(lang_id: str, output: str):
     return issues
 
 
+def build_summary(report):
+    totals = Counter(item["status"] for item in report)
+    by_lang = defaultdict(lambda: Counter())
+    issue_counter = Counter()
+    weak_examples = defaultdict(list)
+
+    for item in report:
+        lang_id = item["langId"]
+        by_lang[lang_id][item["status"]] += 1
+        for issue in item.get("issues", []):
+            issue_counter[(lang_id, issue)] += 1
+        if item["status"] != "ok":
+            weak_examples[lang_id].append(item)
+
+    return {
+        "totals": dict(totals),
+        "by_lang": {lang: dict(counts) for lang, counts in by_lang.items()},
+        "top_issues": [
+            {"langId": lang, "issue": issue, "count": count}
+            for (lang, issue), count in issue_counter.most_common(20)
+        ],
+        "weak_examples": {
+            lang: items[:3]
+            for lang, items in weak_examples.items()
+        },
+    }
+
+
+def render_markdown_summary(summary):
+    lines = ["# Translation Quality Benchmark Summary", ""]
+    lines.append("## Totals")
+    lines.append("")
+    for status, count in summary["totals"].items():
+        lines.append(f"- `{status}`: {count}")
+    lines.append("")
+    lines.append("## By Language")
+    lines.append("")
+    for lang, counts in sorted(summary["by_lang"].items()):
+        stats = ", ".join(f"{k}={v}" for k, v in sorted(counts.items()))
+        lines.append(f"- `{lang}`: {stats}")
+    lines.append("")
+    lines.append("## Top Issues")
+    lines.append("")
+    for item in summary["top_issues"]:
+        lines.append(f"- `{item['langId']}`: `{item['issue']}` x {item['count']}")
+    lines.append("")
+    lines.append("## Weak Examples")
+    lines.append("")
+    for lang, items in sorted(summary["weak_examples"].items()):
+        lines.append(f"### {lang}")
+        for item in items:
+            lines.append(f"- case `{item['case_id']}`")
+            lines.append(f"  - source: {item.get('source', '')}")
+            lines.append(f"  - output: {item.get('output', item.get('error', ''))}")
+            issues = item.get("issues") or []
+            if issues:
+                lines.append(f"  - issues: {', '.join(issues)}")
+        lines.append("")
+    return "\n".join(lines).strip() + "\n"
+
+
 def main():
-    api_url = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_API_URL
+    parser = argparse.ArgumentParser()
+    parser.add_argument("api_url", nargs="?", default=DEFAULT_API_URL)
+    parser.add_argument("--json-out", dest="json_out")
+    parser.add_argument("--md-out", dest="md_out")
+    args = parser.parse_args()
+
+    api_url = args.api_url
     cases = json.loads(CASES_PATH.read_text())
     report = []
     for case in cases:
@@ -105,7 +174,17 @@ def main():
                     'status': 'error',
                     'error': str(exc),
                 })
-    print(json.dumps(report, ensure_ascii=False, indent=2))
+    summary = build_summary(report)
+    payload = {
+        "results": report,
+        "summary": summary,
+    }
+    rendered = json.dumps(payload, ensure_ascii=False, indent=2)
+    print(rendered)
+    if args.json_out:
+        Path(args.json_out).write_text(rendered)
+    if args.md_out:
+        Path(args.md_out).write_text(render_markdown_summary(summary))
 
 
 if __name__ == '__main__':

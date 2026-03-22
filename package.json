@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "benchmark:quality": "python3 scripts/run_quality_benchmark.py"
+    "benchmark:quality": "python3 scripts/run_quality_benchmark.py",
+    "benchmark:quality:report": "python3 scripts/run_quality_benchmark.py --json-out benchmark.latest.json --md-out benchmark.latest.md"
   },
   "dependencies": {
     "@ffmpeg/core": "^0.12.10",

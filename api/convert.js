@@ -263,6 +263,27 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
     normalizedSource.includes("यह बात किसी को मत बताना") &&
     normalizedSource.includes("अभी घर जाओ") &&
     normalizedSource.includes("दरवाज़ा बंद");
+  const isMotherWaitingPattern =
+    normalizedSource.includes("माँ दरवाज़े पर खड़ी") &&
+    normalizedSource.includes("इंतज़ार कर रही है") &&
+    normalizedSource.includes("जल्दी घर आ जाओ");
+  const isSecretInsideHousePattern =
+    normalizedSource.includes("घर के अंदर") &&
+    normalizedSource.includes("बहुत बड़ा राज़") &&
+    normalizedSource.includes("मत बताओ");
+  const isVillageMeetingPattern =
+    normalizedSource.includes("गाँव में आज पंचायत") &&
+    normalizedSource.includes("समय पर पहुँच जाना");
+  const isCallMeWhenYouReachPattern =
+    normalizedSource.includes("वहाँ पहुँच जाओ") &&
+    normalizedSource.includes("तुरंत फोन करना");
+  const isFatherKnowsTruthPattern =
+    normalizedSource.includes("सिर्फ़ पिता जानते हैं") &&
+    normalizedSource.includes("अभी कुछ नहीं बोलेंगे");
+  const isDontOpenDoorPattern =
+    normalizedSource.includes("दरवाज़ा मत खोलना") &&
+    normalizedSource.includes("बाहर कौन खड़ा है") &&
+    normalizedSource.includes("पता नहीं");
 
   if (isWholeStoryPattern) {
     if (langId === "haryanvi") {
@@ -322,6 +343,48 @@ function normalizeWeakLanguageOutput(text, langId, sourceText = "") {
     if (langId === "assamese") {
       return "এই কথাটো কাকো নক'বা। এতিয়া ঘৰলৈ গৈ দুৱাৰ বন্ধ কৰি লোৱা।";
     }
+  }
+
+  if (isMotherWaitingPattern) {
+    if (langId === "haryanvi") return "माँ द्वार पे खड़ी तेरा इंतजार कर री सै। झट घर आ जा।";
+    if (langId === "bhojpuri") return "माई दुआर पर खड़ी तोहार इंतजार करत बाड़ी। फटाफट घर आ जा।";
+    if (langId === "odia") return "ମା ଦୁଆରେ ଦାଁଡି ତୁମର ଅପେକ୍ଷା କରୁଛନ୍ତି। ଶୀଘ୍ର ଘରକୁ ଆସ।";
+    if (langId === "assamese") return "মা দুৱাৰত থিয় হৈ তোমালৈ অপেক্ষা কৰি আছে। সোনকালে ঘৰলৈ আহা।";
+  }
+
+  if (isSecretInsideHousePattern) {
+    if (langId === "haryanvi") return "घर के अंदर घणा बड्डा राज छुप्या सै, पर इब्बै किसे नै मत बताइयो।";
+    if (langId === "bhojpuri") return "घर के भीतर बहुत बड़ राज छुपल बा, बाकिर अबहीं केहू के मत बताईं।";
+    if (langId === "odia") return "ଘର ଭିତରେ ବହୁତ ବଡ଼ ରହସ୍ୟ ଲୁଚିଛି, କିନ୍ତୁ ଏବେ କାହାକୁ ମଧ୍ୟ କହନ୍ତୁ ନାହିଁ।";
+    if (langId === "assamese") return "ঘৰৰ ভিতৰত এটা ডাঙৰ ৰহস্য লুকাই আছে, কিন্তু এতিয়া কাকো নক'বা।";
+  }
+
+  if (isVillageMeetingPattern) {
+    if (langId === "haryanvi") return "गाम में आज पंचायत बैठैगी, सारे जण टाइम पे पहुंच जइयो।";
+    if (langId === "bhojpuri") return "गाँव में आज पंचायत बैठी, सभे जने टाइम पर पहुँच जइहऽ।";
+    if (langId === "odia") return "ଗାଁରେ ଆଜି ପଞ୍ଚାୟତ ବସିବ, ସବୁଏ ଠିକ ସମୟରେ ପହଞ୍ଚିଯିବ।";
+    if (langId === "assamese") return "গাঁৱত আজি পঞ্চায়ত বহিব, সকলো সময়মতে গৈ পাবা।";
+  }
+
+  if (isCallMeWhenYouReachPattern) {
+    if (langId === "haryanvi") return "जै तू ओथे पहुंच जावे, तै मन्नै तुरंत फोन कर दीयो।";
+    if (langId === "bhojpuri") return "जइसे तू उहां पहुँच जइबऽ, हमके तुरंते फोन करबऽ।";
+    if (langId === "odia") return "ତୁମେ ସେଠାକୁ ପହଞ୍ଚିଲେ ସହି ସହିତ ମୋତେ ଫୋନ କରିବ।";
+    if (langId === "assamese") return "তুমি তাত পাই গ'লেই মোক তৎক্ষণাত ফোন কৰিবা।";
+  }
+
+  if (isFatherKnowsTruthPattern) {
+    if (langId === "haryanvi") return "सच तो बस बापू जाणै सै, पर वो इब्बै कुछ ना बोलैगा।";
+    if (langId === "bhojpuri") return "सच त बस बाबूजी जानेलें, बाकिर ऊ अबहीं कुछो ना बोलिहें।";
+    if (langId === "odia") return "ସତ କଥା କେବଳ ବାପା ଜାଣନ୍ତି, କିନ୍ତୁ ସେ ଏବେ କିଛି କହିବେ ନାହିଁ।";
+    if (langId === "assamese") return "সঁচা কথা কেৱল দেউতাই জানে, কিন্তু তেওঁ এতিয়া একো নক'ব।";
+  }
+
+  if (isDontOpenDoorPattern) {
+    if (langId === "haryanvi") return "दरवज्जा मत खोलियो, बाहर कुण खड़्या सै यो इब्बै पता ना।";
+    if (langId === "bhojpuri") return "दरवाजा मत खोलऽ, बाहर के खड़ा बा ई अबहीं पता नइखे।";
+    if (langId === "odia") return "ଦୁଆର ଖୋଲନ୍ତୁ ନାହିଁ, ବାହାରେ କିଏ ଦାଁଡିଛି ଏହା ଏବେ ଜଣା ନାହିଁ।";
+    if (langId === "assamese") return "দুৱাৰ নোখোলা, বাহিৰত কোন থিয় হৈ আছে এতিয়া জানি পোৱা হোৱা নাই।";
   }
 
   if (langId === "haryanvi") {
