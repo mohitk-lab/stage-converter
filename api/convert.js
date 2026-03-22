@@ -209,7 +209,7 @@ async function sleep(ms) {
 
 function buildSourceFallback(langId, sourceText) {
   if (!sourceText) return "";
-  const normalized = normalizeWeakLanguageOutput(" ", langId, sourceText);
+  const normalized = normalizeWeakLanguageOutput(sourceText, langId, sourceText);
   return normalized && normalized !== sourceText ? normalized : "";
 }
 
