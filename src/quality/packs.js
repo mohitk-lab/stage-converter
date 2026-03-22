@@ -1,0 +1,108 @@
+export const QUALITY_PROMPT_PACKS = {
+  haryanvi: {
+    system: `
+HARYANVI QUALITY PACK:
+- Prefer real Haryanvi village speech, not plain Hindi.
+- High-value markers: सै, सूं, सैं, इब्बै, तन्नै, किसे नै, कड़ै, रया.
+- Avoid Punjabi/Bhojpuri contamination.
+- Imperatives should sound local: बताइयो, कर ल्यो, जा.`,
+    checklist: `
+- Prefer Haryanvi wording like तन्नै / इब्बै / कड़ै / रया where natural.
+- Avoid Punjabi-style forms like नूं / जाणदा.
+- Avoid plain-Hindi wording when a natural Haryanvi option exists.`,
+  },
+  bhojpuri: {
+    system: `
+BHOJPURI QUALITY PACK:
+- Prefer Eastern Hindi / Bhojpuri grammar, not plain Hindi.
+- High-value markers: रउरा, तोहार, हम, बा, बानी, जानेला, अबहीं, केहू.
+- Avoid Haryanvi/Rajasthani markers like सै, छे, कोनी.
+- Imperatives should sound Bhojpuri: बताईं, चलीं, करीं.`,
+    checklist: `
+- Prefer Bhojpuri pronouns and verb endings.
+- Avoid standard Hindi 'तुम', 'है', 'नहीं' if a Bhojpuri form is natural.
+- Output should read like spoken Bhojpuri, not translated Hindi.`,
+  },
+  rajasthani: {
+    system: `
+RAJASTHANI QUALITY PACK:
+- Prefer natural Rajasthani markers: छे, छूं, म्हारो, थारै, कठै, कोनी.
+- Avoid Haryanvi markers like सै, सूं, इब्बै.
+- Imperatives should sound Rajasthani: बतायजो, बोलियो, जासी, कर ल्यो.`,
+    checklist: `
+- Prefer local Rajasthani forms over neutral Hindi.
+- Avoid Haryanvi/Bhojpuri bleed.
+- Keep sentence flow natural and regional, not textbook Hindi.`,
+  },
+  gujarati: {
+    system: `
+GUJARATI QUALITY PACK:
+- Prefer natural spoken Gujarati, not textbook literal translation.
+- High-value wording: અહીં, તમને, મળશે, હમણાં, સાચી વાત, કહેશો નહીં.
+- Preserve Gujarati script only.
+- Reorder sentence if Hindi order sounds unnatural in Gujarati.`,
+    checklist: `
+- Use idiomatic Gujarati word order.
+- Avoid leaving Devanagari/Hindi words unchanged.
+- Prefer clean, natural spoken Gujarati over stiff formal Gujarati.`,
+  },
+};
+
+export const QUALITY_FEW_SHOTS = {
+  haryanvi: [
+    { role: 'user', content: 'तुम कब आओगे? मैं तुम्हारा इंतज़ार कर रहा हूँ।' },
+    { role: 'assistant', content: 'तू कद आवेगा? मैं तेरा इंतजार कर रया सूं।' },
+    { role: 'user', content: 'यह बात किसी को मत बताना। अभी घर जाओ और दरवाज़ा बंद कर लो।' },
+    { role: 'assistant', content: 'ये बात किसे नै मत बताइयो। इब्बै घर जा अर दरवज्जा बंद कर ल्यो।' },
+    { role: 'user', content: 'वो बहुत अच्छा आदमी है लेकिन उसकी बीवी को कोई नहीं जानता। वो कहाँ गया?' },
+    { role: 'assistant', content: 'वो घणा बढ़िया आदमी सै, पर उस्की लुगाई नै कोई ना जाणै। वो कड़ै गया?' },
+    { role: 'user', content: 'सच्चाई अभी मत बोलो, सही समय आने दो।' },
+    { role: 'assistant', content: 'सचाई इब्बै मत बोलो, सही टेम आवण दो।' },
+    { role: 'user', content: 'तुमने ऐसा क्यों किया? मुझे पहले बता देते।' },
+    { role: 'assistant', content: 'तन्नै ऐस्सा क्यूं कर्या? म्हानै पहले बता देता।' },
+    { role: 'user', content: 'मैं अभी बाज़ार जा रहा हूँ, शाम तक वापस आ जाऊँगा।' },
+    { role: 'assistant', content: 'मैं इब्बै बाजार जा रया सूं, सांझ तक वापस आ जाऊंगा।' },
+  ],
+  bhojpuri: [
+    { role: 'user', content: 'तुम कब आओगे? मैं तुम्हारा इंतज़ार कर रहा हूँ।' },
+    { role: 'assistant', content: 'तू कब अइबा? हम तोहार इंतजार करत बानी।' },
+    { role: 'user', content: 'यह बात किसी को मत बताना। अभी घर जाओ और दरवाज़ा बंद कर लो।' },
+    { role: 'assistant', content: 'ई बात केहू के मत बताईं। अबहीं घर जा के दरवाजा बंद कर लीं।' },
+    { role: 'user', content: 'वो बहुत अच्छा आदमी है लेकिन उसकी बीवी को कोई नहीं जानता। वो कहाँ गया?' },
+    { role: 'assistant', content: 'ऊ बहुत नीमन आदमी बा, बाकिर ओकर मेहरारू के केहू ना जानेला। ऊ कहाँ गइल?' },
+    { role: 'user', content: 'सच्चाई अभी मत बोलो, सही समय आने दो।' },
+    { role: 'assistant', content: 'सच अबहीं मत बोलऽ, सही बखत आवे दऽ।' },
+    { role: 'user', content: 'तुमने ऐसा क्यों किया? मुझे पहले बता देते।' },
+    { role: 'assistant', content: 'तू अइसन काहे कइलऽ? हमके पहिले बता देतऽ।' },
+    { role: 'user', content: 'मैं अभी बाज़ार जा रहा हूँ, शाम तक वापस आ जाऊँगा।' },
+    { role: 'assistant', content: 'हम अबहीं बाजार जात बानी, साँझ ले लौट आइब।' },
+  ],
+  rajasthani: [
+    { role: 'user', content: 'तुम कब आओगे? मैं तुम्हारा इंतज़ार कर रहा हूँ।' },
+    { role: 'assistant', content: 'तूं कद आवेलो? म्हैं थारो इंतजार करतो छूं।' },
+    { role: 'user', content: 'यह बात किसी को मत बताना। अभी घर जाओ और दरवाज़ा बंद कर लो।' },
+    { role: 'assistant', content: 'आ बात काकै नै मत बतायजो। अबार घर जाओ अर द्वार बंद कर ल्यो।' },
+    { role: 'user', content: 'वो बहुत अच्छा आदमी है लेकिन उसकी बीवी को कोई नहीं जानता। वो कहाँ गया?' },
+    { role: 'assistant', content: 'वो घणो सारो मिनख छे, पण उणरी लुगाई नै कोनी जाणे। वो कठै गयो?' },
+    { role: 'user', content: 'सच्चाई अभी मत बोलो, सही समय आने दो।' },
+    { role: 'assistant', content: 'साँच अबार मत बोलियो, ठीक टाइम आवण दो।' },
+    { role: 'user', content: 'तुमने ऐसा क्यों किया? मुझे पहले बता देते।' },
+    { role: 'assistant', content: 'थैं ऐसो क्यूं कियो? म्हानै पहलां बताय देतो।' },
+    { role: 'user', content: 'मैं अभी बाज़ार जा रहा हूँ, शाम तक वापस आ जाऊँगा।' },
+    { role: 'assistant', content: 'म्हैं अबार बाजार जावां छूं, सांझ ताईं वापस आ जासूं।' },
+  ],
+  gujarati: [
+    { role: 'user', content: 'तुम कब आओगे? मैं तुम्हारा इंतज़ार कर रहा हूँ।' },
+    { role: 'assistant', content: 'તમે ક્યારે આવશો? હું તમારું રાહ જોઈ રહ્યો છું.' },
+    { role: 'user', content: 'यह बात किसी को मत बताना। अभी घर जाओ और दरवाज़ा बंद कर लो।' },
+    { role: 'assistant', content: 'આ વાત કોઈને કહેશો નહીં. હમણાં ઘરે જાઓ અને બારણું બંધ કરી લો.' },
+    { role: 'user', content: 'वो बहुत अच्छा आदमी है लेकिन उसकी बीवी को कोई नहीं जानता। वो कहाँ गया?' },
+    { role: 'assistant', content: 'એ બહુ સારો માણસ છે, પણ એની પત્નીને કોઈ ઓળખતું નથી. એ ક્યાં ગયો?' },
+    { role: 'user', content: 'सच्चाई अभी मत बोलो, सही समय आने दो।' },
+    { role: 'assistant', content: 'હમણાં સાચી વાત ન કહો, યોગ્ય સમય આવવા દો.' },
+    { role: 'user', content: 'तुमने ऐसा क्यों किया? मुझे पहले बता देते।' },
+    { role: 'assistant', content: 'તમે આવું કેમ કર્યું? મને પહેલાં કહી દીધું હોત.' },
+    { role: 'user', content: 'मैं अभी बाज़ार जा रहा हूँ, शाम तक वापस आ जाऊँगा।' },
+    { role: 'assistant', content: 'હું હમણાં બજારમાં જઈ રહ્યો છું, સાંજ સુધી પાછો આવી જઈશ.' },
+  ],
+};

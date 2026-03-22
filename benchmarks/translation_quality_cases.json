@@ -1,0 +1,74 @@
+[
+  {
+    "id": "story_warning",
+    "source": "पूरी कहानी यहाँ मिलेगी आपको, लेकिन अभी सच मत बताइए।",
+    "langs": ["haryanvi", "bhojpuri", "rajasthani", "gujarati"],
+    "notes": "Warning + truth-holdback sentence"
+  },
+  {
+    "id": "unknown_wife",
+    "source": "वो बहुत अच्छा आदमी है लेकिन उसकी बीवी को कोई नहीं जानता। वो कहाँ गया?",
+    "langs": ["haryanvi", "bhojpuri", "rajasthani", "gujarati"],
+    "notes": "Two-sentence mystery"
+  },
+  {
+    "id": "waiting",
+    "source": "तुम कब आओगे? मैं तुम्हारा इंतज़ार कर रहा हूँ।",
+    "langs": ["haryanvi", "bhojpuri", "rajasthani", "gujarati"],
+    "notes": "Question + waiting statement"
+  },
+  {
+    "id": "dont_tell_go_home",
+    "source": "यह बात किसी को मत बताना। अभी घर जाओ और दरवाज़ा बंद कर लो।",
+    "langs": ["haryanvi", "bhojpuri", "rajasthani", "gujarati"],
+    "notes": "Imperative / warning"
+  },
+  {
+    "id": "market_return",
+    "source": "मैं अभी बाज़ार जा रहा हूँ, शाम तक वापस आ जाऊँगा।",
+    "langs": ["haryanvi", "bhojpuri", "rajasthani", "gujarati"],
+    "notes": "Everyday future statement"
+  },
+  {
+    "id": "why_did_you_do_this",
+    "source": "तुमने ऐसा क्यों किया? मुझे पहले बता देते।",
+    "langs": ["haryanvi", "bhojpuri", "rajasthani", "gujarati"],
+    "notes": "Complaint / emotional question"
+  },
+  {
+    "id": "mother_waiting",
+    "source": "माँ दरवाज़े पर खड़ी तुम्हारा इंतज़ार कर रही है। जल्दी घर आ जाओ।",
+    "langs": ["haryanvi", "bhojpuri", "rajasthani", "gujarati"],
+    "notes": "Family + imperative"
+  },
+  {
+    "id": "secret_inside_house",
+    "source": "घर के अंदर बहुत बड़ा राज़ छिपा है, पर अभी किसी को मत बताओ।",
+    "langs": ["haryanvi", "bhojpuri", "rajasthani", "gujarati"],
+    "notes": "Drama / hidden secret"
+  },
+  {
+    "id": "village_meeting",
+    "source": "गाँव में आज पंचायत बैठेगी, सब लोग समय पर पहुँच जाना।",
+    "langs": ["haryanvi", "bhojpuri", "rajasthani", "gujarati"],
+    "notes": "Village public announcement"
+  },
+  {
+    "id": "call_me_when_you_reach",
+    "source": "जब तुम वहाँ पहुँच जाओ तो मुझे तुरंत फोन करना।",
+    "langs": ["haryanvi", "bhojpuri", "rajasthani", "gujarati"],
+    "notes": "Instruction / action"
+  },
+  {
+    "id": "father_knows_truth",
+    "source": "सच तो सिर्फ़ पिता जानते हैं, लेकिन वो अभी कुछ नहीं बोलेंगे।",
+    "langs": ["haryanvi", "bhojpuri", "rajasthani", "gujarati"],
+    "notes": "Family drama / withheld truth"
+  },
+  {
+    "id": "dont_open_door",
+    "source": "दरवाज़ा मत खोलना, बाहर कौन खड़ा है ये अभी पता नहीं।",
+    "langs": ["haryanvi", "bhojpuri", "rajasthani", "gujarati"],
+    "notes": "Threat / suspense"
+  }
+]

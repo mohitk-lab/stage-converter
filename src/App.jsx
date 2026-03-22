@@ -6,6 +6,7 @@ import Notifications from "./Notifications.jsx";
 import CommandPalette from "./CommandPalette.jsx";
 import GlossaryManager from "./GlossaryManager.jsx";
 import { playClick, playSuccess, playPop, playError } from "./sounds.js";
+import { QUALITY_FEW_SHOTS, QUALITY_PROMPT_PACKS } from "./quality/packs.js";
 
 const CONVERT_API_URL = import.meta.env.VITE_CONVERT_API_URL || "/api/convert";
 const GLOSSARY_STORAGE_KEY = "ruhi_glossary";
@@ -806,6 +807,10 @@ const FEW_SHOT_EXAMPLES = {
   ],
 };
 
+for (const [langId, examples] of Object.entries(QUALITY_FEW_SHOTS)) {
+  FEW_SHOT_EXAMPLES[langId] = [...(FEW_SHOT_EXAMPLES[langId] || []), ...examples];
+}
+
 /* --- Contrastive reference for confusable dialects --- */
 const CONTRASTIVE_TABLE = `
 === CRITICAL: Same sentences in each dialect \u2014 study the differences ===
@@ -1178,6 +1183,7 @@ HOSPITALITY: મેહમાન નવાજી, "જમવા ચાલો" (co
 
 /* --- System prompt builder --- */
 const buildSingleConverterSystem = (id, selectedTone, culturalAdapt = false) => {
+  const qualityPack = QUALITY_PROMPT_PACKS[id] || {};
   const checklistMap = {
     haryanvi: `
 HARYANVI FINAL CHECKLIST:
@@ -1294,7 +1300,7 @@ URDU FINAL CHECKLIST:
 - Preserve politeness and imperative tone.
 SELF-CHECK: if the wording sounds mechanically translated, rewrite.`,
   };
-  const checklist = checklistMap[id] || "";
+  const checklist = (checklistMap[id] || "") + (qualityPack.checklist ? `\n${qualityPack.checklist}` : "");
 
   const needsContrastive = ["bhojpuri", "haryanvi", "rajasthani"].includes(id);
   const contrastiveDialects = {
@@ -1327,6 +1333,7 @@ STEP 3 \u2014 REWRITE in ${id === "hindi" ? "standard Hindi" : id === "english" 
 - Output ONLY the converted text. No explanation, no labels, nothing else.
 - ${id === "english" ? "Write only in English Latin script." : "Write only in the target language/script. Do not leave Hindi source words unchanged unless they are proper nouns."}
 ${culturalAdapt && CULTURAL_RULES[id] ? "\n" + CULTURAL_RULES[id] + "\n" : ""}
+${qualityPack.system ? "\n" + qualityPack.system + "\n" : ""}
 ${needsContrastive ? "\n" + CONTRASTIVE_TABLE : ""}
 ${DIALECT_RULES[id]}
 ${checklist}
